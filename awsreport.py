@@ -16,8 +16,8 @@ import sys, getopt
 import argparse
 import importlib
 import kskpkg.config.awsglobal as awsglobal
-import numpy as np
-import pandas as pd
+import numpy as np   # pip install numpy
+import pandas as pd  # pip install pandas
 
 
 # 현재 디렉토리
