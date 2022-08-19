@@ -25,10 +25,18 @@ import json
 import boto3
 import logging
 
+# OS 판단
+my_os = sys.platform
+print(my_os)
+if my_os == "linux":
+  path_logconf = os.getcwd() + '/config/logging.conf'
+else:
+  path_logconf = os.getcwd() + '\config\logging.conf'
+
 if __name__ == "__main__":
   # Main 실행으로 절대 경로 
   from config import awsglobal
-  awsglobal.init_logger(os.getcwd() + '/config/logging.conf')
+  awsglobal.init_logger(path_logconf)
   klogger     = awsglobal.klogger
   klogger_dat = awsglobal.klogger_dat
 else:

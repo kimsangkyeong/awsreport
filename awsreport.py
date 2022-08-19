@@ -22,12 +22,22 @@ import pandas as pd  # pip install pandas
 
 # 현재 디렉토리
 path_cwd = os.getcwd()
+# OS 판단
+my_os = sys.platform
+print(my_os)
+if my_os == "linux":
+  path_logconf = path_cwd + '/kskpkg/config/logging.conf'
+  output_file = f'{path_cwd}/output.xlsx'
+else:
+  path_logconf = path_cwd + '\kskpkg\config\logging.conf'
+  output_file = f'{path_cwd}\output.xlsx'
+
 def global_config_init():
   global klogger
   global klogger_dat
 
   # Main에서 log config 경로 전달
-  awsglobal.init_logger(path_cwd + '/kskpkg/config/logging.conf')
+  awsglobal.init_logger(path_logconf)
   klogger     = awsglobal.klogger
   klogger_dat = awsglobal.klogger_dat
 
@@ -95,7 +105,6 @@ def main(argv):
     df = pd.concat([df, pd.DataFrame(result)], ignore_index=True)
     klogger.debug(df.values)
 
-  output_file = f'{path_cwd}/output.xlsx'
   if os.path.exists(output_file):
     with pd.ExcelWriter(f'{path_cwd}/output.xlsx', mode='a') as writer:
       df.to_excel(writer, sheet_name='vpc', engine='openpyxl') # pip install openpyxl
