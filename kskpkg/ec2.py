@@ -45,13 +45,52 @@ else:
   klogger     = awsglobal.klogger
   klogger_dat = awsglobal.klogger_dat
 
+def describe_internet_gateways(searchRegions):
+  '''
+    search igws in searchRegions
+  '''
+  for region in searchRegions:
+    try:
+      results = [] 
+      ec2=boto3.client('ec2', region )
+      igws = ec2.describe_internet_gateways()
+      if 200 == igws["ResponseMetadata"]["HTTPStatusCode"]:
+        # klogger_dat.debug(igws["InternetGateways"])
+        for igw in igws["InternetGateways"]:
+          klogger_dat.debug(igw)
+          # igw assigned vcpid 값
+          attachedvpcid = "Not Assigned"
+          if 'Attachments' in igw:
+            for attached in igw['Attachments']:
+              if attached['State'] == 'available':
+                attachedvpcid = attached['VpcId']
+                break
+          # igw Tag중 Name 값 
+          # * igw 정보는 모두 scalar 형식이라서 DataFrame 변환오류 회피위해 list 처리함
+          tagname = ['Not Exist Name Tag']
+          if 'Tags' in igw:
+            for tag in igw['Tags']:
+              if tag['Key'] == 'Name':
+                tagname[0] = tag['Value']
+                break
+          results.append( { "InternetGatewayId": igw["InternetGatewayId"],
+                            "InternetGatewayTName" : tagname,
+                            "AttachedVpcId" : attachedvpcid ,
+                            "VpcTName" : ''
+                           })
+        # klogger.debug(results)
+      else:
+        klogger.error("call error : %d", igws["ResponseMetadata"]["HTTPStatusCode"])
+    except Exception as othererr:
+       klogger.error("ec2.describe_internet_gateways(),region[%s],%s", region, othererr)
+  return results
+
 def describe_vpcs(searchRegions):
   '''
     search vpcs in searchRegions
   '''
   for region in searchRegions:
     try:
-
       results = [] 
       ec2=boto3.client('ec2', region )
       vpcs = ec2.describe_vpcs()
@@ -73,16 +112,57 @@ def describe_vpcs(searchRegions):
               if tag['Key'] == 'Name':
                 tagname = tag['Value']
                 break
-          results.append( { "vpcid": vpc["VpcId"],
-                            "Name" : tagname,
+          results.append( { "VpcId": vpc["VpcId"],
+                            "VpcTName" : tagname,
                             "Cidr" : associateCidr })
         #klogger.debug(results)
       else:
         klogger.error("call error : %d", vpcs["ResponseMetadata"]["HTTPStatusCode"])
-
     except Exception as othererr:
        klogger.error("ec2.describe_vpcs(),region[%s],%s", region, othererr)
+  return results
 
+def describe_nat_gateways(searchRegions):
+  '''
+    search nat in searchRegions
+  '''
+  for region in searchRegions:
+    try:
+      results = [] 
+      ec2=boto3.client('ec2', region )
+      nats = ec2.describe_nat_gateways()
+      if 200 == nats["ResponseMetadata"]["HTTPStatusCode"]:
+        klogger_dat.debug(nats["InternetGateways"])
+        for nat in nats["NatGateways"]:
+          # igw assigned vcpid 값
+          natgatewayaddresses = []
+          if 'NatGatewayAddresses' in nat:
+            for nataddr in nat['NatGatewayAddresses']:
+              natgatewayaddresses.append({'PrivateIp':nataddr['PrivateIp']})
+              natgatewayaddresses.append({'PublicIp':nataddr['PublicIp']})
+              
+          # nat Tag중 Name 값 
+          # * nat 정보가 모두 scalar 형식인 경우 대비 DataFrame 변환오류 회피위해 list 처리함
+          tagname = ['Not Exist Name Tag']
+          if 'Tags' in nat:
+            for tag in nat['Tags']:
+              if tag['Key'] == 'Name':
+                tagname[0] = tag['Value']
+                break
+          results.append( { "NatGatewayId": nat["NatGatewayId"],
+                            "NatGatewayTName" : tagname,
+                            "State" : nat["State"],
+                            "ConnectivityType" : nat["ConnectivityType"],
+                            "NatGatewayAddresses" : natgatewayaddresses,
+                            "SubnetId" : nat["SubnetId"],
+                            "VpcId" : nat["VpcId"] ,
+                            "VpcTName" : ''
+                           })
+        klogger.debug(results)
+      else:
+        klogger.error("call error : %d", nats["ResponseMetadata"]["HTTPStatusCode"])
+    except Exception as othererr:
+       klogger.error("ec2.describe_nat_gateways(),region[%s],%s", region, othererr)
   return results
 
 def describe_instances(searchRegions):
@@ -91,7 +171,6 @@ def describe_instances(searchRegions):
   '''
   for region in searchRegions:
     try:
-
       results = [] 
       ec2=boto3.client('ec2', region )
       inss = ec2.describe_instances()
@@ -137,18 +216,18 @@ def describe_instances(searchRegions):
             for sg in ins["SecurityGroups"]:
               securitygroups.append( {sg["GroupName"]:sg["GroupId"]} )
 
-            results.append( { "instance_id": ins["InstanceId"],
-                              "Name" : tagname,
+            results.append( { "InstanceId": ins["InstanceId"],
+                              "InstanceTName" : tagname,
                               "Platform" : platform,
                               "Architecture" : ins["Architecture"],
-                              "type" : ins["InstanceType"],
+                              "InstanceType" : ins["InstanceType"],
                               "KeyName" : keyname,
                               "Placement" : ins["Placement"]["AvailabilityZone"],
                               "PrivateIpAddress" : ins["PrivateIpAddress"],
                               "PublicIpAddress" : pubipaddr,
                               "SubnetId" : ins["SubnetId"],
                               "VpcId" : ins["VpcId"],
-                              "VpcName" : '',
+                              "VpcTName" : '',
                               "EbsOptimized" : ins["EbsOptimized"],
                               "IamInstanceProfile" : iaminsprofile,
                               "SecurityGroups" : securitygroups
@@ -156,16 +235,16 @@ def describe_instances(searchRegions):
         klogger.debug(results)
       else:
         klogger.error("call error : %d", inss["ResponseMetadata"]["HTTPStatusCode"])
-
     except Exception as othererr:
        klogger.error("ec2.describe_instances(),region[%s],%s", region, othererr)
-
   return results
 
 def main(argv):
   ###  set search region name to variable of searchRegions
   searchRegions = ['ap-northeast-2']
   describe_vpcs(searchRegions) 
+  describe_internet_gateways(searchRegions) 
+  describe_nat_gateways(searchRegions)
   describe_instances(searchRegions) 
   sys.exit(0)
 

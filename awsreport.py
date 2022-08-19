@@ -51,6 +51,7 @@ def getobjectstring(content):
   funcstr = content[idx+1:]
   return modstr, funcstr
 
+# dynamic module load and call function
 def executefunc(objstr, regions):
   '''
      execute function from reserved function string
@@ -69,60 +70,46 @@ def executefunc(objstr, regions):
     print("executefunc() %s" % othererr)
     return False
 
-def cmd_parse():
-  cmdlines = [
-      # data means => 0:option, 1:dest , 2:required , 3:action , 4:const , 5:help
-      { '-i' : ('instance'  , False, 'store_const', 'awspkg.ec2.ec2instanceslist.describe_instances',
-                              'ec2instance operation(describe)'                                       )},
-      { '-v' : ('vpc'       , False, 'store_const', 'awspkg.ec2.ec2vpcslist.describe_vpcs',
-                              'ec2vpc operation(describe)'                                            )},
-             ]
+# boto3 results to dataframe
+def results_to_dataframe(results):
+  df = pd.DataFrame()
+  for result in results:
+    df_tmp = pd.DataFrame(result)
+    df = pd.concat([df, df_tmp], ignore_index=True)
+  #klogger.debug(df.values)
+  return df
 
-  parser = argparse.ArgumentParser(description='aws operation tool for datalake infra')
-
-  for cmdline in cmdlines:
-    for key, dtuple in cmdline.items():
-      dlist = list(dtuple)
-      if dlist[2] == 'append': # action is append type
-        parser.add_argument(key, dest=dlist[0], required=dlist[1], action=dlist[2],                 help=dlist[4])
-      else:                    # action is store_const type
-        parser.add_argument(key, dest=dlist[0], required=dlist[1], action=dlist[2], const=dlist[3], help=dlist[4])
-
-  return parser.parse_args()
+def get_vpcname(df, x):
+  for vpcid, vpctname in df[['VpcId','VpcTName']].value_counts().index:
+    if x == vpcid:
+      return vpctname
 
 def main(argv):
   # logger setting 
   global_config_init()
 
-  # vpcs
-  results = executefunc("kskpkg.ec2.describe_vpcs", ['ap-northeast-2'])
-  df_vpc = pd.DataFrame()
-  for result in results:
-    df_tmp = pd.DataFrame(result)
-    df_vpc = pd.concat([df_vpc, df_tmp], ignore_index=True)
-    klogger.debug(df_vpc.values)
-  # instances
-  results = executefunc("kskpkg.ec2.describe_instances", ['ap-northeast-2'])
-  df_ins = pd.DataFrame()
-  klogger.debug(df_ins.values)
-  for result in results:
-    df_tmp = pd.DataFrame(result)
-    df_ins = pd.concat([df_ins, df_tmp], ignore_index=True)
-    klogger.debug(df_ins.values)
-  exit(1)
+  df_vpc = results_to_dataframe(executefunc("kskpkg.ec2.describe_vpcs", ['ap-northeast-2']))
+  # df_igw = results_to_dataframe(executefunc("kskpkg.ec2.describe_internet_gateways", ['ap-northeast-2']))
+  # df_igw['VpcTName'] = df_igw['AttachedVpcId'].apply(lambda x : get_vpcname(df_vpc,x)) # get VpcTagName
+  # klogger_dat.debug(df_igw)
+  df_nat = results_to_dataframe(executefunc("kskpkg.ec2.describe_nat_gateways", ['ap-northeast-2']))
+  df_nat['VpcTName'] = df_nat['VpcId'].apply(lambda x : get_vpcname(df_vpc,x)) # get VpcTagName
+  klogger_dat.debug(df_nat)
+  df_ins = results_to_dataframe(executefunc("kskpkg.ec2.describe_instances", ['ap-northeast-2']))
+  df_ins['VpcTName'] = df_ins['VpcId'].apply(lambda x : get_vpcname(df_vpc,x)) # get VpcTagName
+  # klogger_dat.debug(df_ins)
+
   # to_excel 
   if os.path.exists(output_file):
     with pd.ExcelWriter(output_file, mode='a', if_sheet_exists='replace', engine='openpyxl') as writer:
+      df_igw.to_excel(writer, sheet_name='igw', index=False) 
       df_vpc.to_excel(writer, sheet_name='vpc', index=False) # pip install openpyxl
       df_ins.to_excel(writer, sheet_name='instance', index=False) 
   else:
     with pd.ExcelWriter(output_file, engine='openpyxl') as writer:
+      df_igw.to_excel(writer, sheet_name='igw', index=False) 
       df_vpc.to_excel(writer, sheet_name='vpc', index=False)
       df_ins.to_excel(writer, sheet_name='instance', index=False) 
-
-#  args = cmd_parse()
-#  if args.instance    != None:
-#    executefunc(args.instance, args.regions)
 
 if __name__ == "__main__":
    main(sys.argv[:])
