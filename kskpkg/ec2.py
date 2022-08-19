@@ -25,9 +25,9 @@ import json
 import boto3
 import logging
 
-# OS 판단
+# OS 판단  : win32, linux, cygwin, darwin, aix
 my_os = sys.platform
-print(my_os)
+#print(my_os)
 if my_os == "linux":
   path_logconf = os.getcwd() + '/config/logging.conf'
 else:
@@ -135,10 +135,9 @@ def describe_instances(searchRegions):
             # securitygroups 값
             securitygroups = []
             for sg in ins["SecurityGroups"]:
-              securitygroups.append( {"GroupName": sg["GroupName"],
-                                      "GroupId": sg["GroupId"]} )
+              securitygroups.append( {sg["GroupName"]:sg["GroupId"]} )
 
-            results.append( { "insid": ins["InstanceId"],
+            results.append( { "instance_id": ins["InstanceId"],
                               "Name" : tagname,
                               "Platform" : platform,
                               "Architecture" : ins["Architecture"],
@@ -149,6 +148,7 @@ def describe_instances(searchRegions):
                               "PublicIpAddress" : pubipaddr,
                               "SubnetId" : ins["SubnetId"],
                               "VpcId" : ins["VpcId"],
+                              "VpcName" : '',
                               "EbsOptimized" : ins["EbsOptimized"],
                               "IamInstanceProfile" : iaminsprofile,
                               "SecurityGroups" : securitygroups

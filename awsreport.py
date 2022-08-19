@@ -7,7 +7,7 @@
 # --------  -----------   -------------------------------------------------
 # Version :     date    :  reason
 #  1.0      2019.09.06     first create
-#          
+# ref     : https://pandas.pydata.org/docs/reference/api/pandas.ExcelWriter.html, .to_excel.html
 ####################################################################################################
 ### This first line is for modules to work with Python 2 or 3
 from __future__ import print_function
@@ -19,12 +19,11 @@ import kskpkg.config.awsglobal as awsglobal
 import numpy as np   # pip install numpy
 import pandas as pd  # pip install pandas
 
-
 # 현재 디렉토리
 path_cwd = os.getcwd()
-# OS 판단
+# OS 판단  : win32, linux, cygwin, darwin, aix
 my_os = sys.platform
-print(my_os)
+#print(my_os)
 if my_os == "linux":
   path_logconf = path_cwd + '/kskpkg/config/logging.conf'
   output_file = f'{path_cwd}/output.xlsx'
@@ -92,25 +91,34 @@ def cmd_parse():
   return parser.parse_args()
 
 def main(argv):
-
+  # logger setting 
   global_config_init()
 
-  results = executefunc("kskpkg.ec2.describe_instances", ['ap-northeast-2'])
-
-  exit(1)
-
+  # vpcs
   results = executefunc("kskpkg.ec2.describe_vpcs", ['ap-northeast-2'])
-  df = pd.DataFrame()
+  df_vpc = pd.DataFrame()
   for result in results:
-    df = pd.concat([df, pd.DataFrame(result)], ignore_index=True)
-    klogger.debug(df.values)
-
+    df_tmp = pd.DataFrame(result)
+    df_vpc = pd.concat([df_vpc, df_tmp], ignore_index=True)
+    klogger.debug(df_vpc.values)
+  # instances
+  results = executefunc("kskpkg.ec2.describe_instances", ['ap-northeast-2'])
+  df_ins = pd.DataFrame()
+  klogger.debug(df_ins.values)
+  for result in results:
+    df_tmp = pd.DataFrame(result)
+    df_ins = pd.concat([df_ins, df_tmp], ignore_index=True)
+    klogger.debug(df_ins.values)
+  exit(1)
+  # to_excel 
   if os.path.exists(output_file):
-    with pd.ExcelWriter(f'{path_cwd}/output.xlsx', mode='a') as writer:
-      df.to_excel(writer, sheet_name='vpc', engine='openpyxl') # pip install openpyxl
+    with pd.ExcelWriter(output_file, mode='a', if_sheet_exists='replace', engine='openpyxl') as writer:
+      df_vpc.to_excel(writer, sheet_name='vpc', index=False) # pip install openpyxl
+      df_ins.to_excel(writer, sheet_name='instance', index=False) 
   else:
-    with pd.ExcelWriter(f'{path_cwd}/output.xlsx') as writer:
-      df.to_excel(writer, sheet_name='vpc', engine='openpyxl') # pip install openpyxl
+    with pd.ExcelWriter(output_file, engine='openpyxl') as writer:
+      df_vpc.to_excel(writer, sheet_name='vpc', index=False)
+      df_ins.to_excel(writer, sheet_name='instance', index=False) 
 
 #  args = cmd_parse()
 #  if args.instance    != None:
