@@ -8,6 +8,8 @@
 # Version :     date    :  reason
 #  1.0      2019.09.06     first create
 # ref     : https://pandas.pydata.org/docs/reference/api/pandas.ExcelWriter.html, .to_excel.html
+# required install package : # pip install numpy, pandas, openpyxl
+#
 ####################################################################################################
 ### This first line is for modules to work with Python 2 or 3
 from __future__ import print_function
@@ -18,6 +20,7 @@ import importlib
 import kskpkg.config.awsglobal as awsglobal
 import numpy as np   # pip install numpy
 import pandas as pd  # pip install pandas
+from datetime import date
 
 # 현재 디렉토리
 path_cwd = os.getcwd()
@@ -26,10 +29,10 @@ my_os = sys.platform
 #print(my_os)
 if my_os == "linux":
   path_logconf = path_cwd + '/kskpkg/config/logging.conf'
-  output_file = f'{path_cwd}/output.xlsx'
+  output_file = f'{path_cwd}/output_{date.today().strftime("%Y%m%d")}.xlsx'
 else:
   path_logconf = path_cwd + '\kskpkg\config\logging.conf'
-  output_file = f'{path_cwd}\output.xlsx'
+  output_file = f'{path_cwd}\output_{date.today().strftime("%Y%m%d")}.xlsx'
 
 def global_config_init():
   global klogger
@@ -51,8 +54,8 @@ def getobjectstring(content):
   funcstr = content[idx+1:]
   return modstr, funcstr
 
-# dynamic module load and call function : return one
-def executefunc(objstr, regions):
+# dynamic module load and call function : parameter one
+def executefunc_p1(objstr):
   '''
      execute function from reserved function string
   '''
@@ -62,8 +65,25 @@ def executefunc(objstr, regions):
     objfunction = getattr(objmodule, objlist[1]) 
 
     # dynamic function call
-    results = objfunction(regions)
+    results = objfunction()
+    return results
 
+  except Exception as othererr:
+    print("executefunc() %s" % othererr)
+    return False
+
+# dynamic module load and call function : return one
+def executefunc(objstr, param):
+  '''
+     execute function from reserved function string
+  '''
+  try:
+    objlist = getobjectstring(objstr)
+    objmodule = importlib.import_module(objlist[0])
+    objfunction = getattr(objmodule, objlist[1]) 
+
+    # dynamic function call
+    results = objfunction(param)
     return results
 
   except Exception as othererr:
@@ -80,7 +100,7 @@ def results_to_dataframe(results):
   return df
 
 # dynamic module load and call function : return two
-def executefunc2(objstr, regions):
+def executefunc2(objstr, param):
   '''
      execute function from reserved function string
   '''
@@ -90,8 +110,7 @@ def executefunc2(objstr, regions):
     objfunction = getattr(objmodule, objlist[1]) 
 
     # dynamic function call
-    results1, results2 = objfunction(regions)
-
+    results1, results2 = objfunction(param)
     return results1, results2
 
   except Exception as othererr:
@@ -126,6 +145,12 @@ def main(argv):
   # logger setting 
   global_config_init()
 
+  df_route53 = results_to_dataframe(executefunc_p1("kskpkg.route53.list_hosted_zones"))
+  # klogger_dat.debug(df_route53)
+  df_route53_record = results_to_dataframe(executefunc("kskpkg.route53.list_resource_record_sets",list(df_route53['Id'])))
+  # klogger_dat.debug(df_route53_record)
+  df_cloudmap = results_to_dataframe(executefunc_p1("kskpkg.servicediscovery.list_namespaces"))
+  # klogger_dat.debug(df_cloudmap)
   df_vpc = results_to_dataframe(executefunc("kskpkg.ec2.describe_vpcs", ['ap-northeast-2']))
   df_igw = results_to_dataframe(executefunc("kskpkg.ec2.describe_internet_gateways", ['ap-northeast-2']))
   df_igw['VpcTName'] = df_igw['AttachedVpcId'].apply(lambda x : get_vpcname(df_vpc,x)) # get VpcTagName
@@ -152,7 +177,10 @@ def main(argv):
   klogger_dat.debug("%s\n%s","-"*20,"save to excel")
   if os.path.exists(output_file):
     with pd.ExcelWriter(output_file, mode='a', if_sheet_exists='replace', engine='openpyxl') as writer:
-      df_vpc.to_excel(writer, sheet_name='vpc', index=False) # pip install openpyxl
+      df_route53.to_excel(writer, sheet_name='route53', index=False) 
+      df_route53_record.to_excel(writer, sheet_name='route53_record', index=False) 
+      df_cloudmap.to_excel(writer, sheet_name='cloudmap', index=False) 
+      df_vpc.to_excel(writer, sheet_name='vpc', index=False)
       df_igw.to_excel(writer, sheet_name='igw', index=False) 
       df_nat.to_excel(writer, sheet_name='nat', index=False) 
       df_subnet.to_excel(writer, sheet_name='subnet', index=False) 
@@ -161,6 +189,9 @@ def main(argv):
       df_ins.to_excel(writer, sheet_name='instance', index=False) 
   else:
     with pd.ExcelWriter(output_file, engine='openpyxl') as writer:
+      df_route53.to_excel(writer, sheet_name='route53', index=False)
+      df_route53_record.to_excel(writer, sheet_name='route53_record', index=False) 
+      df_cloudmap.to_excel(writer, sheet_name='cloudmap', index=False) 
       df_vpc.to_excel(writer, sheet_name='vpc', index=False)
       df_igw.to_excel(writer, sheet_name='igw', index=False) 
       df_nat.to_excel(writer, sheet_name='nat', index=False) 

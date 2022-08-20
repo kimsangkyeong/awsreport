@@ -9,13 +9,7 @@
 #  1.0      2019.09.06     first create
 #  1.1      2019.09.15     local klogger assign to klogger that made by main program.
 #
-# Ref     : https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/ec2.html#EC2.Client.describe_vpcs 
-#           result data info => Vpcs, result code info => ResponseMetadata 
-#
-#           API info : step1. logging config file setup : 'logging.conf'
-#                      step2. logging.config.fileConfig('logging.conf')
-#                      step3. klogger = logging.getLogger('logConsoleTypeA')
-#                      step4. klogger.debug, info, warning, error, critical
+# Ref     : https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/ec2.html
 #          
 ####################################################################################################
 ### This first line is for modules to work with Python 2 or 3
