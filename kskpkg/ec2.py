@@ -100,12 +100,10 @@ def describe_vpcs(searchRegions):
         #klogger_dat.debug(vpcs["Vpcs"])
         for vpc in vpcs["Vpcs"]:
           # vpc 할당 CIDR 값
-          associateCidr = []
+          associateCidr = []; states = []
           for cidr in vpc['CidrBlockAssociationSet']:
-            if cidr['CidrBlockState']['State'] == 'associated' :
-              associateCidr.append({cidr['CidrBlock']:'use'})
-            else:
-              associateCidr.append({cidr['CidrBlock']:'nouse'})
+            associateCidr.append(cidr['CidrBlock'])
+            states.append(cidr['CidrBlockState']['State'])
 
           # vpc Tag중 Name 값
           tagname = 'Not Exist Name Tag'
@@ -116,7 +114,9 @@ def describe_vpcs(searchRegions):
                 break
           results.append( { "VpcId": vpc["VpcId"],
                             "VpcTName" : tagname,
-                            "Cidr" : associateCidr })
+                            "Cidr" : associateCidr,
+                            "State" : states 
+                          })
         #klogger.debug(results)
       else:
         klogger.error("call error : %d", vpcs["ResponseMetadata"]["HTTPStatusCode"])
@@ -367,6 +367,7 @@ def main(argv):
   describe_nat_gateways(searchRegions)
   describe_instances(searchRegions) 
   describe_subnets(searchRegions) 
+  describe_route_tables(searchRegions) 
   sys.exit(0)
 
 if __name__ == "__main__":
