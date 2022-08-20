@@ -294,6 +294,293 @@ def describe_route_tables(searchRegions):
       klogger.error("ec2.describe_route_tables(),region[%s],%s", region, othererr)
   return results1, results2
 
+# def describe_security_groups(searchRegions):
+#   '''
+#     search security groups in searchRegions
+#   '''
+#   klogger_dat.debug('security groups')
+#   for region in searchRegions:
+#     try:
+#       results = [] 
+#       ec2=boto3.client('ec2', region )
+#       sgs = ec2.describe_security_groups()
+#       if 200 == sgs["ResponseMetadata"]["HTTPStatusCode"]:
+#         klogger_dat.debug("%s",sgs["SecurityGroups"])
+#       else:
+#         klogger.error("call error : %d", sgs["ResponseMetadata"]["HTTPStatusCode"])
+#     except Exception as othererr:
+#       klogger.error("ec2.describe_security_groups(),region[%s],%s", region, othererr)
+#   return results
+
+def describe_security_groups(searchRegions):
+  '''
+    search security groups in searchRegions
+  '''
+  klogger_dat.debug('security groups')
+  for region in searchRegions:
+    try:
+      results = [] 
+      ec2=boto3.client('ec2', region )
+      sgs = ec2.describe_security_groups()
+      if 200 == sgs["ResponseMetadata"]["HTTPStatusCode"]:
+        # klogger_dat.debug("%s",sgs["SecurityGroups"])
+        for sg in sgs["SecurityGroups"]:
+          in_fromport = []; in_protocol = []; in_cidrip = []; in_desc = [];
+          in_prefixlistid = []; in_pldesc =[]; in_toport = []; 
+          in_grp_desc =[]; in_grp_groupid =[]; in_grp_groupname =[]; in_grp_peer =[]; 
+          in_grp_userid =[]; in_grp_vpcid =[]; in_grp_vpcpeer =[];  
+          out_fromport = []; out_protocol = []; out_cidrip = []; out_desc = [];
+          out_prefixlistid = []; out_pldesc =[]; out_toport = []; 
+          out_grp_desc =[]; out_grp_groupid =[]; out_grp_groupname =[]; out_grp_peer =[]; 
+          out_grp_userid =[]; out_grp_vpcid =[]; out_grp_vpcpeer =[];  
+          len_intotal  = 0; len_outtotal = 0;
+          len_IpPermissions = 0; len_IpRanges = 0; len_PrefixListIds = 0; len_UserIdGroupPairs = 0;
+          len_oIpPermissions = 0; len_oIpRanges = 0; len_oPrefixListIds = 0; len_oUserIdGroupPairs = 0;
+          
+          if 'IpPermissions' in sg :
+            len_IpPermissions = len(sg['IpPermissions'])
+            for inrule in sg['IpPermissions']:
+              in_fromport.append(inrule['FromPort'] if 'FromPort' in inrule else ' ')
+              if 'IpProtocol' in inrule :
+                if inrule['IpProtocol'] == '-1' :
+                  in_protocol.append('ALL')
+                else:
+                  in_protocol.append(inrule['IpProtocol'])
+              else:
+                in_protocol.append(' ')
+              if 'IpRanges' in inrule :
+                len_IpRanges = len(inrule['IpRanges'])
+                for iprange in inrule['IpRanges']:
+                  in_cidrip.append(iprange['CidrIp'] if 'CidrIp' in iprange else ' ')
+                  in_desc.append(iprange['Description'] if 'Description' in iprange else ' ')
+              else:
+                in_cidrip.append(' ')
+                in_desc.append(' ')
+              if 'PrefixListIds' in inrule :
+                len_PrefixListIds = len(inrule['PrefixListIds'])
+                for prefixlist in inrule['PrefixListIds']:
+                  in_prefixlistid.append(prefixlist['PrefixListId'] if 'PrefixListId' in prefixlist else ' ')
+                  in_pldesc.append(prefixlist['Description'] if 'Description' in prefixlist else ' ')
+              else:
+                in_prefixlistid.append(' ')
+                in_pldesc.append(' ')
+              in_toport.append(inrule['ToPort'] if 'ToPort' in inrule else ' ')
+              if 'UserIdGroupPairs' in inrule :
+                len_UserIdGroupPairs = len(inrule['UserIdGroupPairs'])
+                for grouppair in inrule['UserIdGroupPairs']:
+                  in_grp_desc.append(grouppair['Description'] if 'Description' in grouppair else ' ')
+                  in_grp_groupid.append(grouppair['GroupId'] if 'GroupId' in grouppair else ' ')
+                  in_grp_groupname.append(grouppair['GroupName'] if 'GroupName' in grouppair else ' ')
+                  in_grp_peer.append(grouppair['PeeringStatus'] if 'PeeringStatus' in grouppair else ' ')
+                  in_grp_userid.append(grouppair['UserId'] if 'UserId' in grouppair else ' ')
+                  in_grp_vpcid.append(grouppair['VpcId'] if 'VpcId' in grouppair else ' ')
+                  in_grp_vpcpeer.append(grouppair['VpcPeeringConnectionId'] 
+                                        if 'VpcPeeringConnectionId' in grouppair else ' ')
+              else:
+                in_grp_desc.append(' ')
+                in_grp_groupid.append(' ')
+                in_grp_groupname.append(' ')
+                in_grp_peer.append(' ')
+                in_grp_userid.append(' ')
+                in_grp_vpcid.append(' ')
+                in_grp_vpcpeer.append(' ')
+
+              max_len = max(len_IpRanges, len_PrefixListIds, len_UserIdGroupPairs)
+              len_intotal = len_intotal + max(1, max_len)
+              # klogger.debug(" in : intotal - %d,  max - %d, ip - %d, pr -%d, grp - %d", 
+              #                 len_intotal, max_len, len_IpRanges, len_PrefixListIds, len_UserIdGroupPairs)
+              # depth 1 필드, 갯수 보정하기
+              for ix in range(1, max_len):
+                in_fromport.append(inrule['FromPort'] if 'FromPort' in inrule else ' ')
+                if 'IpProtocol' in inrule :
+                  if inrule['IpProtocol'] == '-1' :
+                    in_protocol.append('ALL')
+                  else:
+                    in_protocol.append(inrule['IpProtocol'])
+                else:
+                  in_protocol.append(' ')
+                in_toport.append(inrule['ToPort'] if 'ToPort' in inrule else ' ')
+              # dept 2 IpRanges 필드, 갯수 보정하기
+              for ix in range(len_IpRanges, max_len):
+                in_cidrip.append(' ')
+                in_desc.append(' ')
+              # dept 2 PrefixListIds 필드, 갯수 보정하기
+              for ix in range(len_PrefixListIds, max_len):
+                in_prefixlistid.append(' ')
+                in_pldesc.append(' ')
+              # dept 2 UserIdGroupPairs 필드, 갯수 보정하기
+              for ix in range(len_UserIdGroupPairs, max_len):
+                in_grp_desc.append(' ')
+                in_grp_groupid.append(' ')
+                in_grp_groupname.append(' ')
+                in_grp_peer.append(' ')
+                in_grp_userid.append(' ')
+                in_grp_vpcid.append(' ')
+                in_grp_vpcpeer.append(' ')
+          if 'IpPermissionsEgress' in sg :
+            len_oIpPermissions = len(sg['IpPermissionsEgress'])
+            for outrule in sg['IpPermissionsEgress']:
+              out_fromport.append(outrule['FromPort'] if 'FromPort' in outrule else ' ')
+              if 'IpProtocol' in outrule :
+                if outrule['IpProtocol'] == '-1' :
+                  out_protocol.append('ALL')
+                else:
+                  out_protocol.append(outrule['IpProtocol'])
+              else:
+                out_protocol.append(' ')
+              if 'IpRanges' in outrule :
+                len_oIpRanges = len(outrule['IpRanges'])
+                for iprange in outrule['IpRanges']:
+                  out_cidrip.append(iprange['CidrIp'] if 'CidrIp' in iprange else ' ')
+                  out_desc.append(iprange['Description'] if 'Description' in iprange else ' ')
+              else:
+                out_cidrip.append(' ')
+                out_desc.append(' ')
+              if 'PrefixListIds' in outrule :
+                len_oPrefixListIds = len(outrule['PrefixListIds'])
+                for prefixlist in outrule['PrefixListIds']:
+                  out_prefixlistid.append(prefixlist['PrefixListId'] if 'PrefixListId' in prefixlist else ' ')
+                  out_pldesc.append(prefixlist['Description'] if 'Description' in prefixlist else ' ')
+              else:
+                out_prefixlistid.append(' ')
+                out_pldesc.append(' ')
+              out_toport.append(outrule['ToPort'] if 'ToPort' in outrule else ' ')
+              if 'UserIdGroupPairs' in outrule :
+                len_oUserIdGroupPairs = len(outrule['UserIdGroupPairs'])
+                for grouppair in outrule['UserIdGroupPairs']:
+                  out_grp_desc.append(grouppair['Description'] if 'Description' in grouppair else ' ')
+                  out_grp_groupid.append(grouppair['GroupId'] if 'GroupId' in grouppair else ' ')
+                  out_grp_groupname.append(grouppair['GroupName'] if 'GroupName' in grouppair else ' ')
+                  out_grp_peer.append(grouppair['PeeringStatus'] if 'PeeringStatus' in grouppair else ' ')
+                  out_grp_userid.append(inrgrouppairule['UserId'] if 'UserId' in grouppair else ' ')
+                  out_grp_vpcid.append(grouppair['VpcId'] if 'VpcId' in grouppair else ' ')
+                  out_grp_vpcpeer.append(grouppair['VpcPeeringConnectionId'] 
+                                        if 'VpcPeeringConnectionId' in grouppair else ' ')
+              else:
+                out_grp_desc.append(' ')
+                out_grp_groupid.append(' ')
+                out_grp_groupname.append(' ')
+                out_grp_peer.append(' ')
+                out_grp_userid.append(' ')
+                out_grp_vpcid.append(' ')
+                out_grp_vpcpeer.append(' ')
+              max_len = max(len_oIpRanges, len_oPrefixListIds, len_oUserIdGroupPairs)
+              len_outtotal = len_outtotal + max(1, max_len)
+              # klogger.debug(" in : outtotal - %d,  max - %d, ip - %d, pr -%d, grp - %d", 
+              #                 len_outtotal, max_len, len_oIpRanges, len_oPrefixListIds, len_oUserIdGroupPairs)
+              # depth 1 필드, 갯수 보정하기
+              for ix in range(1, max_len):
+                out_fromport.append(outrule['FromPort'] if 'FromPort' in outrule else ' ')
+                if 'IpProtocol' in outrule :
+                  if outrule['IpProtocol'] == '-1' :
+                    out_protocol.append('ALL')
+                  else:
+                    out_protocol.append(outrule['IpProtocol'])
+                else:
+                  out_protocol.append(' ')
+                out_toport.append(outrule['ToPort'] if 'ToPort' in outrule else ' ')
+              # dept 2 IpRanges 필드, 갯수 보정하기
+              for ix in range(len_oIpRanges, max_len):
+                out_cidrip.append(' ')
+                out_desc.append(' ')
+              # dept 2 PrefixListIds 필드, 갯수 보정하기
+              for ix in range(len_oPrefixListIds, max_len):
+                out_prefixlistid.append(' ')
+                out_pldesc.append(' ')
+              # dept 2 UserIdGroupPairs 필드, 갯수 보정하기
+              for ix in range(len_oUserIdGroupPairs, max_len):
+                out_grp_desc.append(' ')
+                out_grp_groupid.append(' ')
+                out_grp_groupname.append(' ')
+                out_grp_peer.append(' ')
+                out_grp_userid.append(' ')
+                out_grp_vpcid.append(' ')
+                out_grp_vpcpeer.append(' ')
+
+          # klogger.debug(" intotal : %d, outtotla : %d", len_intotal, len_outtotal)
+          # 전체 in , out data gap 보정하기
+          for ix in range(len_intotal, max(len_intotal, len_outtotal)):
+            in_fromport.append(' ')
+            in_protocol.append(' ')
+            in_toport.append(' ')
+            in_cidrip.append(' ')
+            in_desc.append(' ')
+            in_prefixlistid.append(' ')
+            in_pldesc.append(' ')
+            in_grp_desc.append(' ')
+            in_grp_groupid.append(' ')
+            in_grp_groupname.append(' ')
+            in_grp_peer.append(' ')
+            in_grp_userid.append(' ')
+            in_grp_vpcid.append(' ')
+            in_grp_vpcpeer.append(' ')            
+          for ix in range(len_outtotal, max(len_intotal, len_outtotal)):
+            out_fromport.append(' ')
+            out_protocol.append(' ')
+            out_toport.append(' ')
+            out_cidrip.append(' ')
+            out_desc.append(' ')
+            out_prefixlistid.append(' ')
+            out_pldesc.append(' ')
+            out_grp_desc.append(' ')
+            out_grp_groupid.append(' ')
+            out_grp_groupname.append(' ')
+            out_grp_peer.append(' ')
+            out_grp_userid.append(' ')
+            out_grp_vpcid.append(' ')
+            out_grp_vpcpeer.append(' ')            
+
+          sgdesc = sg["Description"] if 'Description' in sg else ' '
+          # sg Tag중 Name 값
+          tagname = 'Not Exist Name Tag'
+          if 'Tags' in sg:
+            for tag in sg['Tags']:
+              if tag['Key'] == 'Name':
+                tagname = tag['Value']
+                break
+          results.append( { "SGroupId": sg["GroupId"],
+                            "SGroupName" : sg["GroupName"],
+                            "SGroupTName" : tagname,
+                            "Description" : sgdesc,
+                            "In_IpProtocol" : in_protocol,
+                            "In_FromPort" : in_fromport,
+                            "In_ToPort" : in_toport,
+                            "In_CidrIp" : in_cidrip,
+                            "In_GroupId" : in_grp_groupid,
+                            "In_GroupName" : in_grp_groupname,
+                            "In_UserIdGroupPairs_Description" : in_grp_desc,
+                            "In_Description" : in_desc,
+                            "In_PrefixListId" : in_prefixlistid,
+                            "In_PLDescription" : in_pldesc,
+                            "In_PeeringStatus" : in_grp_peer,
+                            "In_UserId" : in_grp_userid,
+                            "In_VpcId" : in_grp_vpcid,
+                            "In_VpcPeeringConnectionId" : in_grp_vpcpeer,
+                            "Out_IpProtocol" : out_protocol,
+                            "Out_FromPort" : out_fromport,
+                            "Out_ToPort" : out_toport,
+                            "Out_CidrIp" : out_cidrip,
+                            "Out_Description" : out_desc,
+                            "Out_GroupId" : out_grp_groupid,
+                            "Out_GroupName" : out_grp_groupname,
+                            "Out_UserIdGroupPairs_Description" : out_grp_desc,
+                            "Out_PrefixListId" : out_prefixlistid,
+                            "Out_PLDescription" : out_pldesc,
+                            "Out_PeeringStatus" : out_grp_peer,
+                            "Out_UserId" : out_grp_userid,
+                            "Out_VpcId" : out_grp_vpcid,
+                            "Out_VpcPeeringConnectionId" : out_grp_vpcpeer,
+                            "VpcId" : sg["VpcId"],
+                            "VpcTName" : '',
+                        })
+        # klogger.debug(results)
+      else:
+        klogger.error("call error : %d", sgs["ResponseMetadata"]["HTTPStatusCode"])
+    except Exception as othererr:
+      klogger.error("ec2.describe_security_groups(),region[%s],%s", region, othererr)
+  return results
+
+
 def describe_instances(searchRegions):
   '''
     search instances in searchRegions

@@ -92,11 +92,12 @@ def executefunc(objstr, param):
 
 # boto3 results to dataframe
 def results_to_dataframe(results):
+  # klogger.debug(results)
   df = pd.DataFrame()
   for result in results:
     df_tmp = pd.DataFrame(result)
     df = pd.concat([df, df_tmp], ignore_index=True)
-  #klogger.debug(df.values)
+  # klogger.debug(df.values)
   return df
 
 # dynamic module load and call function : return two
@@ -141,6 +142,16 @@ def get_subnetname(df, x):
     if x == subnetid:
       return subnettname
 
+def get_sgname(df, x, tagname=False):
+  if tagname :
+    for sgid, sgname in df[['SGroupId','SGroupTName']].value_counts().index:
+      if x == sgid:
+        return sgname
+  else:
+    for sgid, sgname in df[['SGroupId','SGroupName']].value_counts().index:
+      if x == sgid:
+        return sgname
+
 def main(argv):
   # logger setting 
   global_config_init()
@@ -172,6 +183,11 @@ def main(argv):
   df_ins['VpcTName'] = df_ins['VpcId'].apply(lambda x : get_vpcname(df_vpc,x)) # get VpcTagName
   df_ins['SubnetTName'] = df_ins['SubnetId'].apply(lambda x : get_subnetname(df_subnet,x)) # get VpcTagName
   # klogger_dat.debug(df_ins)
+  df_sg = results_to_dataframe(executefunc("kskpkg.ec2.describe_security_groups", ['ap-northeast-2']))
+  df_sg['VpcTName'] = df_sg['VpcId'].apply(lambda x : get_vpcname(df_vpc,x)) # get VpcTagName
+  df_sg['In_GroupName'] = df_sg['In_GroupId'].apply(lambda x : get_sgname(df_sg,x)) # get VpcTagName
+  df_sg['Out_GroupName'] = df_sg['Out_GroupId'].apply(lambda x : get_sgname(df_sg,x)) # get VpcTagName
+  # klogger_dat.debug(df_sg)
 
   # to_excel 
   klogger_dat.debug("%s\n%s","-"*20,"save to excel")
@@ -187,6 +203,7 @@ def main(argv):
       df_routea.to_excel(writer, sheet_name='router', index=False) 
       df_routet.to_excel(writer, sheet_name='routeinfo', index=False) 
       df_ins.to_excel(writer, sheet_name='instance', index=False) 
+      df_sg.to_excel(writer, sheet_name='securegroup', index=False) 
   else:
     with pd.ExcelWriter(output_file, engine='openpyxl') as writer:
       df_route53.to_excel(writer, sheet_name='route53', index=False)
@@ -199,6 +216,7 @@ def main(argv):
       df_routea.to_excel(writer, sheet_name='router', index=False) 
       df_routet.to_excel(writer, sheet_name='routeinfo', index=False) 
       df_ins.to_excel(writer, sheet_name='instance', index=False) 
+      df_sg.to_excel(writer, sheet_name='securegroup', index=False) 
   klogger_dat.debug("finished")
 
 if __name__ == "__main__":
