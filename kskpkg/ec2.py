@@ -580,6 +580,101 @@ def describe_security_groups(searchRegions):
       klogger.error("ec2.describe_security_groups(),region[%s],%s", region, othererr)
   return results
 
+def describe_network_interfaces(searchRegions):
+  '''
+    search eni in searchRegions
+  '''
+  klogger_dat.debug('ec2-ENI')
+  for region in searchRegions:
+    try:
+      results = [] 
+      ec2=boto3.client('ec2', region )
+      nets = ec2.describe_network_interfaces()
+      if 200 == nets["ResponseMetadata"]["HTTPStatusCode"]:
+        # klogger_dat.debug("%s",nets["NetworkInterfaces"])
+        for net in nets["NetworkInterfaces"]:
+            desc = net['Description'] if 'Description' in net else ''
+            if 'Association' in net :
+              publicip = net['Association']['PublicIp'] if 'PublicIp' in net['Association'] else ' '
+              publicdnsname = net['Association']['PublicDnsName'] if 'PublicDnsName' in net['Association'] else ' '
+            else:
+              publicip = ''
+              publicdnsname = ''
+            if 'Attachment' in net :
+              attach_instanceid = net['Attachment']['InstanceId'] if 'InstanceId' in net['Attachment'] else ' '
+              attach_instanceownerid = net['Attachment']['InstanceOwnerId'] if 'InstanceOwnerId' in net['Attachment'] else ' '
+              attach_deviceindex = net['Attachment']['DeviceIndex'] if 'DeviceIndex' in net['Attachment'] else ' '
+              attach_networkcardindex = net['Attachment']['NetworkCardIndex'] if 'NetworkCardIndex' in net['Attachment'] else ' '
+            else:
+              attach_instanceid = ''
+              attach_deviceindex = ''
+              attach_networkcardindex = ''
+              attach_instanceownerid = ''
+            privateipaddrs = []; len_privateipaddrs = 1;
+            if 'PrivateIpAddresses' in net :
+              len_privateipaddrs = len(net['PrivateIpAddresses'])
+              for ipaddr in net['PrivateIpAddresses']:
+                if 'Association' in ipaddr:
+                  privateipaddrs.append({'Primary':ipaddr['Primary'], 
+                                         'PrivateIpAddress':ipaddr['PrivateIpAddress'],
+                                         'PublicIp':ipaddr['Association']['PublicIp'],
+                                         'PublicDnsName':ipaddr['Association']['PublicDnsName']})
+                else:
+                  privateipaddrs.append({'Primary':ipaddr['Primary'], 
+                                         'PrivateIpAddress':ipaddr['PrivateIpAddress']})
+            else:
+              privateipaddrs.append(' ')
+            sgroupids = []; sgroupnames = []; len_sgroups = 1;
+            if 'Groups' in net :
+              len_sgroups = len(net['Groups'])
+              for sgroup in net['Groups']:
+                sgroupids.append(sgroup['GroupId'])
+                sgroupnames.append(sgroup['GroupName'])
+            else:
+              sgroupids.append(' ')
+              sgroupnames.append(' ')
+            # list count 동기화처리
+            max_len = max(len_privateipaddrs, len_sgroups)
+            for ix in range(len_privateipaddrs, max_len):
+              privateipaddrs.append(' ')
+            for ix in range(len_sgroups, max_len):
+              sgroupids.append(' ')
+              sgroupnames.append(' ')
+            # net Tag중 Name 값
+            tagname = 'Not Exist Name Tag'
+            if 'TagSet' in net:
+              for tag in net['TagSet']:
+                if tag['Key'] == 'Name':
+                  tagname = tag['Value']
+                  break
+            results.append( { "NetworkInterfaceId": net["NetworkInterfaceId"],
+                              "Status" : net["Status"],
+                              "InterfaceType" : net["InterfaceType"],
+                              "Description" : desc,
+                              "AvailabilityZone" : net["AvailabilityZone"],
+                              "PrivateIpAddress" : net["PrivateIpAddress"],
+                              "PublicIp" : publicip,
+                              "PublicDnsName" : publicdnsname,
+                              "Attach_InstanceID" : attach_instanceid,
+                              "Attach_InstanceOwnerID" : attach_instanceownerid,
+                              "Attach_DeviceIndex" : attach_deviceindex,
+                              "Attach_NetworkCardIndex" : attach_networkcardindex,
+                              "ENITName" : tagname,
+                              "PrivateIpAddresses" : privateipaddrs,
+                              "SGroupId" : sgroupids,
+                              "SGroupName": sgroupnames,
+                              "SubnetId" : net["SubnetId"],
+                              "SubnetTName" : '',
+                              "VpcId" : net["VpcId"],
+                              "VpcTName" : '',
+                          })
+        # klogger.debug(results)
+      else:
+        klogger.error("call error : %d", nets["ResponseMetadata"]["HTTPStatusCode"])
+    except Exception as othererr:
+      klogger.error("ec2.describe_network_interfaces(),region[%s],%s", region, othererr)
+  return results
+
 
 def describe_instances(searchRegions):
   '''
@@ -649,6 +744,7 @@ def main(argv):
   describe_instances(searchRegions) 
   describe_subnets(searchRegions) 
   describe_route_tables(searchRegions) 
+  describe_security_groups(searchRegions) 
   sys.exit(0)
 
 if __name__ == "__main__":

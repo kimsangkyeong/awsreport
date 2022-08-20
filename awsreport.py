@@ -21,6 +21,7 @@ import kskpkg.config.awsglobal as awsglobal
 import numpy as np   # pip install numpy
 import pandas as pd  # pip install pandas
 from datetime import date
+import IPython.display as display # pip install ipython
 
 # 현재 디렉토리
 path_cwd = os.getcwd()
@@ -33,6 +34,9 @@ if my_os == "linux":
 else:
   path_logconf = path_cwd + '\kskpkg\config\logging.conf'
   output_file = f'{path_cwd}\output_{date.today().strftime("%Y%m%d")}.xlsx'
+
+pd.set_option("display.max_colwidth", 999)  # 컬럼 정보 보여주기
+pd.set_option("display.max_rows", 150)  # row 정보 보여주기
 
 def global_config_init():
   global klogger
@@ -188,6 +192,11 @@ def main(argv):
   df_sg['In_GroupName'] = df_sg['In_GroupId'].apply(lambda x : get_sgname(df_sg,x)) # get VpcTagName
   df_sg['Out_GroupName'] = df_sg['Out_GroupId'].apply(lambda x : get_sgname(df_sg,x)) # get VpcTagName
   # klogger_dat.debug(df_sg)
+  df_eni = results_to_dataframe(executefunc("kskpkg.ec2.describe_network_interfaces", ['ap-northeast-2']))
+  df_eni['VpcTName'] = df_eni['VpcId'].apply(lambda x : get_vpcname(df_vpc,x)) # get VpcTagName
+  df_eni['SubnetTName'] = df_eni['SubnetId'].apply(lambda x : get_subnetname(df_subnet,x)) # get VpcTagName
+  # klogger_dat.debug(df_eni)
+  # display.display(df_eni)
 
   # to_excel 
   klogger_dat.debug("%s\n%s","-"*20,"save to excel")
@@ -204,6 +213,7 @@ def main(argv):
       df_routet.to_excel(writer, sheet_name='routeinfo', index=False) 
       df_ins.to_excel(writer, sheet_name='instance', index=False) 
       df_sg.to_excel(writer, sheet_name='securegroup', index=False) 
+      df_eni.to_excel(writer, sheet_name='eni', index=False) 
   else:
     with pd.ExcelWriter(output_file, engine='openpyxl') as writer:
       df_route53.to_excel(writer, sheet_name='route53', index=False)
@@ -217,6 +227,7 @@ def main(argv):
       df_routet.to_excel(writer, sheet_name='routeinfo', index=False) 
       df_ins.to_excel(writer, sheet_name='instance', index=False) 
       df_sg.to_excel(writer, sheet_name='securegroup', index=False) 
+      df_eni.to_excel(writer, sheet_name='eni', index=False) 
   klogger_dat.debug("finished")
 
 if __name__ == "__main__":
