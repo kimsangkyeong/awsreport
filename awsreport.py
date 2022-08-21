@@ -156,13 +156,18 @@ def get_sgname(df, x, tagname=False):
       if x == sgid:
         return sgname
 
+def get_elbname(df, x):
+  for loadbalacerarn, loadbalancername in df[['LoadBalancerArn','LoadBalancerName']].value_counts().index:
+    if x == loadbalacerarn :
+      return loadbalancername
+
 def main(argv):
   # logger setting 
   global_config_init()
 
   df_route53 = results_to_dataframe(executefunc_p1("kskpkg.route53.list_hosted_zones"))
   # klogger_dat.debug(df_route53)
-  df_route53_record = results_to_dataframe(executefunc("kskpkg.route53.list_resource_record_sets",list(df_route53['Id'])))
+  df_route53_record = results_to_dataframe(executefunc("kskpkg.route53.list_resource_record_sets",list(df_route53['Id'].value_counts().index)))
   # klogger_dat.debug(df_route53_record)
   df_cloudmap = results_to_dataframe(executefunc_p1("kskpkg.servicediscovery.list_namespaces"))
   # klogger_dat.debug(df_cloudmap)
@@ -177,33 +182,36 @@ def main(argv):
   # klogger_dat.debug(df_subnet)
   df_nat = results_to_dataframe(executefunc("kskpkg.ec2.describe_nat_gateways", ['ap-northeast-2']))
   df_nat['VpcTName'] = df_nat['VpcId'].apply(lambda x : get_vpcname(df_vpc,x)) # get VpcTagName
-  df_nat['SubnetTName'] = df_nat['SubnetId'].apply(lambda x : get_subnetname(df_subnet,x)) # get VpcTagName
+  df_nat['SubnetTName'] = df_nat['SubnetId'].apply(lambda x : get_subnetname(df_subnet,x)) # get Subnet TagName
   # klogger_dat.debug(df_nat)
   results1, results2 = executefunc2("kskpkg.ec2.describe_route_tables", ['ap-northeast-2'])
   df_routea, df_routet = two_results_to_dataframe(results1, results2)
   df_routea['VpcTName'] = df_routea['VpcId'].apply(lambda x : get_vpcname(df_vpc,x)) # get VpcTagName
-  df_routea['SubnetTName'] = df_routea['SubnetId'].apply(lambda x : get_subnetname(df_subnet,x)) # get VpcTagName
+  df_routea['SubnetTName'] = df_routea['SubnetId'].apply(lambda x : get_subnetname(df_subnet,x)) # get Subnet TagName
   df_routet['VpcTName'] = df_routet['VpcId'].apply(lambda x : get_vpcname(df_vpc,x)) # get VpcTagName
   # klogger_dat.debug(df_routet)
   df_ins = results_to_dataframe(executefunc("kskpkg.ec2.describe_instances", ['ap-northeast-2']))
   df_ins['VpcTName'] = df_ins['VpcId'].apply(lambda x : get_vpcname(df_vpc,x)) # get VpcTagName
-  df_ins['SubnetTName'] = df_ins['SubnetId'].apply(lambda x : get_subnetname(df_subnet,x)) # get VpcTagName
+  df_ins['SubnetTName'] = df_ins['SubnetId'].apply(lambda x : get_subnetname(df_subnet,x)) # get Subnet TagName
   # klogger_dat.debug(df_ins)
   df_sg = results_to_dataframe(executefunc("kskpkg.ec2.describe_security_groups", ['ap-northeast-2']))
   df_sg['VpcTName'] = df_sg['VpcId'].apply(lambda x : get_vpcname(df_vpc,x)) # get VpcTagName
-  df_sg['In_GroupName'] = df_sg['In_GroupId'].apply(lambda x : get_sgname(df_sg,x)) # get VpcTagName
-  df_sg['Out_GroupName'] = df_sg['Out_GroupId'].apply(lambda x : get_sgname(df_sg,x)) # get VpcTagName
+  df_sg['In_GroupName'] = df_sg['In_GroupId'].apply(lambda x : get_sgname(df_sg,x)) # get Security Group TagName
+  df_sg['Out_GroupName'] = df_sg['Out_GroupId'].apply(lambda x : get_sgname(df_sg,x)) # get Security Group TagName
   # klogger_dat.debug(df_sg)
   df_eni = results_to_dataframe(executefunc("kskpkg.ec2.describe_network_interfaces", ['ap-northeast-2']))
   df_eni['VpcTName'] = df_eni['VpcId'].apply(lambda x : get_vpcname(df_vpc,x)) # get VpcTagName
-  df_eni['SubnetTName'] = df_eni['SubnetId'].apply(lambda x : get_subnetname(df_subnet,x)) # get VpcTagName
+  df_eni['SubnetTName'] = df_eni['SubnetId'].apply(lambda x : get_subnetname(df_subnet,x)) # get Subnet TagName
   # klogger_dat.debug(df_eni)
   # display.display(df_eni)
   df_elb = results_to_dataframe(executefunc_p1("kskpkg.elb.describe_load_balancers"))
   df_elb['VpcTName'] = df_elb['VpcId'].apply(lambda x : get_vpcname(df_vpc,x)) # get VpcTagName
-  df_elb['SubnetTName'] = df_elb['SubnetId'].apply(lambda x : get_subnetname(df_subnet,x)) # get VpcTagName
-  df_elb['SecurityGroupName'] = df_elb['SecurityGroupId'].apply(lambda x : get_sgname(df_sg,x)) # get VpcTagName
+  df_elb['SubnetTName'] = df_elb['SubnetId'].apply(lambda x : get_subnetname(df_subnet,x)) # get Subnet TagName
+  df_elb['SecurityGroupName'] = df_elb['SecurityGroupId'].apply(lambda x : get_sgname(df_sg,x)) # get Security Group TagName
   # klogger_dat.debug(df_elb)
+  df_elb_listener = results_to_dataframe(executefunc("kskpkg.elb.describe_listeners", list(df_elb['LoadBalancerArn'].value_counts().index)))
+  df_elb_listener['LoadBalancerName'] = df_elb_listener['LoadBalancerArn'].apply(lambda x : get_elbname(df_elb,x)) # get ELB Name
+  # klogger_dat.debug(df_elb_listener)
   df_s3 = results_to_dataframe(executefunc_p1("kskpkg.s3.list_buckets"))
   # klogger_dat.debug(df_s3)
 
@@ -222,6 +230,7 @@ def main(argv):
       df_routea.to_excel(writer, sheet_name='router', index=False) 
       df_routet.to_excel(writer, sheet_name='routeinfo', index=False) 
       df_elb.to_excel(writer, sheet_name='elb', index=False) 
+      df_elb_listener.to_excel(writer, sheet_name='elb_listener', index=False) 
       df_ins.to_excel(writer, sheet_name='instance', index=False) 
       df_sg.to_excel(writer, sheet_name='securegroup', index=False) 
       df_eni.to_excel(writer, sheet_name='eni', index=False) 
@@ -239,6 +248,7 @@ def main(argv):
       df_routea.to_excel(writer, sheet_name='router', index=False) 
       df_routet.to_excel(writer, sheet_name='routeinfo', index=False) 
       df_elb.to_excel(writer, sheet_name='elb', index=False) 
+      df_elb_listener.to_excel(writer, sheet_name='elb_listener', index=False) 
       df_ins.to_excel(writer, sheet_name='instance', index=False) 
       df_sg.to_excel(writer, sheet_name='securegroup', index=False) 
       df_eni.to_excel(writer, sheet_name='eni', index=False) 
