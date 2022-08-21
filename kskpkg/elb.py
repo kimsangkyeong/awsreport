@@ -555,6 +555,102 @@ def describe_rules(ListenerArns):
     klogger.error("elbv2.describe_rules(),%s", othererr)
   return results
 
+def describe_target_groups(LoadBalancerArns):
+  '''
+    search load_balancers target groups
+  '''
+  klogger_dat.debug('ELB-TargetGroup')
+#   klogger_dat.debug(LoadBalancerArns)
+  try:
+    results = [] 
+    elb=boto3.client('elbv2')
+    for LoadBalancerArn in LoadBalancerArns :
+      targetgrps = elb.describe_target_groups(LoadBalancerArn=LoadBalancerArn)
+    #   klogger_dat.debug(targetgrps)
+      if 200 == targetgrps["ResponseMetadata"]["HTTPStatusCode"]:
+      #   klogger_dat.debug(targetgrps["TargetGroups"])
+        if len(targetgrps["TargetGroups"]) > 0 :
+          for targetgrp in targetgrps["TargetGroups"]:
+            # klogger_dat.debug(targetgrp)
+            protocols = []; ports = []; tgrpnames = []; tgrparns = [];
+            targettypes = []; henableds = []; hprotocols = []; hports = []; hintsecs = [];
+            htimeouts = []; hcounts = []; uhcounts = []; hpaths = []; mhttpcodes = [];
+            mgrpccodes = []; versions = []; vpcids = [];
+            
+            tgrparns.append(targetgrp['TargetGroupArn'] if 'TargetGroupArn' in targetgrp else ' ')
+            tgrpnames.append(targetgrp['TargetGroupName'] if 'TargetGroupName' in targetgrp else ' ')
+            protocols.append(targetgrp['Protocol'] if 'Protocol' in targetgrp else ' ')
+            ports.append(targetgrp['Port'] if 'Port' in targetgrp else ' ')
+            vpcids.append(targetgrp['VpcId'] if 'VpcId' in targetgrp else ' ')
+            targettypes.append(targetgrp['TargetType'] if 'TargetType' in targetgrp else ' ')
+            henableds.append(targetgrp['HealthCheckEnabled'] if 'HealthCheckEnabled' in targetgrp else ' ')
+            hprotocols.append(targetgrp['HealthCheckProtocol'] if 'HealthCheckProtocol' in targetgrp else ' ')
+            hports.append(targetgrp['HealthCheckPort'] if 'HealthCheckPort' in targetgrp else ' ')
+            hintsecs.append(targetgrp['HealthCheckIntervalSeconds'] if 'HealthCheckIntervalSeconds' in targetgrp else ' ')
+            htimeouts.append(targetgrp['HealthCheckTimeoutSeconds'] if 'HealthCheckTimeoutSeconds' in targetgrp else ' ')
+            hcounts.append(targetgrp['HealthyThresholdCount'] if 'HealthyThresholdCount' in targetgrp else ' ')
+            uhcounts.append(targetgrp['UnhealthyThresholdCount'] if 'UnhealthyThresholdCount' in targetgrp else ' ')
+            hpaths.append(targetgrp['HealthCheckPath'] if 'HealthCheckPath' in targetgrp else ' ')
+            if 'Matcher' in targetgrp :
+              mhttpcodes.append(targetgrp['Matcher']['HttpCode'] if 'HttpCode' in targetgrp['Matcher'] else ' ')
+              mgrpccodes.append(targetgrp['Matcher']['GrpcCode'] if 'GrpcCode' in targetgrp['Matcher'] else ' ')
+            else:
+              mhttpcodes.append(' ')
+              mgrpccodes.append(' ')
+            versions.append(targetgrp['ProtocolVersion'] if 'ProtocolVersion' in targetgrp else ' ')
+
+            results.append( { "LoadBalancerName": '',
+                              "LoadBalancerArn" : LoadBalancerArn,
+                              "Protocol" : protocols,
+                              "Port" : ports,
+                              "TargetGroupName" : tgrpnames,
+                              "TargetGroupArn" : tgrparns,
+                              "TargetType" : targettypes,
+                              "HealthCheckEnabled" : henableds,
+                              "HealthCheckProtocol" : hprotocols,
+                              "HealthCheckPort" : hports,
+                              "HealthCheckIntervalSeconds" : hintsecs,
+                              "HealthCheckTimeoutSeconds" : htimeouts,
+                              "HealthyThresholdCount" : hcounts,
+                              "UnhealthyThresholdCount" : uhcounts,
+                              "HealthCheckPath" : hpaths,
+                              "Matcher_HttpCode" : mhttpcodes,
+                              "Matcher_GrpcCode" : mgrpccodes,
+                              "ProtocolVersion" : versions,
+                              "VpcId" : vpcids,
+                              "VpcTName" : '',
+                             })
+          
+        else: # column list
+          results.append( { "LoadBalancerName": ' ',
+                            "LoadBalancerArn" : ' ',
+                            "Protocol" : ' ',
+                            "Port" : ' ',
+                            "TargetGroupName" : ' ',
+                            "TargetType" : ' ',
+                            "HealthCheckEnabled" : ' ',
+                            "HealthCheckProtocol" : ' ',
+                            "HealthCheckPort" : ' ',
+                            "HealthCheckIntervalSeconds" : ' ',
+                            "HealthCheckTimeoutSeconds" : ' ',
+                            "HealthyThresholdCount" : ' ',
+                            "UnhealthyThresholdCount" : ' ',
+                            "HealthCheckPath" : ' ',
+                            "Matcher_HttpCode" : ' ',
+                            "Matcher_GrpcCode" : ' ',
+                            "ProtocolVersion" : ' ',
+                            "VpcId" : ' ',
+                            "VpcTName" : list(' '),
+                           })
+          
+        # klogger.debug(results)
+      else:
+        klogger.error("call error : %d", targetgrps["ResponseMetadata"]["HTTPStatusCode"])
+    # klogger.debug(results)
+  except Exception as othererr:
+    klogger.error("elbv2.describe_target_groups(),%s", othererr)
+  return results
+
 def main(argv):
 
   describe_load_balancers() 
