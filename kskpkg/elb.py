@@ -15,6 +15,7 @@
 from __future__ import print_function
 import os, sys, getopt
 import json
+from urllib import request
 import boto3
 import logging
 
@@ -320,10 +321,243 @@ def describe_listeners(LoadBalancerArns):
     klogger.error("elbv2.describe_listeners(),%s", othererr)
   return results
 
+def describe_rules(ListenerArns):
+  '''
+    search load_balancers Listenser Rules
+  '''
+  klogger_dat.debug('ELB-Listener-Rule')
+#   klogger_dat.debug(ListenerArns)
+  try:
+    results = [] 
+    elb=boto3.client('elbv2')
+    for LisenerArn in ListenerArns :
+      rules = elb.describe_rules(ListenerArn=LisenerArn)
+    #   klogger_dat.debug(rules)
+      if 200 == rules["ResponseMetadata"]["HTTPStatusCode"]:
+      #   klogger_dat.debug(rules["Rules"])
+        if len(rules["Rules"]) > 0 :
+          for rule in rules["Rules"]:
+            # klogger_dat.debug(rule)
+            actorders = []; acttypes = []; acttgrparn =[]; tgrparns = [];
+            tgrpweights = []; tgrpsticki = []; tgrpstikidu = []; rprotocols = []; rports = [];
+            rhosts = []; rpaths = []; rquerys = []; rstates = []; fmsgbodys = []; fstates = [];
+            fcontenttypes = []; oidcissuers = []; oidcendpoints = []; oidcscopes = []; oidctoken = [];
+            oidccookies = []; oidcextparams = []; oidcunauths = []; cognitodomains = [];
+            cognitoarns = []; cognitocliids = []; cognitocookies = []; cognitoscopes = [];
+            cognitoextparams = []; cognitounauths = []; cfields = []; cvalues = [];
+            chostconfs = []; cpathconfs = []; chttpheaders = []; chttpvalues= []; cquerykeys = [];
+            cqueryvalues = []; cmethodconfs = []; cipconfs = [];
+
+            if 'Conditions' in rule :
+              for condition in rule['Conditions']:
+                cfields.append(condition['Field'] if 'Field' in condition else ' ')
+                if 'Values' in condition :
+                  for value in condition['Values'] :
+                    cvalues.append(value)
+                if 'HostHeaderConfig' in condition :
+                  for value in condition['HostHeaderConfig']['Values'] :
+                    chostconfs.append(value)
+                if 'PathPatternConfig' in condition :
+                  for value in condition['PathPatternConfig']['Values'] :
+                    cpathconfs.append(value)
+                if 'HttpHeaderConfig' in condition :
+                  chttpheaders.append(condition['HttpHeaderConfig']['HttpHeaderName']
+                                      if 'HttpHeaderName' in condition['HttpHeaderConfig'] else ' ')
+                  if 'Values' in condition['HttpHeaderConfig']:
+                    for value in condition['HttpHeaderConfig']['Values'] :
+                      chttpvalues.append(value)
+                if 'QueryStringConfig' in condition :
+                  for value in condition['QueryStringConfig']['Values']:
+                    cquerykeys.append(value['Key'] if 'Key' in value else ' ')
+                    cqueryvalues.append(value['Value'] if 'Value' in value else ' ')
+                if 'HttpRequestMethodConfig' in condition :
+                  for value in condition['HttpRequestMethodConfig']['Values'] :
+                    cmethodconfs.append(value)
+                if 'SourceIpConfig' in condition :
+                  for value in condition['SourceIpConfig']['Values'] :
+                    cipconfs.append(value)
+            if 'Actions' in rule :
+              for action in rule['Actions']:
+                actorders.append(action['Order'] if 'Order' in action else ' ')
+                acttypes.append(action['Type'] if 'Type' in action else ' ')
+                acttgrparn.append(action['TargetGroupArn'] if 'TargetGroupArn' in action else ' ')
+                if 'AuthenticateOidcConfig' in action :
+                  oidcissuers.append(action['AuthenticateOidcConfig']['Issuer'] 
+                                     if 'Issuer' in action['AuthenticateOidcConfig'] else ' ')
+                  oidcendpoints.append(action['AuthenticateOidcConfig']['AuthorizationEndpoint'] 
+                                     if 'AuthorizationEndpoint' in action['AuthenticateOidcConfig'] else ' ')
+                  oidcscopes.append(action['AuthenticateOidcConfig']['Scope'] 
+                                     if 'Scope' in action['AuthenticateOidcConfig'] else ' ')
+                  oidccookies.append(action['AuthenticateOidcConfig']['SessionCookieName'] 
+                                     if 'SessionCookieName' in action['AuthenticateOidcConfig'] else ' ')
+                  oidcextparams.append(action['AuthenticateOidcConfig']['AuthenticationRequestExtraParams']['string'] 
+                                     if 'AuthenticationRequestExtraParams' in action['AuthenticateOidcConfig'] else ' ')
+                  oidcunauths.append(action['AuthenticateOidcConfig']['OnUnauthenticatedRequest'] 
+                                     if 'OnUnauthenticatedRequest' in action['AuthenticateOidcConfig'] else ' ')
+                  oidctoken.append(action['AuthenticateOidcConfig']['TokenEndpoint'] 
+                                     if 'TokenEndpoint' in action['AuthenticateOidcConfig'] else ' ')
+                if 'AuthenticateCognitoConfig' in action :
+                  cognitodomains.append(action['AuthenticateCognitoConfig']['UserPoolDomain'] 
+                                   if 'UserPoolDomain' in action['AuthenticateCognitoConfig'] else ' ')
+                  cognitoarns.append(action['AuthenticateCognitoConfig']['UserPoolArn'] 
+                                   if 'UserPoolArn' in action['AuthenticateCognitoConfig'] else ' ')
+                  cognitocliids.append(action['AuthenticateCognitoConfig']['UserPoolClientId'] 
+                                   if 'UserPoolClientId' in action['AuthenticateCognitoConfig'] else ' ')
+                  cognitocookies.append(action['AuthenticateCognitoConfig']['SessionCookieName'] 
+                                   if 'SessionCookieName' in action['AuthenticateCognitoConfig'] else ' ')
+                  cognitoscopes.append(action['AuthenticateCognitoConfig']['Scope'] 
+                                   if 'Scope' in action['AuthenticateCognitoConfig'] else ' ')
+                  cognitoextparams.append(action['AuthenticateCognitoConfig']['AuthenticationRequestExtraParams']['string'] 
+                                   if 'AuthenticationRequestExtraParams' in action['AuthenticateCognitoConfig'] else ' ')
+                  cognitounauths.append(action['AuthenticateCognitoConfig']['OnUnauthenticatedRequest'] 
+                                   if 'OnUnauthenticatedRequest' in action['AuthenticateCognitoConfig'] else ' ')
+                if 'RedirectConfig' in action :
+                  rprotocols.append(action['RedirectConfig']['Protocol'] 
+                                   if 'Protocol' in action['RedirectConfig'] else ' ')
+                  rports.append(action['RedirectConfig']['Port'] 
+                                   if 'Port' in action['RedirectConfig'] else ' ')
+                  rhosts.append(action['RedirectConfig']['Host'] 
+                                   if 'Host' in action['RedirectConfig'] else ' ')
+                  rpaths.append(action['RedirectConfig']['Path'] 
+                                   if 'Path' in action['RedirectConfig'] else ' ')
+                  rquerys.append(action['RedirectConfig']['Query'] 
+                                   if 'Query' in action['RedirectConfig'] else ' ')
+                  rstates.append(action['RedirectConfig']['StatusCode'] 
+                                   if 'StatusCode' in action['RedirectConfig'] else ' ')
+                if 'FixedResponseConfig' in action :
+                  fmsgbodys.append(action['FixedResponseConfig']['MessageBody'] 
+                                   if 'MessageBody' in action['FixedResponseConfig'] else ' ')
+                  fstates.append(action['FixedResponseConfig']['StatusCode'] 
+                                   if 'StatusCode' in action['FixedResponseConfig'] else ' ')
+                  fcontenttypes.append(action['FixedResponseConfig']['ContentType'] 
+                                   if 'ContentType' in action['FixedResponseConfig'] else ' ')
+                if 'ForwardConfig' in action :
+                  if 'TargetGroups' in action['ForwardConfig'] :
+                    for tgroup in action['ForwardConfig']['TargetGroups'] :
+                      tgrparns.append(tgroup['TargetGroupArn'] 
+                                    if 'TargetGroupArn' in tgroup else ' ')
+                      tgrpweights.append(tgroup['Weight'] 
+                                    if 'Weight' in tgroup else ' ')
+                  if 'TargetGroupStickinessConfig' in action['ForwardConfig'] :
+                    tgrpsticki.append(action['ForwardConfig']['TargetGroupStickinessConfig']['Enabled'] 
+                                    if 'Enabled' in action['ForwardConfig']['TargetGroupStickinessConfig'] else ' ')
+                    tgrpstikidu.append(action['ForwardConfig']['TargetGroupStickinessConfig']['DurationSeconds'] 
+                                    if 'DurationSeconds' in action['ForwardConfig']['TargetGroupStickinessConfig'] else ' ')  
+            # list count sync with space
+            utils.ListSyncCountWithSpace(actorders, acttypes, acttgrparn, 
+                                 tgrparns, tgrpweights, tgrpsticki, tgrpstikidu, 
+                                 rprotocols, rports, rhosts, rpaths, rquerys, rstates, 
+                                 fmsgbodys, fstates, fcontenttypes, 
+                                 oidcissuers, oidcendpoints, oidcscopes, oidctoken,
+                                 oidccookies, oidcextparams, oidcunauths, 
+                                 cognitodomains, cognitoarns, cognitocliids, cognitocookies, 
+                                 cognitoscopes, cognitoextparams, cognitounauths, cfields,
+                                 cvalues, chostconfs, cpathconfs, chttpheaders, chttpvalues,
+                                 cquerykeys, cqueryvalues, cmethodconfs, cipconfs)
+
+            results.append( { "LoadBalancerInfo": ' ',
+                              "ListenerArn" : LisenerArn,
+                              "RuleArn" : rule['RuleArn'],
+                              "Priority" : rule['Priority'],
+                              "Cond_Field" : cfields,
+                              "Cond_Values" : cvalues,
+                              "Cond_HostHeaderConfig" : chostconfs,
+                              "Cond_PathPatternConfig" : cpathconfs,
+                              "Cond_HttpHeaderName" : chttpheaders,
+                              "Cond_HttpHeaderValue" : chttpvalues,
+                              "Cond_QueryStringKey" : cquerykeys,
+                              "Cond_QueryStringValue" : cqueryvalues,
+                              "Cond_HttpRequestMethodConfig" : cmethodconfs,
+                              "Cond_SourceIpConfig" : cipconfs,
+                              "Act_Type" : acttypes,
+                              "Act_TargetGroupArn" : acttgrparn,
+                              "Act_Order" : actorders,
+                              "Forward_TargetGroupArn" : tgrparns,
+                              "Forward_TargetGroupWeight" : tgrpweights,
+                              "Forward_TargetGroupStickiness" : tgrpsticki,
+                              "Forward_TargetGroupStickinessDuration" : tgrpstikidu,
+                              "Redir_Protocol" : rprotocols,
+                              "Redir_Port" : rports,
+                              "Redir_Host" : rhosts,
+                              "Redir_Path" : rpaths,
+                              "Redir_Query" : rquerys,
+                              "Redir_StatusCode" : rstates,
+                              "FixRep_MessageBody" : fmsgbodys,
+                              "FixRep_StatusCode" : fstates,
+                              "FixRep_ContentType" : fcontenttypes,
+                              "Act_oidc_Issuer" : oidcissuers,
+                              "Act_oidc_AuthorizationEndpoint" : oidcendpoints,
+                              "Act_oidc_Scope" : oidcscopes,
+                              "Act_oidc_TokenEndpoint" : oidctoken,
+                              "Act_oidc_SessionCookieName" : oidccookies,
+                              "Act_oidc_AuthExtraParams" : oidcextparams,
+                              "Act_oidc_OnUnauthRequest" : oidcunauths,
+                              "Act_cognito_UserPoolDomain" : cognitodomains,
+                              "Act_cognito_UserPoolArn" : cognitoarns,
+                              "Act_cognito_UserPoolClientId" : cognitocliids,
+                              "Act_cognito_SessionCookieName" : cognitocookies,
+                              "Act_cognito_Scope" : cognitoscopes,
+                              "Act_cognito_AuthExtraParams" : cognitoextparams,
+                              "Act_cognito_OnUnauthRequest" : cognitounauths,
+                             })
+        else: # column list
+          results.append( { "LoadBalancerInfo": ' ',
+                            "ListenerArn" : ' ',
+                            "RuleArn" : ' ',
+                            "Priority" : ' ',
+                            "Cond_Field" : ' ',
+                            "Cond_Values" : ' ',
+                            "Cond_HostHeaderConfig" : ' ',
+                            "Cond_PathPatternConfig" : ' ',
+                            "Cond_HttpHeaderName" : ' ',
+                            "Cond_HttpHeaderValue" : ' ',
+                            "Cond_QueryStringKey" : ' ',
+                            "Cond_QueryStringValue" : ' ',
+                            "Cond_HttpRequestMethodConfig" : ' ',
+                            "Cond_SourceIpConfig" : ' ',
+                            "Act_Type" : ' ',
+                            "Act_TargetGroupArn" : ' ',
+                            "Act_Order" : ' ',
+                            "Forward_TargetGroupArn" : ' ',
+                            "Forward_TargetGroupWeight" : ' ',
+                            "Forward_TargetGroupStickiness" : ' ',
+                            "Forward_TargetGroupStickinessDuration" : ' ',
+                            "Redir_Protocol" : ' ',
+                            "Redir_Port" : ' ',
+                            "Redir_Host" : ' ',
+                            "Redir_Path" : ' ',
+                            "Redir_Query" : ' ',
+                            "Redir_StatusCode" : ' ',
+                            "FixRep_MessageBody" : ' ',
+                            "FixRep_StatusCode" : ' ',
+                            "FixRep_ContentType" : ' ',
+                            "Act_oidc_Issuer" : ' ',
+                            "Act_oidc_AuthorizationEndpoint" : ' ',
+                            "Act_oidc_Scope" : ' ',
+                            "Act_oidc_TokenEndpoint" : ' ',
+                            "Act_oidc_SessionCookieName" : ' ',
+                            "Act_oidc_AuthExtraParams" : ' ',
+                            "Act_oidc_OnUnauthRequest" : ' ',
+                            "Act_cognito_UserPoolDomain" : ' ',
+                            "Act_cognito_UserPoolArn" : ' ',
+                            "Act_cognito_UserPoolClientId" : ' ',
+                            "Act_cognito_SessionCookieName" : ' ',
+                            "Act_cognito_Scope" : ' ',
+                            "Act_cognito_AuthExtraParams" : ' ',
+                            "Act_cognito_OnUnauthRequest" : list(' '),
+                           })
+          
+        # klogger.debug(results)
+      else:
+        klogger.error("call error : %d", rules["ResponseMetadata"]["HTTPStatusCode"])
+    # klogger.debug(results)
+  except Exception as othererr:
+    klogger.error("elbv2.describe_rules(),%s", othererr)
+  return results
+
 def main(argv):
 
   describe_load_balancers() 
-  describe_listeners()
 
   sys.exit(0)
 

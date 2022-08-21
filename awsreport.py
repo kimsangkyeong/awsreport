@@ -161,6 +161,11 @@ def get_elbname(df, x):
     if x == loadbalacerarn :
       return loadbalancername
 
+def get_elbinfo(df, x):
+  for listenerarn, loadbalacerarn, loadbalancername, protocol, port in df[['ListenerArn','LoadBalancerArn','LoadBalancerName', 'Protocol', 'Port']].value_counts().index:
+    if x == listenerarn :
+      return { loadbalancername : loadbalacerarn, protocol : port }
+
 def main(argv):
   # logger setting 
   global_config_init()
@@ -212,6 +217,9 @@ def main(argv):
   df_elb_listener = results_to_dataframe(executefunc("kskpkg.elb.describe_listeners", list(df_elb['LoadBalancerArn'].value_counts().index)))
   df_elb_listener['LoadBalancerName'] = df_elb_listener['LoadBalancerArn'].apply(lambda x : get_elbname(df_elb,x)) # get ELB Name
   # klogger_dat.debug(df_elb_listener)
+  df_elb_listener_rule = results_to_dataframe(executefunc("kskpkg.elb.describe_rules", list(df_elb_listener['ListenerArn'].value_counts().index)))
+  df_elb_listener_rule['LoadBalancerInfo'] = df_elb_listener_rule['ListenerArn'].apply(lambda x : get_elbinfo(df_elb_listener,x)) # get ELB Info
+  # klogger_dat.debug(df_elb_listener_rule)
   df_s3 = results_to_dataframe(executefunc_p1("kskpkg.s3.list_buckets"))
   # klogger_dat.debug(df_s3)
 
@@ -231,6 +239,7 @@ def main(argv):
       df_routet.to_excel(writer, sheet_name='routeinfo', index=False) 
       df_elb.to_excel(writer, sheet_name='elb', index=False) 
       df_elb_listener.to_excel(writer, sheet_name='elb_listener', index=False) 
+      df_elb_listener_rule.to_excel(writer, sheet_name='elb_listener_rule', index=False) 
       df_ins.to_excel(writer, sheet_name='instance', index=False) 
       df_sg.to_excel(writer, sheet_name='securegroup', index=False) 
       df_eni.to_excel(writer, sheet_name='eni', index=False) 
@@ -249,6 +258,7 @@ def main(argv):
       df_routet.to_excel(writer, sheet_name='routeinfo', index=False) 
       df_elb.to_excel(writer, sheet_name='elb', index=False) 
       df_elb_listener.to_excel(writer, sheet_name='elb_listener', index=False) 
+      df_elb_listener_rule.to_excel(writer, sheet_name='elb_listener_rule', index=False) 
       df_ins.to_excel(writer, sheet_name='instance', index=False) 
       df_sg.to_excel(writer, sheet_name='securegroup', index=False) 
       df_eni.to_excel(writer, sheet_name='eni', index=False) 
