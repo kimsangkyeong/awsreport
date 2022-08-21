@@ -30,13 +30,20 @@ if __name__ == "__main__":
   # Main 실행으로 절대 경로 
   from config import awsglobal
   awsglobal.init_logger(path_logconf)
+  global klogger
+  global klogger_dat
+
   klogger     = awsglobal.klogger
   klogger_dat = awsglobal.klogger_dat
+#   import utils  오류
+#  * global 변수를 공유하는 package 내의 모듈을 Main으로 실행할 때 import 하는 방법 확인 필요.
+
 else:
   # Module 실행으로 상대 경로 
   from .config import awsglobal
   klogger     = awsglobal.klogger
   klogger_dat = awsglobal.klogger_dat
+  from . import utils
 
 def describe_load_balancers():
   '''
@@ -69,22 +76,9 @@ def describe_load_balancers():
             for sg in loadbalancer['SecurityGroups']:
               securitygroups.append(sg)
               sgrpnames.append(' ')
-          # list count sync
-          len_availzons       = len(availzons)
-          len_eip_ipaddrs     = len(eip_ipaddrs)
-          len_securitygroups  = len(securitygroups)
-          max_len = max(len_availzons,len_eip_ipaddrs,len_securitygroups)
-          for ix in range(len_availzons, max_len):
-            availzons.append(' ')
-            availsubnetids.append(' ')
-            availsubnetnames.append(' ')
-          for ix in range(len_eip_ipaddrs, max_len):
-            eip_ipaddrs.append(' ')
-            eip_allocateids.append(' ')
-            privateaddrs.append(' ')
-          for ix in range(len_securitygroups, max_len):
-            securitygroups.append(' ')
-            sgrpnames.append(' ')
+          # list count sync with space
+          utils.ListSyncCountWithSpace(availzons, availsubnetids, availsubnetnames,
+                eip_ipaddrs, eip_allocateids, privateaddrs, securitygroups, sgrpnames)
   
           results.append( { "LoadBalancerName": loadbalancer['LoadBalancerName'],
                             "Scheme" : loadbalancer['Scheme'],

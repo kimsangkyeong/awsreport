@@ -33,11 +33,15 @@ if __name__ == "__main__":
   awsglobal.init_logger(path_logconf)
   klogger     = awsglobal.klogger
   klogger_dat = awsglobal.klogger_dat
+#   import utils  오류
+#  * global 변수를 공유하는 package 내의 모듈을 Main으로 실행할 때 import 하는 방법 확인 필요.
+
 else:
   # Module 실행으로 상대 경로 
   from .config import awsglobal
   klogger     = awsglobal.klogger
   klogger_dat = awsglobal.klogger_dat
+  from . import utils
 
 def describe_internet_gateways(searchRegions):
   '''
@@ -696,7 +700,6 @@ def describe_network_interfaces(searchRegions):
                 attach_instanceownerid = ''
               privateipaddrs = []; len_privateipaddrs = 1;
               if 'PrivateIpAddresses' in net :
-                len_privateipaddrs = len(net['PrivateIpAddresses'])
                 for ipaddr in net['PrivateIpAddresses']:
                   if 'Association' in ipaddr:
                     privateipaddrs.append({'Primary':ipaddr['Primary'], 
@@ -710,20 +713,15 @@ def describe_network_interfaces(searchRegions):
                 privateipaddrs.append(' ')
               sgroupids = []; sgroupnames = []; len_sgroups = 1;
               if 'Groups' in net :
-                len_sgroups = len(net['Groups'])
                 for sgroup in net['Groups']:
                   sgroupids.append(sgroup['GroupId'])
                   sgroupnames.append(sgroup['GroupName'])
               else:
                 sgroupids.append(' ')
                 sgroupnames.append(' ')
-              # list count 동기화처리
-              max_len = max(len_privateipaddrs, len_sgroups)
-              for ix in range(len_privateipaddrs, max_len):
-                privateipaddrs.append(' ')
-              for ix in range(len_sgroups, max_len):
-                sgroupids.append(' ')
-                sgroupnames.append(' ')
+              # list count sync with space
+              utils.ListSyncCountWithSpace(privateipaddrs, sgroupids, sgroupnames)              
+
               # net Tag중 Name 값
               tagname = 'Not Exist Name Tag'
               if 'TagSet' in net:
