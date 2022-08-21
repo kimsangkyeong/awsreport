@@ -50,7 +50,7 @@ def describe_load_balancers():
   '''
     search load_balancers
   '''
-  klogger_dat.debug('ELB')
+  klogger_dat.debug('elb')
   try:
     results = [] 
     elb=boto3.client('elbv2')
@@ -134,7 +134,7 @@ def describe_listeners(LoadBalancerArns):
   '''
     search load_balancers Listensers
   '''
-  klogger_dat.debug('ELB-Listener')
+  klogger_dat.debug('elb-listener')
 #   klogger_dat.debug(LoadBalancerArns)
   try:
     results = [] 
@@ -325,7 +325,7 @@ def describe_rules(ListenerArns):
   '''
     search load_balancers Listenser Rules
   '''
-  klogger_dat.debug('ELB-Listener-Rule')
+  klogger_dat.debug('elb-listener-rule')
 #   klogger_dat.debug(ListenerArns)
   try:
     results = [] 
@@ -559,7 +559,7 @@ def describe_target_groups(LoadBalancerArns):
   '''
     search load_balancers target groups
   '''
-  klogger_dat.debug('ELB-TargetGroup')
+  klogger_dat.debug('elb-targetgroup')
 #   klogger_dat.debug(LoadBalancerArns)
   try:
     results = [] 

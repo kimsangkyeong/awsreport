@@ -671,7 +671,7 @@ def describe_network_interfaces(searchRegions):
   '''
     search eni in searchRegions
   '''
-  klogger_dat.debug('ec2-ENI')
+  klogger_dat.debug('ec2-eni')
   for region in searchRegions:
     try:
       results = [] 

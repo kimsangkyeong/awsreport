@@ -50,7 +50,7 @@ def describe_file_systems():
   '''
     search EFS 
   '''
-  klogger_dat.debug('EFS')
+  klogger_dat.debug('efs')
   try:
     results = [] 
     efs=boto3.client('efs')
@@ -128,7 +128,7 @@ def describe_file_systems():
     else:
       klogger.error("call error : %d", filesystems["ResponseMetadata"]["HTTPStatusCode"])
   except Exception as othererr:
-    klogger.error("efs.describe_file_systems,%s", othererr)
+    klogger.error("efs.describe_file_systems(),%s", othererr)
   return results
 
 def main(argv):

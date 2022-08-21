@@ -166,6 +166,11 @@ def get_elbinfo(df, x):
     if x == listenerarn :
       return { loadbalancername : loadbalacerarn, protocol : port }
 
+def get_keyalias(df, x):
+  for keyarn, keyalias in df[['KeyArn','KeyAlias']].value_counts().index:
+    if x == keyarn :
+      return keyalias
+
 def main(argv):
   # logger setting 
   global_config_init()
@@ -195,6 +200,8 @@ def main(argv):
   df_routea['SubnetTName'] = df_routea['SubnetId'].apply(lambda x : get_subnetname(df_subnet,x)) # get Subnet TagName
   df_routet['VpcTName'] = df_routet['VpcId'].apply(lambda x : get_vpcname(df_vpc,x)) # get VpcTagName
   # klogger_dat.debug(df_routet)
+  df_kms = results_to_dataframe(executefunc_p1("kskpkg.kms.list_keys"))
+  # klogger_dat.debug(df_kms)
   df_ins = results_to_dataframe(executefunc("kskpkg.ec2.describe_instances", ['ap-northeast-2']))
   df_ins['VpcTName'] = df_ins['VpcId'].apply(lambda x : get_vpcname(df_vpc,x)) # get VpcTagName
   df_ins['SubnetTName'] = df_ins['SubnetId'].apply(lambda x : get_subnetname(df_subnet,x)) # get Subnet TagName
@@ -225,8 +232,10 @@ def main(argv):
   df_elb_targetgroup['LoadBalancerName'] = df_elb_targetgroup['LoadBalancerArn'].apply(lambda x : get_elbname(df_elb,x)) # get ELB Name
   # klogger_dat.debug(df_elb_targetgroup)
   df_s3 = results_to_dataframe(executefunc_p1("kskpkg.s3.list_buckets"))
+  df_s3['KMSMasterKeyAlias'] = df_s3['KMSMasterKeyID'].apply(lambda x : get_keyalias(df_kms,x)) # get KMS Key alias
   # klogger_dat.debug(df_s3)
   df_efs = results_to_dataframe(executefunc_p1("kskpkg.efs.describe_file_systems"))
+  df_efs['KmsKeyAlias'] = df_efs['KmsKeyId'].apply(lambda x : get_keyalias(df_kms,x)) # get KMS Key alias
   # klogger_dat.debug(df_efs)
 
   # to_excel 
@@ -252,6 +261,7 @@ def main(argv):
       df_eni.to_excel(writer, sheet_name='eni', index=False) 
       df_efs.to_excel(writer, sheet_name='efs', index=False) 
       df_s3.to_excel(writer, sheet_name='s3', index=False) 
+      df_kms.to_excel(writer, sheet_name='kms', index=False) 
   else:
     with pd.ExcelWriter(output_file, engine='openpyxl') as writer:
       df_route53.to_excel(writer, sheet_name='route53', index=False)
@@ -273,6 +283,7 @@ def main(argv):
       df_eni.to_excel(writer, sheet_name='eni', index=False) 
       df_efs.to_excel(writer, sheet_name='efs', index=False) 
       df_s3.to_excel(writer, sheet_name='s3', index=False) 
+      df_kms.to_excel(writer, sheet_name='kms', index=False) 
   klogger_dat.debug("finished")
 
 if __name__ == "__main__":

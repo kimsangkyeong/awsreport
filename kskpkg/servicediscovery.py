@@ -42,7 +42,7 @@ def list_namespaces():
   '''
     search hosted zone
   '''
-  klogger_dat.debug('ServiceDiscovery:CloudMap')
+  klogger_dat.debug('servicediscovery:cloudmap')
   try:
     results = [] 
     servicediscovery=boto3.client('servicediscovery')
