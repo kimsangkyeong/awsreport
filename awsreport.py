@@ -226,6 +226,8 @@ def main(argv):
   # klogger_dat.debug(df_elb_targetgroup)
   df_s3 = results_to_dataframe(executefunc_p1("kskpkg.s3.list_buckets"))
   # klogger_dat.debug(df_s3)
+  df_efs = results_to_dataframe(executefunc_p1("kskpkg.efs.describe_file_systems"))
+  # klogger_dat.debug(df_efs)
 
   # to_excel 
   klogger_dat.debug("%s\n%s","-"*20,"save to excel")
@@ -248,6 +250,7 @@ def main(argv):
       df_ins.to_excel(writer, sheet_name='instance', index=False) 
       df_sg.to_excel(writer, sheet_name='securegroup', index=False) 
       df_eni.to_excel(writer, sheet_name='eni', index=False) 
+      df_efs.to_excel(writer, sheet_name='efs', index=False) 
       df_s3.to_excel(writer, sheet_name='s3', index=False) 
   else:
     with pd.ExcelWriter(output_file, engine='openpyxl') as writer:
@@ -268,6 +271,7 @@ def main(argv):
       df_ins.to_excel(writer, sheet_name='instance', index=False) 
       df_sg.to_excel(writer, sheet_name='securegroup', index=False) 
       df_eni.to_excel(writer, sheet_name='eni', index=False) 
+      df_efs.to_excel(writer, sheet_name='efs', index=False) 
       df_s3.to_excel(writer, sheet_name='s3', index=False) 
   klogger_dat.debug("finished")
 

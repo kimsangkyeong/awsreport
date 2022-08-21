@@ -164,7 +164,7 @@ def describe_nat_gateways(searchRegions):
               connectivitytype = nat['ConnectivityType']
             # nat Tag중 Name 값 
             # * nat 정보가 모두 scalar 형식인 경우 대비 DataFrame 변환오류 회피위해 list 처리함
-            tagname = [']Not Exist Name Tag']
+            tagname = ['Not Exist Name Tag']
             if 'Tags' in nat:
               for tag in nat['Tags']:
                 if tag['Key'] == 'Name':
