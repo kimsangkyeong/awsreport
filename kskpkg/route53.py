@@ -49,18 +49,30 @@ def list_hosted_zones():
     hosts = route53.list_hosted_zones()
     if 200 == hosts["ResponseMetadata"]["HTTPStatusCode"]:
       # klogger_dat.debug(hosts["HostedZones"])
-      for host in hosts["HostedZones"]:
-        linkedservices = list({'ServicePrincipal':host['LinkedService']['ServicePrincipal']}
-                               if 'LinkedService' in host else ' ')
-        results.append( { "Id": host["Id"],
-                          "Name" : host['Name'],
-                          "Comment" : host['Config']['Comment'],
-                          "Type" : 'Public' if not host['Config']['PrivateZone'] else 'Private',
-                          "ResourceRecordSetCount" : host["ResourceRecordSetCount"],
-                          "CallerReference" : host["CallerReference"],
-                          "ResourceRecordSetCount" : host["ResourceRecordSetCount"],
-                          "LinkedService" : linkedservices
+      if len(hosts["HostedZones"]) > 0:
+        for host in hosts["HostedZones"]:
+          linkedservices = list({'ServicePrincipal':host['LinkedService']['ServicePrincipal']}
+                                 if 'LinkedService' in host else ' ')
+          results.append( { "Id": host["Id"],
+                            "Name" : host['Name'],
+                            "Comment" : host['Config']['Comment'],
+                            "Type" : 'Public' if not host['Config']['PrivateZone'] else 'Private',
+                            "ResourceRecordSetCount" : host["ResourceRecordSetCount"],
+                            "CallerReference" : host["CallerReference"],
+                            "ResourceRecordSetCount" : host["ResourceRecordSetCount"],
+                            "LinkedService" : linkedservices
+                           })
+      else: # column list
+        results.append( { "Id": ' ',
+                          "Name" : ' ',
+                          "Comment" : ' ',
+                          "Type" : ' ',
+                          "ResourceRecordSetCount" : ' ',
+                          "CallerReference" : ' ',
+                          "ResourceRecordSetCount" : ' ',
+                          "LinkedService" : list(' '),
                          })
+      
      # klogger.debug(results)
     else:
       klogger.error("call error : %d", hosts["ResponseMetadata"]["HTTPStatusCode"])
@@ -82,31 +94,45 @@ def list_resource_record_sets(searchHostZoneids):
       records = route53.list_resource_record_sets(HostedZoneId=shostzoneid)
       if 200 == records["ResponseMetadata"]["HTTPStatusCode"]:
         # klogger_dat.debug(records["ResourceRecordSets"])
-        for record in records["ResourceRecordSets"]:
-          resourcerecords = []
-          if 'ResourceRecords' in record :
-            for resourcerecord in record['ResourceRecords']:
-              resourcerecords.append(resourcerecord['Value'])
-          else:
-            resourcerecords.append('')
-          setidentifier = record['SetIdentifier'] if 'SetIdentifier' in record else ' '
-          multivalueanswer = record['MultiValueAnswer'] if 'MultiValueAnswer' in record else ' '
-          callereference = record['CallerReference'] if 'CallerReference' in record else ' '
-          resourcerecordsetcount = record['ResourceRecordSetCount'] if 'ResourceRecordSetCount' in record else ' '
-          aliastarget = record['AliasTarget']['DNSName'] if 'AliasTarget' in record else ' '
-          evaluatetargethealth = record['AliasTarget']['EvaluateTargetHealth'] if 'AliasTarget' in record else ' '
-          
-          results.append( { "HostedZoneId" : searchHostZoneid,
-                            "Name": record["Name"],
-                            "Type" : record['Type'],
-                            "ResourceRecords" : resourcerecords,
-                            "AliasTarget" : aliastarget,
-                            "EvaluateTargetHealth" : evaluatetargethealth,
-                            "SetIdentifier" : setidentifier,
-                            "MultiValueAnswer" : multivalueanswer,
-                            "CallerReference" : callereference,
-                            "ResourceRecordSetCount" : resourcerecordsetcount,
+        if len(records["ResourceRecordSets"]) > 0:
+          for record in records["ResourceRecordSets"]:
+            resourcerecords = []
+            if 'ResourceRecords' in record :
+              for resourcerecord in record['ResourceRecords']:
+                resourcerecords.append(resourcerecord['Value'])
+            else:
+              resourcerecords.append('')
+            setidentifier = record['SetIdentifier'] if 'SetIdentifier' in record else ' '
+            multivalueanswer = record['MultiValueAnswer'] if 'MultiValueAnswer' in record else ' '
+            callereference = record['CallerReference'] if 'CallerReference' in record else ' '
+            resourcerecordsetcount = record['ResourceRecordSetCount'] if 'ResourceRecordSetCount' in record else ' '
+            aliastarget = record['AliasTarget']['DNSName'] if 'AliasTarget' in record else ' '
+            evaluatetargethealth = record['AliasTarget']['EvaluateTargetHealth'] if 'AliasTarget' in record else ' '
+            
+            results.append( { "HostedZoneId" : searchHostZoneid,
+                              "Name": record["Name"],
+                              "Type" : record['Type'],
+                              "ResourceRecords" : resourcerecords,
+                              "AliasTarget" : aliastarget,
+                              "EvaluateTargetHealth" : evaluatetargethealth,
+                              "SetIdentifier" : setidentifier,
+                              "MultiValueAnswer" : multivalueanswer,
+                              "CallerReference" : callereference,
+                              "ResourceRecordSetCount" : resourcerecordsetcount,
+                             })
+        else: # column list
+          results.append( { "HostedZoneId" : ' ',
+                            "Name": ' ',
+                            "Type" : ' ',
+                            "ResourceRecords" : ' ',
+                            "AliasTarget" : ' ',
+                            "EvaluateTargetHealth" : ' ',
+                            "SetIdentifier" : ' ',
+                            "MultiValueAnswer" : ' ',
+                            "CallerReference" : ' ',
+                            "ResourceRecordSetCount" : list(' '),
                            })
+        
         # klogger.debug(results)
       else:
         klogger.error("call error : %d", records["ResponseMetadata"]["HTTPStatusCode"])

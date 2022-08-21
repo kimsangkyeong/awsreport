@@ -50,22 +50,34 @@ def list_namespaces():
     # klogger_dat.debug(namespaces)
     if 200 == namespaces["ResponseMetadata"]["HTTPStatusCode"]:
     #   klogger_dat.debug(namespaces["Namespaces"])
-      for namespace in namespaces["Namespaces"]:
-        dnsproperties = list(namespace['DnsProperties']['HostedZoneId'] 
-                             if 'DnsProperties' in namespace else ' ')
-        httpproperties = list(namespace['HttpProperties']['HttpName']
-                             if 'HttpProperties' in namespace else ' ')
-        servicecount = namespace["ServiceCount"] if 'ServiceCount' in namespace else ''
-
-        results.append( { "Id": namespace["Id"],
-                          "Name" : namespace['Name'],
-                          "Type" : namespace['Type'],
-                          "Description" : namespace["Description"],
-                          "ServiceCount" : servicecount,
-                          "DnsProperties" : dnsproperties,
-                          "HttpProperties" : httpproperties,
-                          "CreateDate" : namespace['CreateDate'].strftime("%Y-%m-%d %H:%M")
+      if len(namespaces["Namespaces"]) > 0 :
+        for namespace in namespaces["Namespaces"]:
+          dnsproperties = list(namespace['DnsProperties']['HostedZoneId'] 
+                               if 'DnsProperties' in namespace else ' ')
+          httpproperties = list(namespace['HttpProperties']['HttpName']
+                               if 'HttpProperties' in namespace else ' ')
+          servicecount = namespace["ServiceCount"] if 'ServiceCount' in namespace else ''
+  
+          results.append( { "Id": namespace["Id"],
+                            "Name" : namespace['Name'],
+                            "Type" : namespace['Type'],
+                            "Description" : namespace["Description"],
+                            "ServiceCount" : servicecount,
+                            "DnsProperties" : dnsproperties,
+                            "HttpProperties" : httpproperties,
+                            "CreateDate" : namespace['CreateDate'].strftime("%Y-%m-%d %H:%M")
+                           })
+      else: # column list
+        results.append( { "Id": ' ',
+                          "Name" : ' ',
+                          "Type" : ' ',
+                          "Description" : ' ',
+                          "ServiceCount" : ' ',
+                          "DnsProperties" : ' ',
+                          "HttpProperties" : ' ',
+                          "CreateDate" : list(' '),
                          })
+        
     #   klogger.debug(results)
     else:
       klogger.error("call error : %d", namespaces["ResponseMetadata"]["HTTPStatusCode"])
