@@ -166,6 +166,21 @@ def get_elbinfo(df, x):
     if x == listenerarn :
       return { loadbalancername : loadbalacerarn, protocol : port }
 
+def get_eniname(df, x):
+  for netinfid, enitname in df[['NetworkInterfaceId','ENITName']].value_counts().index:
+    if x == netinfid :
+      return enitname
+
+def get_eipname(df, x):
+  for allocationid, eiptname in df[['AllocationId','EIPTName']].value_counts().index:
+    if x == allocationid :
+      return eiptname
+
+def get_insname(df, x):
+  for instanceid, instname in df[['InstanceId','InstanceTName']].value_counts().index:
+    if x == instanceid :
+      return instname
+
 def get_keyalias(df, x):
   for keyarn, keyalias in df[['KeyArn','KeyAlias']].value_counts().index:
     if x == keyarn :
@@ -184,16 +199,13 @@ def main(argv):
   df_acm = results_to_dataframe(executefunc_p1("kskpkg.acm.list_certificates"))
   # klogger_dat.debug(df_acm)
   df_vpc = results_to_dataframe(executefunc("kskpkg.ec2.describe_vpcs", ['ap-northeast-2']))
+  # klogger_dat.debug(df_vpc)
   df_igw = results_to_dataframe(executefunc("kskpkg.ec2.describe_internet_gateways", ['ap-northeast-2']))
   df_igw['VpcTName'] = df_igw['AttachedVpcId'].apply(lambda x : get_vpcname(df_vpc,x)) # get VpcTagName
   # klogger_dat.debug(df_igw)
   df_subnet = results_to_dataframe(executefunc("kskpkg.ec2.describe_subnets", ['ap-northeast-2']))
   df_subnet['VpcTName'] = df_subnet['VpcId'].apply(lambda x : get_vpcname(df_vpc,x)) # get VpcTagName
   # klogger_dat.debug(df_subnet)
-  df_nat = results_to_dataframe(executefunc("kskpkg.ec2.describe_nat_gateways", ['ap-northeast-2']))
-  df_nat['VpcTName'] = df_nat['VpcId'].apply(lambda x : get_vpcname(df_vpc,x)) # get VpcTagName
-  df_nat['SubnetTName'] = df_nat['SubnetId'].apply(lambda x : get_subnetname(df_subnet,x)) # get Subnet TagName
-  # klogger_dat.debug(df_nat)
   results1, results2 = executefunc2("kskpkg.ec2.describe_route_tables", ['ap-northeast-2'])
   df_routea, df_routet = two_results_to_dataframe(results1, results2)
   df_routea['VpcTName'] = df_routea['VpcId'].apply(lambda x : get_vpcname(df_vpc,x)) # get VpcTagName
@@ -214,8 +226,19 @@ def main(argv):
   df_eni = results_to_dataframe(executefunc("kskpkg.ec2.describe_network_interfaces", ['ap-northeast-2']))
   df_eni['VpcTName'] = df_eni['VpcId'].apply(lambda x : get_vpcname(df_vpc,x)) # get VpcTagName
   df_eni['SubnetTName'] = df_eni['SubnetId'].apply(lambda x : get_subnetname(df_subnet,x)) # get Subnet TagName
+  df_eni['Attach_InstanceTName'] = df_eni['Attach_InstanceID'].apply(lambda x : get_insname(df_ins,x)) # get Instance TagName
   # klogger_dat.debug(df_eni)
   # display.display(df_eni)
+  df_eip = results_to_dataframe(executefunc("kskpkg.ec2.describe_addresses", ['ap-northeast-2']))
+  df_eip['ENITName'] = df_eip['NetworkInterfaceId'].apply(lambda x : get_eniname(df_eni,x)) # get ENI TagName
+  df_eip['InstanceTName'] = df_eip['InstanceId'].apply(lambda x : get_insname(df_ins,x)) # get Instance TagName
+  # klogger_dat.debug(df_eip)
+  df_nat = results_to_dataframe(executefunc("kskpkg.ec2.describe_nat_gateways", ['ap-northeast-2']))
+  df_nat['VpcTName'] = df_nat['VpcId'].apply(lambda x : get_vpcname(df_vpc,x)) # get VpcTagName
+  df_nat['SubnetTName'] = df_nat['SubnetId'].apply(lambda x : get_subnetname(df_subnet,x)) # get Subnet TagName
+  df_nat['EIPTName'] = df_nat['AllocationId'].apply(lambda x : get_eipname(df_eip,x)) # get EIP TagName
+  df_nat['ENITName'] = df_nat['NetworkInterfaceId'].apply(lambda x : get_eniname(df_eni,x)) # get ENI TagName
+  # klogger_dat.debug(df_nat)
   df_elb = results_to_dataframe(executefunc_p1("kskpkg.elb.describe_load_balancers"))
   df_elb['VpcTName'] = df_elb['VpcId'].apply(lambda x : get_vpcname(df_vpc,x)) # get VpcTagName
   df_elb['SubnetTName'] = df_elb['SubnetId'].apply(lambda x : get_subnetname(df_subnet,x)) # get Subnet TagName
@@ -255,6 +278,7 @@ def main(argv):
       df_vpc.to_excel(writer, sheet_name='vpc', index=False)
       df_igw.to_excel(writer, sheet_name='igw', index=False) 
       df_nat.to_excel(writer, sheet_name='nat', index=False) 
+      df_eip.to_excel(writer, sheet_name='eip', index=False) 
       df_subnet.to_excel(writer, sheet_name='subnet', index=False) 
       df_routea.to_excel(writer, sheet_name='router', index=False) 
       df_routet.to_excel(writer, sheet_name='routeinfo', index=False) 
@@ -278,6 +302,7 @@ def main(argv):
       df_vpc.to_excel(writer, sheet_name='vpc', index=False)
       df_igw.to_excel(writer, sheet_name='igw', index=False) 
       df_nat.to_excel(writer, sheet_name='nat', index=False) 
+      df_eip.to_excel(writer, sheet_name='eip', index=False) 
       df_subnet.to_excel(writer, sheet_name='subnet', index=False) 
       df_routea.to_excel(writer, sheet_name='router', index=False) 
       df_routet.to_excel(writer, sheet_name='routeinfo', index=False) 

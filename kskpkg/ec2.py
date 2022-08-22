@@ -175,11 +175,19 @@ def describe_nat_gateways(searchRegions):
         if len(nats["NatGateways"]) > 0:
           for nat in nats["NatGateways"]:
             # nat assigned ip 값
-            publicips = []; privateips = []
-            if 'NatGatewayAddresses' in nat:
+            publicips = []; privateips = []; allocationids =[]; netinfids = [];
+            if ('NatGatewayAddresses' in nat) and (len(nat['NatGatewayAddresses']) > 0):
               for nataddr in nat['NatGatewayAddresses']:
                 publicips.append(nataddr['PublicIp'])
                 privateips.append(nataddr['PrivateIp'])
+                allocationids.append(nataddr['AllocationId'])
+                netinfids.append(nataddr['NetworkInterfaceId'])
+            else: # Not Exists
+              publicips.append(' ')
+              privateips.append(' ')
+              allocationids.append(' ')
+              netinfids.append(' ')
+              
             # nat ConnectivityType 값
             connectivitytype = 'Not Setting'
             if 'ConnectivityType' in nat:
@@ -197,6 +205,10 @@ def describe_nat_gateways(searchRegions):
                               "State" : nat["State"],
                               "PublicIp" : publicips,
                               "PrivateIp" : privateips,
+                              "EIPTName" : ' ',
+                              "AllocationId" : allocationids,
+                              "ENITName" : ' ',
+                              "NetworkInterfaceId" : netinfids,
                               "ConnectivityType" : connectivitytype,
                               "SubnetId" : nat["SubnetId"],
                               "SubnetTName" : '',
@@ -209,6 +221,10 @@ def describe_nat_gateways(searchRegions):
                             "State" : ' ',
                             "PublicIp" : ' ',
                             "PrivateIp" : ' ',
+                            "EIPTName" : ' ',
+                            "AllocationId" : ' ',
+                            "ENITName" : ' ',
+                            "NetworkInterfaceId" : ' ',
                             "ConnectivityType" : ' ',
                             "SubnetId" : ' ',
                             "SubnetTName" : ' ',
@@ -222,6 +238,10 @@ def describe_nat_gateways(searchRegions):
                           "State" : 'ERROR CHECK',
                           "PublicIp" : 'ERROR CHECK',
                           "PrivateIp" : 'ERROR CHECK',
+                          "EIPTName" : 'ERROR CHECK',
+                          "AllocationId" : 'ERROR CHECK',
+                          "ENITName" : 'ERROR CHECK',
+                          "NetworkInterfaceId" : 'ERROR CHECK',
                           "ConnectivityType" : 'ERROR CHECK',
                           "SubnetId" : 'ERROR CHECK',
                           "SubnetTName" : 'ERROR CHECK',
@@ -236,6 +256,10 @@ def describe_nat_gateways(searchRegions):
                         "State" : 'ERROR CHECK',
                         "PublicIp" : 'ERROR CHECK',
                         "PrivateIp" : 'ERROR CHECK',
+                        "EIPTName" : 'ERROR CHECK',
+                        "AllocationId" : 'ERROR CHECK',
+                        "ENITName" : 'ERROR CHECK',
+                        "NetworkInterfaceId" : 'ERROR CHECK',
                         "ConnectivityType" : 'ERROR CHECK',
                         "SubnetId" : 'ERROR CHECK',
                         "SubnetTName" : 'ERROR CHECK',
@@ -977,6 +1001,7 @@ def describe_network_interfaces(searchRegions):
                                 "PublicIp" : publicip,
                                 "PublicDnsName" : publicdnsname,
                                 "Attach_InstanceID" : attach_instanceid,
+                                "Attach_InstanceTName" : ' ',
                                 "Attach_InstanceOwnerID" : attach_instanceownerid,
                                 "Attach_DeviceIndex" : attach_deviceindex,
                                 "Attach_NetworkCardIndex" : attach_networkcardindex,
@@ -999,6 +1024,7 @@ def describe_network_interfaces(searchRegions):
                             "PublicIp" : ' ',
                             "PublicDnsName" : ' ',
                             "Attach_InstanceID" : ' ',
+                            "Attach_InstanceTName" : ' ',
                             "Attach_InstanceOwnerID" : ' ',
                             "Attach_DeviceIndex" : ' ',
                             "Attach_NetworkCardIndex" : ' ',
@@ -1022,6 +1048,7 @@ def describe_network_interfaces(searchRegions):
                           "PublicIp" : 'ERROR CHECK',
                           "PublicDnsName" : 'ERROR CHECK',
                           "Attach_InstanceID" : 'ERROR CHECK',
+                          "Attach_InstanceTName" : 'ERROR CHECK',
                           "Attach_InstanceOwnerID" : 'ERROR CHECK',
                           "Attach_DeviceIndex" : 'ERROR CHECK',
                           "Attach_NetworkCardIndex" : 'ERROR CHECK',
@@ -1046,6 +1073,7 @@ def describe_network_interfaces(searchRegions):
                         "PublicIp" : 'ERROR CHECK',
                         "PublicDnsName" : 'ERROR CHECK',
                         "Attach_InstanceID" : 'ERROR CHECK',
+                        "Attach_InstanceTName" : 'ERROR CHECK',
                         "Attach_InstanceOwnerID" : 'ERROR CHECK',
                         "Attach_DeviceIndex" : 'ERROR CHECK',
                         "Attach_NetworkCardIndex" : 'ERROR CHECK',
@@ -1177,16 +1205,106 @@ def describe_instances(searchRegions):
       pass
   return results
 
+def describe_addresses(searchRegions):
+  '''
+    search Elastic IPs in searchRegions
+  '''
+  klogger_dat.debug('eip')
+  for region in searchRegions:
+    try:
+      results = [] 
+      ec2=boto3.client('ec2', region )
+      eips = ec2.describe_addresses()
+      if 200 == eips["ResponseMetadata"]["HTTPStatusCode"]:
+        # klogger_dat.debug("%s",eips["Addresses"])
+        if len(eips["Addresses"]) > 0 :
+          for eip in eips["Addresses"]:
+            # eip Tag중 Name 값
+            tagname = ['Not Exist Name Tag']
+            if 'Tags' in eip:
+              for tag in eip['Tags']:
+                if tag['Key'] == 'Name':
+                  tagname[0] = tag['Value']
+                  break
+  
+            results.append( { "PublicIp": eip['PublicIp'] if 'PublicIp' in eip else ' ',
+                              "EIPTName" : tagname,
+                              "InstanceId" : eip['InstanceId'] if 'InstanceId' in eip else ' ',
+                              "InstanceTName" : ' ',
+                              "Domain" : eip['Domain'] if 'Domain' in eip else ' ',
+                              "ENITName" : ' ',
+                              "NetworkInterfaceId" : eip['NetworkInterfaceId'] if 'NetworkInterfaceId' in eip else ' ',
+                              "PrivateIpAddress" : eip['PrivateIpAddress'] if 'PrivateIpAddress' in eip else ' ',
+                              "PublicIpv4Pool" : eip['PublicIpv4Pool'] if 'PublicIpv4Pool' in eip else ' ',
+                              "NetworkBorderGroup" : eip['NetworkBorderGroup'] if 'NetworkBorderGroup' in eip else ' ',
+                              "AllocationId" : eip['AllocationId'] if 'AllocationId' in eip else ' ',
+                              "AssociationId" : eip['AssociationId'] if 'AssociationId' in eip else ' ',
+                              "CarrierIp" : eip['CarrierIp'] if 'CarrierIp' in eip else ' ',
+                            })
+        else:  # column list
+          results.append( { "PublicIp": ' ',
+                            "EIPTName" : ' ',
+                            "InstanceId" : ' ',
+                            "InstanceTName" : ' ',
+                            "Domain" : ' ',
+                            "ENITName" : ' ',
+                            "NetworkInterfaceId" : ' ',
+                            "PrivateIpAddress" : ' ',
+                            "PublicIpv4Pool" : ' ',
+                            "NetworkBorderGroup" : ' ',
+                            "AllocationId" : ' ',
+                            "AssociationId" : ' ',
+                            "CarrierIp" : list(' '),
+                          })
+      else:
+        klogger.error("call error : %d", eips["ResponseMetadata"]["HTTPStatusCode"])
+        results.append( { "PublicIp": 'ERROR CHECK',
+                          "EIPTName" : 'ERROR CHECK',
+                          "InstanceId" : 'ERROR CHECK',
+                          "InstanceTName" : 'ERROR CHECK',
+                          "Domain" : 'ERROR CHECK',
+                          "ENITName" : 'ERROR CHECK',
+                          "NetworkInterfaceId" : 'ERROR CHECK',
+                          "PrivateIpAddress" : 'ERROR CHECK',
+                          "PublicIpv4Pool" : 'ERROR CHECK',
+                          "NetworkBorderGroup" : 'ERROR CHECK',
+                          "AllocationId" : 'ERROR CHECK',
+                          "AssociationId" : 'ERROR CHECK',
+                          "CarrierIp" : list('ERROR CHECK'),
+                        })
+      # klogger.debug(results)
+    except Exception as othererr:
+      klogger.error("ec2.describe_addresses(),region[%s],%s", region, othererr)
+      results.append( { "PublicIp": 'ERROR CHECK',
+                        "EIPTName" : 'ERROR CHECK',
+                        "InstanceId" : 'ERROR CHECK',
+                        "InstanceTName" : 'ERROR CHECK',
+                        "Domain" : 'ERROR CHECK',
+                        "ENITName" : 'ERROR CHECK',
+                        "NetworkInterfaceId" : 'ERROR CHECK',
+                        "PrivateIpAddress" : 'ERROR CHECK',
+                        "PublicIpv4Pool" : 'ERROR CHECK',
+                        "NetworkBorderGroup" : 'ERROR CHECK',
+                        "AllocationId" : 'ERROR CHECK',
+                        "AssociationId" : 'ERROR CHECK',
+                        "CarrierIp" : list('ERROR CHECK'),
+                      })
+    finally:
+      pass
+  return results
+
 def main(argv):
   ###  set search region name to variable of searchRegions
   searchRegions = ['ap-northeast-2']
   describe_vpcs(searchRegions) 
   describe_internet_gateways(searchRegions) 
   describe_nat_gateways(searchRegions)
+  describe_network_interfaces(searchRegions)
   describe_instances(searchRegions) 
   describe_subnets(searchRegions) 
   describe_route_tables(searchRegions) 
   describe_security_groups(searchRegions) 
+  describe_addresses(searchRegions)
   sys.exit(0)
 
 if __name__ == "__main__":
