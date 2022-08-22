@@ -938,7 +938,7 @@ def describe_network_interfaces(searchRegions):
                 attach_networkcardindex = ''
                 attach_instanceownerid = ''
               privateipaddrs = []; len_privateipaddrs = 1;
-              if 'PrivateIpAddresses' in net :
+              if ('PrivateIpAddresses' in net) and (len(net['PrivateIpAddresses']) > 0) :
                 for ipaddr in net['PrivateIpAddresses']:
                   if 'Association' in ipaddr:
                     privateipaddrs.append({'Primary':ipaddr['Primary'], 
@@ -951,7 +951,7 @@ def describe_network_interfaces(searchRegions):
               else:
                 privateipaddrs.append(' ')
               sgroupids = []; sgroupnames = []; len_sgroups = 1;
-              if 'Groups' in net :
+              if ('Groups' in net) and (len(net['Groups']) > 0) :
                 for sgroup in net['Groups']:
                   sgroupids.append(sgroup['GroupId'])
                   sgroupnames.append(sgroup['GroupName'])
