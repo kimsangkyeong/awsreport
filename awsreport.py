@@ -258,6 +258,13 @@ def main(argv):
   df_elb_targetgroup['VpcTName'] = df_elb_targetgroup['VpcId'].apply(lambda x : get_vpcname(df_vpc,x)) # get VpcTagName
   df_elb_targetgroup['LoadBalancerName'] = df_elb_targetgroup['LoadBalancerArn'].apply(lambda x : get_elbname(df_elb,x)) # get ELB Name
   # klogger_dat.debug(df_elb_targetgroup)
+  df_ekscluster = results_to_dataframe(executefunc_p1("kskpkg.eks.list_clusters"))
+  df_ekscluster['VpcTName'] = df_ekscluster['VpcId'].apply(lambda x : get_vpcname(df_vpc,x)) # get VpcTagName
+  df_ekscluster['SubnetTName'] = df_ekscluster['SubnetId'].apply(lambda x : get_subnetname(df_subnet,x)) # get Subnet TagName
+  df_ekscluster['SecurityGroupName'] = df_ekscluster['SecurityGroup'].apply(lambda x : get_sgname(df_sg,x)) # get Security Group TagName
+  df_ekscluster['ClusterSecurityGroupName'] = df_ekscluster['ClusterSecurityGroupId'].apply(lambda x : get_sgname(df_sg,x)) # get Security Group TagName
+  df_ekscluster['EncryptKeyAlias'] = df_ekscluster['EncryptKeyArn'].apply(lambda x : get_keyalias(df_kms,x)) # get KMS Key alias
+  # klogger_dat.debug(df_ekscluster)
   df_s3 = results_to_dataframe(executefunc_p1("kskpkg.s3.list_buckets"))
   df_s3['KMSMasterKeyAlias'] = df_s3['KMSMasterKeyID'].apply(lambda x : get_keyalias(df_kms,x)) # get KMS Key alias
   # klogger_dat.debug(df_s3)
@@ -291,6 +298,7 @@ def main(argv):
       df_elb_listener.to_excel(writer, sheet_name='elb_listener', index=False) 
       df_elb_listener_rule.to_excel(writer, sheet_name='elb_listener_rule', index=False) 
       df_elb_targetgroup.to_excel(writer, sheet_name='elb_targetgroup', index=False) 
+      df_ekscluster.to_excel(writer, sheet_name='eks', index=False) 
       df_ins.to_excel(writer, sheet_name='instance', index=False) 
       df_sg.to_excel(writer, sheet_name='securegroup', index=False) 
       df_eni.to_excel(writer, sheet_name='eni', index=False) 
@@ -316,6 +324,7 @@ def main(argv):
       df_elb_listener.to_excel(writer, sheet_name='elb_listener', index=False) 
       df_elb_listener_rule.to_excel(writer, sheet_name='elb_listener_rule', index=False) 
       df_elb_targetgroup.to_excel(writer, sheet_name='elb_targetgroup', index=False) 
+      df_ekscluster.to_excel(writer, sheet_name='eks', index=False) 
       df_ins.to_excel(writer, sheet_name='instance', index=False) 
       df_sg.to_excel(writer, sheet_name='securegroup', index=False) 
       df_eni.to_excel(writer, sheet_name='eni', index=False) 
