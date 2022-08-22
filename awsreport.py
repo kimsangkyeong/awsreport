@@ -237,6 +237,12 @@ def main(argv):
   df_efs = results_to_dataframe(executefunc_p1("kskpkg.efs.describe_file_systems"))
   df_efs['KmsKeyAlias'] = df_efs['KmsKeyId'].apply(lambda x : get_keyalias(df_kms,x)) # get KMS Key alias
   # klogger_dat.debug(df_efs)
+  df_rdscluser = results_to_dataframe(executefunc_p1("kskpkg.rds.describe_db_clusters"))
+  df_rdscluser['KmsKeyAlias'] = df_rdscluser['KmsKeyId'].apply(lambda x : get_keyalias(df_kms,x)) # get KMS Key alias
+  df_rdscluser['ActivityStreamKmsKeyAlias'] = df_rdscluser['ActivityStreamKmsKeyId'].apply(lambda x : get_keyalias(df_kms,x)) # get KMS Key alias
+  df_rdscluser['PerformanceInsightsKMSKeyAlias'] = df_rdscluser['PerformanceInsightsKMSKeyId'].apply(lambda x : get_keyalias(df_kms,x)) # get KMS Key alias
+  df_rdscluser['VpcSecurityGroupName'] = df_rdscluser['VpcSecurityGroupId'].apply(lambda x : get_sgname(df_sg,x)) # get Security Group TagName
+  # klogger_dat.debug(df_rdscluser)
 
   # to_excel 
   klogger_dat.debug("%s\n%s","-"*20,"save to excel")
@@ -262,6 +268,7 @@ def main(argv):
       df_efs.to_excel(writer, sheet_name='efs', index=False) 
       df_s3.to_excel(writer, sheet_name='s3', index=False) 
       df_kms.to_excel(writer, sheet_name='kms', index=False) 
+      df_rdscluser.to_excel(writer, sheet_name='rds', index=False) 
   else:
     with pd.ExcelWriter(output_file, engine='openpyxl') as writer:
       df_route53.to_excel(writer, sheet_name='route53', index=False)
@@ -284,6 +291,7 @@ def main(argv):
       df_efs.to_excel(writer, sheet_name='efs', index=False) 
       df_s3.to_excel(writer, sheet_name='s3', index=False) 
       df_kms.to_excel(writer, sheet_name='kms', index=False) 
+      df_rdscluser.to_excel(writer, sheet_name='rds', index=False) 
   klogger_dat.debug("finished")
 
 if __name__ == "__main__":
