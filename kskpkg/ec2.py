@@ -512,6 +512,7 @@ def describe_security_groups(searchRegions):
         # klogger_dat.debug("%s",sgs["SecurityGroups"])
         if len(sgs["SecurityGroups"]) > 0:
           for sg in sgs["SecurityGroups"]:
+            # klogger_dat.debug("%s",sg)
             in_fromport = []; in_protocol = []; in_cidrip = []; in_desc = [];
             in_prefixlistid = []; in_pldesc =[]; in_toport = []; 
             in_grp_desc =[]; in_grp_groupid =[]; in_grp_groupname =[]; in_grp_peer =[]; 
@@ -521,11 +522,10 @@ def describe_security_groups(searchRegions):
             out_grp_desc =[]; out_grp_groupid =[]; out_grp_groupname =[]; out_grp_peer =[]; 
             out_grp_userid =[]; out_grp_vpcid =[]; out_grp_vpcpeer =[];  
             len_intotal  = 0; len_outtotal = 0;
-            len_IpPermissions = 0; len_IpRanges = 0; len_PrefixListIds = 0; len_UserIdGroupPairs = 0;
-            len_oIpPermissions = 0; len_oIpRanges = 0; len_oPrefixListIds = 0; len_oUserIdGroupPairs = 0;
+            len_IpRanges = 0; len_PrefixListIds = 0; len_UserIdGroupPairs = 0;
+            len_oIpRanges = 0; len_oPrefixListIds = 0; len_oUserIdGroupPairs = 0;
             
-            if 'IpPermissions' in sg :
-              len_IpPermissions = len(sg['IpPermissions'])
+            if ('IpPermissions' in sg) and (len(sg['IpPermissions']) > 0) :
               for inrule in sg['IpPermissions']:
                 in_fromport.append(inrule['FromPort'] if 'FromPort' in inrule else ' ')
                 if 'IpProtocol' in inrule :
@@ -604,8 +604,23 @@ def describe_security_groups(searchRegions):
                   in_grp_userid.append(' ')
                   in_grp_vpcid.append(' ')
                   in_grp_vpcpeer.append(' ')
-            if 'IpPermissionsEgress' in sg :
-              len_oIpPermissions = len(sg['IpPermissionsEgress'])
+            else: # Inbound Rule Not Exist
+              len_intotal = 1;
+              in_fromport.append(' ')
+              in_protocol.append(' ')
+              in_toport.append(' ')
+              in_cidrip.append(' ')
+              in_desc.append(' ')
+              in_prefixlistid.append(' ')
+              in_pldesc.append(' ')
+              in_grp_desc.append(' ')
+              in_grp_groupid.append(' ')
+              in_grp_groupname.append(' ')
+              in_grp_peer.append(' ')
+              in_grp_userid.append(' ')
+              in_grp_vpcid.append(' ')
+              in_grp_vpcpeer.append(' ')
+            if ('IpPermissionsEgress' in sg) and (len(sg['IpPermissionsEgress']) > 0) :
               for outrule in sg['IpPermissionsEgress']:
                 out_fromport.append(outrule['FromPort'] if 'FromPort' in outrule else ' ')
                 if 'IpProtocol' in outrule :
@@ -683,7 +698,23 @@ def describe_security_groups(searchRegions):
                   out_grp_userid.append(' ')
                   out_grp_vpcid.append(' ')
                   out_grp_vpcpeer.append(' ')
-  
+            else: # Outbound Rule Not Exist
+              len_outtotal = 1; 
+              out_fromport.append(' ')
+              out_protocol.append(' ')
+              out_toport.append(' ')
+              out_cidrip.append(' ')
+              out_desc.append(' ')
+              out_prefixlistid.append(' ')
+              out_pldesc.append(' ')
+              out_grp_desc.append(' ')
+              out_grp_groupid.append(' ')
+              out_grp_groupname.append(' ')
+              out_grp_peer.append(' ')
+              out_grp_userid.append(' ')
+              out_grp_vpcid.append(' ')
+              out_grp_vpcpeer.append(' ')
+
             # klogger.debug(" intotal : %d, outtotla : %d", len_intotal, len_outtotal)
             # 전체 in , out data gap 보정하기
             for ix in range(len_intotal, max(len_intotal, len_outtotal)):
@@ -833,7 +864,7 @@ def describe_security_groups(searchRegions):
                           "VpcId" : 'ERROR CHECK',
                           "VpcTName" : list('ERROR CHECK'),
                       })
-      # klogger.debug(results)
+      # klogger_dat.debug(results)
     except Exception as othererr:
       klogger.error("ec2.describe_security_groups(),region[%s],%s", region, othererr)
       results.append( { "SGroupId": 'ERROR CHECK',
