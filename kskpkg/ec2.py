@@ -1104,56 +1104,122 @@ def describe_instances(searchRegions):
       if 200 == inss["ResponseMetadata"]["HTTPStatusCode"]:
         # klogger_dat.debug("%s",inss["Reservations"])
         if len(inss["Reservations"]) > 0 :
+          ec2_resource = boto3.resource('ec2')
           for rsv in inss["Reservations"]:
-            for ins in rsv["Instances"]:
-              # klogger_dat.debug("%s",ins) 
-              # Platform 값
-              platform = ins["Platform"] if "Platform" in ins else "Not Setting"
-              # KeyName 값
-              keyname = ins["KeyName"] if "KeyName" in ins else "Not Setting"
-              # pubipaddr 값
-              pubipaddr = ins["PublicIpAddress"] if "PublicIpAddress" in ins else "Not Setting"
-              # iaminsprofile 값
-              iaminsprofile = ins["IamInstanceProfile"]["Arn"] if "IamInstanceProfile" in ins else "Not Setting"
-              # securitygroups 값
-              securitygroups = []
-              for sg in ins["SecurityGroups"]:
-                securitygroups.append( {sg["GroupName"]:sg["GroupId"]} )
-              # ins Tag중 Name 값
-              tagname = 'Not Exist Name Tag'
-              if 'Tags' in ins:
-                for tag in ins['Tags']:
-                  if tag['Key'] == 'Name':
-                    tagname = tag['Value']
-                    break
-  
-              results.append( { "InstanceId": ins["InstanceId"],
-                                "InstanceTName" : tagname,
-                                "Platform" : platform,
-                                "Architecture" : ins["Architecture"],
-                                "InstanceType" : ins["InstanceType"],
-                                "KeyName" : keyname,
-                                "Placement" : ins["Placement"]["AvailabilityZone"],
-                                "PrivateIpAddress" : ins["PrivateIpAddress"],
-                                "PublicIpAddress" : pubipaddr,
-                                "SubnetId" : ins["SubnetId"],
-                                "SubnetTName" : '',
-                                "VpcId" : ins["VpcId"],
-                                "VpcTName" : '',
-                                "EbsOptimized" : ins["EbsOptimized"],
-                                "IamInstanceProfile" : iaminsprofile,
-                                "SecurityGroups" : securitygroups
-                            })
+            if len(rsv["Instances"]) > 0 :
+              for ins in rsv["Instances"]:
+                # klogger_dat.debug("%s",ins) 
+                # Platform 값
+                platform = ins["Platform"] if "Platform" in ins else "Not Setting"
+                # KeyName 값
+                keyname = ins["KeyName"] if "KeyName" in ins else "Not Setting"
+                # pubipaddr 값
+                pubipaddr = ins["PublicIpAddress"] if "PublicIpAddress" in ins else "Not Setting"
+                # iaminsprofile 값
+                iaminsprofile = ins["IamInstanceProfile"]["Arn"] if "IamInstanceProfile" in ins else "Not Setting"
+                # securitygroups 값
+                securitygroups = []
+                if len(ins["SecurityGroups"]) > 0 :
+                  for sg in ins["SecurityGroups"]:
+                    securitygroups.append( {sg["GroupName"]:sg["GroupId"]} )
+                # network interface id 값
+                netinfids = []
+                if ('NetworkInterfaces' in ins) and (len(ins['NetworkInterfaces']) > 0) :
+                  for netinf in ins['NetworkInterfaces']:
+                    netinfids.append(netinf['NetworkInterfaceId'])
+                # ebs id, size 값
+                volumeids = []; volumeinfo = [];
+                if ('BlockDeviceMappings' in ins) and (len(ins['BlockDeviceMappings']) > 0):
+                  for ebsmap in ins['BlockDeviceMappings']:
+                    if 'Ebs' in ebsmap :
+                      if 'VolumeId' in ebsmap['Ebs']:
+                        volumeids.append(ebsmap['Ebs']['VolumeId'])
+                        volume = ec2_resource.Volume(ebsmap['Ebs']['VolumeId'])
+                        volumeinfo.append({'DeviceName' : ebsmap['DeviceName'] if 'DeviceName' in ebsmap else ' ',
+                                           'Size' : str(volume.size) + ' GiB',
+                                           'Encrypted' : "True" if volume.encrypted else "False",
+                                           'VolumeKMSId' : volume.kms_key_id if type(volume.kms_key_id) == type('str') else '',
+                                          })
+                        # klogger_dat.debug(volumeinfo)
+                # ins Tag중 Name 값
+                tagname = 'Not Exist Name Tag'
+                if 'Tags' in ins:
+                  for tag in ins['Tags']:
+                    if tag['Key'] == 'Name':
+                      tagname = tag['Value']
+                      break
+                # list count sync with space
+                utils.ListSyncCountWithSpace(netinfids, securitygroups)
+
+                results.append( { "InstanceId": ins["InstanceId"],
+                                  "InstanceTName" : tagname,
+                                  "Architecture" : ins["Architecture"],
+                                  "InstanceType" : ins["InstanceType"],
+                                  "KeyName" : keyname,
+                                  "PrivateIpAddress" : ins["PrivateIpAddress"],
+                                  "PublicIpAddress" : pubipaddr,
+                                  "Placement" : ins["Placement"]["AvailabilityZone"],
+                                  "RootDeviceType" : ins["RootDeviceType"] if 'RootDeviceType' in ins else ' ',
+                                  "RootDeviceName" : ins["RootDeviceName"] if 'RootDeviceName' in ins else ' ',
+                                  "VolumeId" : volumeids,
+                                  "VolumeInfo" : volumeinfo,
+                                  "Hypervisor" : ins["Hypervisor"] if 'Hypervisor' in ins else ' ',
+                                  "VirtualizationType" : ins["VirtualizationType"] if 'VirtualizationType' in ins else ' ',
+                                  "Platform" : platform,
+                                  "ENITName" : ' ',
+                                  "NetworkInterfaceId" : netinfids,
+                                  "SubnetId" : ins["SubnetId"],
+                                  "SubnetTName" : '',
+                                  "VpcId" : ins["VpcId"],
+                                  "VpcTName" : '',
+                                  "EbsOptimized" : ins["EbsOptimized"],
+                                  "IamInstanceProfile" : iaminsprofile,
+                                  "SecurityGroups" : securitygroups,
+                              })
+            else: # Not Exists
+              results.append( { "InstanceId": ' ',
+                                "InstanceTName" : ' ',
+                                "Architecture" : ' ',
+                                "InstanceType" : ' ',
+                                "KeyName" : ' ',
+                                "PrivateIpAddress" : ' ',
+                                "PublicIpAddress" : ' ',
+                                "Placement" : ' ',
+                                "RootDeviceType" : ' ',
+                                "RootDeviceName" : ' ',
+                                "VolumeId" : ' ',
+                                "VolumeInfo" : ' ',
+                                "Hypervisor" : ' ',
+                                "VirtualizationType" : ' ',
+                                "Platform" : ' ',
+                                "ENITName" : ' ',
+                                "NetworkInterfaceId" : ' ',
+                                "SubnetId" : ' ',
+                                "SubnetTName" : ' ',
+                                "VpcId" : ' ',
+                                "VpcTName" : ' ',
+                                "EbsOptimized" : ' ',
+                                "IamInstanceProfile" : ' ',
+                                "SecurityGroups" : list(' '),
+                              })
         else:  # column list
           results.append( { "InstanceId": ' ',
                             "InstanceTName" : ' ',
-                            "Platform" : ' ',
                             "Architecture" : ' ',
                             "InstanceType" : ' ',
                             "KeyName" : ' ',
-                            "Placement" : ' ',
                             "PrivateIpAddress" : ' ',
                             "PublicIpAddress" : ' ',
+                            "Placement" : ' ',
+                            "RootDeviceType" : ' ',
+                            "RootDeviceName" : ' ',
+                            "VolumeId" : ' ',
+                            "VolumeInfo" : ' ',
+                            "Hypervisor" : ' ',
+                            "VirtualizationType" : ' ',
+                            "Platform" : ' ',
+                            "ENITName" : ' ',
+                            "NetworkInterfaceId" : ' ',
                             "SubnetId" : ' ',
                             "SubnetTName" : ' ',
                             "VpcId" : ' ',
@@ -1166,13 +1232,21 @@ def describe_instances(searchRegions):
         klogger.error("call error : %d", inss["ResponseMetadata"]["HTTPStatusCode"])
         results.append( { "InstanceId": 'ERROR CHECK',
                           "InstanceTName" : 'ERROR CHECK',
-                          "Platform" : 'ERROR CHECK',
                           "Architecture" : 'ERROR CHECK',
                           "InstanceType" : 'ERROR CHECK',
                           "KeyName" : 'ERROR CHECK',
-                          "Placement" : 'ERROR CHECK',
                           "PrivateIpAddress" : 'ERROR CHECK',
                           "PublicIpAddress" : 'ERROR CHECK',
+                          "Placement" : 'ERROR CHECK',
+                          "RootDeviceType" : 'ERROR CHECK',
+                          "RootDeviceName" : 'ERROR CHECK',
+                          "VolumeId" : 'ERROR CHECK',
+                          "VolumeInfo" : 'ERROR CHECK',
+                          "Hypervisor" : 'ERROR CHECK',
+                          "VirtualizationType" : 'ERROR CHECK',
+                          "Platform" : 'ERROR CHECK',
+                          "ENITName" : 'ERROR CHECK',
+                          "NetworkInterfaceId" : 'ERROR CHECK',
                           "SubnetId" : 'ERROR CHECK',
                           "SubnetTName" : 'ERROR CHECK',
                           "VpcId" : 'ERROR CHECK',
@@ -1186,13 +1260,21 @@ def describe_instances(searchRegions):
       klogger.error("ec2.describe_instances(),region[%s],%s", region, othererr)
       results.append( { "InstanceId": 'ERROR CHECK',
                         "InstanceTName" : 'ERROR CHECK',
-                        "Platform" : 'ERROR CHECK',
                         "Architecture" : 'ERROR CHECK',
                         "InstanceType" : 'ERROR CHECK',
                         "KeyName" : 'ERROR CHECK',
-                        "Placement" : 'ERROR CHECK',
                         "PrivateIpAddress" : 'ERROR CHECK',
                         "PublicIpAddress" : 'ERROR CHECK',
+                        "Placement" : 'ERROR CHECK',
+                        "RootDeviceType" : 'ERROR CHECK',
+                        "RootDeviceName" : 'ERROR CHECK',
+                        "VolumeId" : 'ERROR CHECK',
+                        "VolumeInfo" : 'ERROR CHECK',
+                        "Hypervisor" : 'ERROR CHECK',
+                        "VirtualizationType" : 'ERROR CHECK',
+                        "Platform" : 'ERROR CHECK',
+                        "ENITName" : 'ERROR CHECK',
+                        "NetworkInterfaceId" : 'ERROR CHECK',
                         "SubnetId" : 'ERROR CHECK',
                         "SubnetTName" : 'ERROR CHECK',
                         "VpcId" : 'ERROR CHECK',
@@ -1293,18 +1375,66 @@ def describe_addresses(searchRegions):
       pass
   return results
 
+def describe_prefix_lists(searchRegions):
+  '''
+    search Prefix List
+  '''
+  klogger_dat.debug('managed prefix list')
+  for region in searchRegions:
+    try:
+      results = [] 
+      ec2=boto3.client('ec2', region )
+      plss = ec2.describe_prefix_lists()
+      # klogger.debug("%s",plss["PrefixLists"])
+      if 200 == plss["ResponseMetadata"]["HTTPStatusCode"]:
+        # klogger_dat.debug("%s",plss["PrefixLists"])
+        if len(plss["PrefixLists"]) > 0 :
+          for pls in plss["PrefixLists"]:
+            cidrs = [];
+            if ('Cidrs' in pls) and (len(pls['Cidrs']) > 0):
+              for cidr in pls['Cidrs']:
+                cidrs.append(cidr)
+            else: # Not Exists
+              cidrs.append(' ')
+            results.append( { "PrefixListName": pls['PrefixListName'] if 'PrefixListName' in pls else ' ',
+                              "PrefixListId" : pls['PrefixListId'] if 'PrefixListId' in pls else ' ',
+                              "Cidrs" : cidrs,
+                            })
+        else:  # Not Exists
+          results.append( { "PrefixListName": ' ',
+                            "PrefixListId" : ' ',
+                            "Cidrs" : list(' '),
+                          })
+      else:
+        klogger.error("call error : %d", plss["ResponseMetadata"]["HTTPStatusCode"])
+        results.append( { "PrefixListName": 'ERROR CHECK',
+                          "PrefixListId" : 'ERROR CHECK',
+                          "Cidrs" : list('ERROR CHECK'),
+                        })
+      # klogger.debug(results)
+    except Exception as othererr:
+      klogger.error("ec2.describe_prefix_lists(),region[%s],%s", region, othererr)
+      results.append( { "PrefixListName": 'ERROR CHECK',
+                        "PrefixListId" : 'ERROR CHECK',
+                        "Cidrs" : list('ERROR CHECK'),
+                      })
+    finally:
+      pass
+  return results
+
 def main(argv):
   ###  set search region name to variable of searchRegions
   searchRegions = ['ap-northeast-2']
   describe_vpcs(searchRegions) 
   describe_internet_gateways(searchRegions) 
   describe_nat_gateways(searchRegions)
-  describe_network_interfaces(searchRegions)
+  describe_network_interfaces(searchRegions) #eni
   describe_instances(searchRegions) 
   describe_subnets(searchRegions) 
   describe_route_tables(searchRegions) 
   describe_security_groups(searchRegions) 
-  describe_addresses(searchRegions)
+  describe_addresses(searchRegions) # eip
+  describe_prefix_lists(searchRegions)
   sys.exit(0)
 
 if __name__ == "__main__":

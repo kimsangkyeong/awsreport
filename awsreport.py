@@ -212,20 +212,24 @@ def main(argv):
   df_routea['SubnetTName'] = df_routea['SubnetId'].apply(lambda x : get_subnetname(df_subnet,x)) # get Subnet TagName
   df_routet['VpcTName'] = df_routet['VpcId'].apply(lambda x : get_vpcname(df_vpc,x)) # get VpcTagName
   # klogger_dat.debug(df_routet)
+  df_eni = results_to_dataframe(executefunc("kskpkg.ec2.describe_network_interfaces", ['ap-northeast-2']))
+  df_eni['VpcTName'] = df_eni['VpcId'].apply(lambda x : get_vpcname(df_vpc,x)) # get VpcTagName
+  df_eni['SubnetTName'] = df_eni['SubnetId'].apply(lambda x : get_subnetname(df_subnet,x)) # get Subnet TagName
   df_kms = results_to_dataframe(executefunc_p1("kskpkg.kms.list_keys"))
   # klogger_dat.debug(df_kms)
   df_ins = results_to_dataframe(executefunc("kskpkg.ec2.describe_instances", ['ap-northeast-2']))
   df_ins['VpcTName'] = df_ins['VpcId'].apply(lambda x : get_vpcname(df_vpc,x)) # get VpcTagName
   df_ins['SubnetTName'] = df_ins['SubnetId'].apply(lambda x : get_subnetname(df_subnet,x)) # get Subnet TagName
+  df_ins['ENITName'] = df_ins['NetworkInterfaceId'].apply(lambda x : get_eniname(df_eni,x)) # get ENI TagName
   # klogger_dat.debug(df_ins)
+  df_mplist = results_to_dataframe(executefunc("kskpkg.ec2.describe_prefix_lists", ['ap-northeast-2']))
+  # klogger_dat.debug(df_mplist)
   df_sg = results_to_dataframe(executefunc("kskpkg.ec2.describe_security_groups", ['ap-northeast-2']))
   df_sg['VpcTName'] = df_sg['VpcId'].apply(lambda x : get_vpcname(df_vpc,x)) # get VpcTagName
   df_sg['In_GroupName'] = df_sg['In_GroupId'].apply(lambda x : get_sgname(df_sg,x)) # get Security Group TagName
   df_sg['Out_GroupName'] = df_sg['Out_GroupId'].apply(lambda x : get_sgname(df_sg,x)) # get Security Group TagName
   # klogger_dat.debug(df_sg)
-  df_eni = results_to_dataframe(executefunc("kskpkg.ec2.describe_network_interfaces", ['ap-northeast-2']))
-  df_eni['VpcTName'] = df_eni['VpcId'].apply(lambda x : get_vpcname(df_vpc,x)) # get VpcTagName
-  df_eni['SubnetTName'] = df_eni['SubnetId'].apply(lambda x : get_subnetname(df_subnet,x)) # get Subnet TagName
+  # 상호 참조관계의 instanse와 eni는 일부 항목만 순서 조정하여 셋팅 ( 먼저 ec2 <- eni tag 치환 후 eni <- ec2 tag 치환)
   df_eni['Attach_InstanceTName'] = df_eni['Attach_InstanceID'].apply(lambda x : get_insname(df_ins,x)) # get Instance TagName
   # klogger_dat.debug(df_eni)
   # display.display(df_eni)
@@ -282,6 +286,7 @@ def main(argv):
       df_subnet.to_excel(writer, sheet_name='subnet', index=False) 
       df_routea.to_excel(writer, sheet_name='router', index=False) 
       df_routet.to_excel(writer, sheet_name='routeinfo', index=False) 
+      df_mplist.to_excel(writer, sheet_name='managed_prefixlist', index=False) 
       df_elb.to_excel(writer, sheet_name='elb', index=False) 
       df_elb_listener.to_excel(writer, sheet_name='elb_listener', index=False) 
       df_elb_listener_rule.to_excel(writer, sheet_name='elb_listener_rule', index=False) 
@@ -306,6 +311,7 @@ def main(argv):
       df_subnet.to_excel(writer, sheet_name='subnet', index=False) 
       df_routea.to_excel(writer, sheet_name='router', index=False) 
       df_routet.to_excel(writer, sheet_name='routeinfo', index=False) 
+      df_mplist.to_excel(writer, sheet_name='managed_prefixlist', index=False) 
       df_elb.to_excel(writer, sheet_name='elb', index=False) 
       df_elb_listener.to_excel(writer, sheet_name='elb_listener', index=False) 
       df_elb_listener_rule.to_excel(writer, sheet_name='elb_listener_rule', index=False) 
