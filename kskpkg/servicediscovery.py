@@ -40,7 +40,7 @@ else:
 
 def list_namespaces():
   '''
-    search hosted zone
+    search service discovery namespaces
   '''
   klogger_dat.debug('servicediscovery:cloudmap')
   try:
@@ -78,12 +78,31 @@ def list_namespaces():
                           "CreateDate" : list(' '),
                          })
         
-    #   klogger.debug(results)
     else:
       klogger.error("call error : %d", namespaces["ResponseMetadata"]["HTTPStatusCode"])
+      results.append( { "Id": 'ERROR CHECK',
+                        "Name" : 'ERROR CHECK',
+                        "Type" : 'ERROR CHECK',
+                        "Description" : 'ERROR CHECK',
+                        "ServiceCount" : 'ERROR CHECK',
+                        "DnsProperties" : 'ERROR CHECK',
+                        "HttpProperties" : 'ERROR CHECK',
+                        "CreateDate" : list('ERROR CHECK'),
+                       })
+    # klogger.debug(results)
   except Exception as othererr:
     klogger.error("route53.list_hosted_zones(),%s", othererr)
-  return results
+    results.append( { "Id": 'ERROR CHECK',
+                      "Name" : 'ERROR CHECK',
+                      "Type" : 'ERROR CHECK',
+                      "Description" : 'ERROR CHECK',
+                      "ServiceCount" : 'ERROR CHECK',
+                      "DnsProperties" : 'ERROR CHECK',
+                      "HttpProperties" : 'ERROR CHECK',
+                      "CreateDate" : list('ERROR CHECK'),
+                     })
+  finally:
+    return results
 
 def main(argv):
 

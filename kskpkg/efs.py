@@ -124,12 +124,53 @@ def describe_file_systems():
                           "ThroughputMode" : ' ',
                           "ProvisionedThroughputInMibps" : list(' '),
                          })
-    #   klogger.debug(results)
     else:
       klogger.error("call error : %d", filesystems["ResponseMetadata"]["HTTPStatusCode"])
+      results.append( { "EFSName": 'ERROR CHECK',
+                        "EFSTName": 'ERROR CHECK',
+                        "FileSystemId" : 'ERROR CHECK',
+                        "FileSystemArn" : 'ERROR CHECK',
+                        "AvailabilityZoneName" : 'ERROR CHECK',
+                        "AvailabilityZoneId" : 'ERROR CHECK',
+                        "NumberOfMountTargets" : 'ERROR CHECK',
+                        "LifeCycleState" : 'ERROR CHECK',
+                        "CreationTime" : 'ERROR CHECK',
+                        "Size_Value" : 'ERROR CHECK',
+                        "Size_Timestamp" : 'ERROR CHECK',
+                        "Size_ValueInIA" : 'ERROR CHECK',
+                        "Size_ValueInStandard" : 'ERROR CHECK',
+                        "Encrypted" : 'ERROR CHECK',
+                        "KmsKeyAlias" : 'ERROR CHECK',
+                        "KmsKeyId" : 'ERROR CHECK',
+                        "PerformanceMode" : 'ERROR CHECK',
+                        "ThroughputMode" : 'ERROR CHECK',
+                        "ProvisionedThroughputInMibps" : list('ERROR CHECK'),
+                       })
+    # klogger.debug(results)
   except Exception as othererr:
     klogger.error("efs.describe_file_systems(),%s", othererr)
-  return results
+    results.append( { "EFSName": 'ERROR CHECK',
+                      "EFSTName": 'ERROR CHECK',
+                      "FileSystemId" : 'ERROR CHECK',
+                      "FileSystemArn" : 'ERROR CHECK',
+                      "AvailabilityZoneName" : 'ERROR CHECK',
+                      "AvailabilityZoneId" : 'ERROR CHECK',
+                      "NumberOfMountTargets" : 'ERROR CHECK',
+                      "LifeCycleState" : 'ERROR CHECK',
+                      "CreationTime" : 'ERROR CHECK',
+                      "Size_Value" : 'ERROR CHECK',
+                      "Size_Timestamp" : 'ERROR CHECK',
+                      "Size_ValueInIA" : 'ERROR CHECK',
+                      "Size_ValueInStandard" : 'ERROR CHECK',
+                      "Encrypted" : 'ERROR CHECK',
+                      "KmsKeyAlias" : 'ERROR CHECK',
+                      "KmsKeyId" : 'ERROR CHECK',
+                      "PerformanceMode" : 'ERROR CHECK',
+                      "ThroughputMode" : 'ERROR CHECK',
+                      "ProvisionedThroughputInMibps" : list('ERROR CHECK'),
+                     })
+  finally:
+    return results
 
 def main(argv):
 

@@ -73,12 +73,21 @@ def list_keys():
                           "KeyAlias": ' ',
                           "KeyArn": list(' '),
                          })
-    #   klogger.debug(results)
     else:
       klogger.error("call error : %d", keys["ResponseMetadata"]["HTTPStatusCode"])
+      results.append( { "KeyId": 'ERROR CHECK',
+                        "KeyAlias": 'ERROR CHECK',
+                        "KeyArn": list('ERROR CHECK'),
+                       })
+    # klogger.debug(results)
   except Exception as othererr:
     klogger.error("kms.list_keys(),%s", othererr)
-  return results
+    results.append( { "KeyId": 'ERROR CHECK',
+                      "KeyAlias": 'ERROR CHECK',
+                      "KeyArn": list('ERROR CHECK'),
+                     })
+  finally:
+    return results
 
 def list_aliases(KeyId):
   '''
@@ -86,7 +95,7 @@ def list_aliases(KeyId):
   '''
 #   klogger_dat.debug('kms alias')
   try:
-    result = ' ' 
+    result = 'ERROR CHECK' 
     kms=boto3.client('kms')
     alias = kms.list_aliases(KeyId=KeyId)
     # klogger_dat.debug(keys)
@@ -98,12 +107,13 @@ def list_aliases(KeyId):
           if 'AliasName' in alias :
             result = alias['AliasName']
             break        
-    #   klogger.debug(result)
     else:
       klogger.error("call error : %d", alias["ResponseMetadata"]["HTTPStatusCode"])
+    # klogger.debug(result)
   except Exception as othererr:
     klogger.error("kms.list_aliases(),%s", othererr)
-  return result
+  finally:
+    return result
 
 def main(argv):
 

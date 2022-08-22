@@ -243,7 +243,7 @@ def main(argv):
   df_rdscluser['PerformanceInsightsKMSKeyAlias'] = df_rdscluser['PerformanceInsightsKMSKeyId'].apply(lambda x : get_keyalias(df_kms,x)) # get KMS Key alias
   df_rdscluser['VpcSecurityGroupName'] = df_rdscluser['VpcSecurityGroupId'].apply(lambda x : get_sgname(df_sg,x)) # get Security Group TagName
   # klogger_dat.debug(df_rdscluser)
-
+  
   # to_excel 
   klogger_dat.debug("%s\n%s","-"*20,"save to excel")
   if os.path.exists(output_file):

@@ -63,12 +63,19 @@ def list_certificates():
         results.append({ "DomainName": ' ',
                          "CertificateArn" : list(' '),
                        })
-    #   klogger.debug(results)
     else:
       klogger.error("call error : %d", certlists["ResponseMetadata"]["HTTPStatusCode"])
+      results.append({ "DomainName": 'ERROR CHECK',
+                       "CertificateArn" : list('ERROR CHECK'),
+                     })
+    # klogger.debug(results)
   except Exception as othererr:
     klogger.error("acm.list_certificates(),%s", othererr)
-  return results
+    results.append({ "DomainName": 'ERROR CHECK',
+                     "CertificateArn" : list('ERROR CHECK'),
+                   })
+  finally:
+    return results
 
 def main(argv):
 

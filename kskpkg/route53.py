@@ -1,6 +1,6 @@
 ####################################################################################################
 # 
-# Purpose : get list vpcs info
+# Purpose : get list route53 info
 # Source  : route53.py
 # Usage   : python route53.py 
 # Develop : ksk
@@ -72,13 +72,31 @@ def list_hosted_zones():
                           "ResourceRecordSetCount" : ' ',
                           "LinkedService" : list(' '),
                          })
-      
-     # klogger.debug(results)
     else:
       klogger.error("call error : %d", hosts["ResponseMetadata"]["HTTPStatusCode"])
+      results.append( { "Id": 'ERROR CHECK',
+                        "Name" : 'ERROR CHECK',
+                        "Comment" : 'ERROR CHECK',
+                        "Type" : 'ERROR CHECK',
+                        "ResourceRecordSetCount" : 'ERROR CHECK',
+                        "CallerReference" : 'ERROR CHECK',
+                        "ResourceRecordSetCount" : 'ERROR CHECK',
+                        "LinkedService" : list('ERROR CHECK'),
+                       })
+    # klogger.debug(results)
   except Exception as othererr:
     klogger.error("route53.list_hosted_zones(),%s", othererr)
-  return results
+    results.append( { "Id": 'ERROR CHECK',
+                      "Name" : 'ERROR CHECK',
+                      "Comment" : 'ERROR CHECK',
+                      "Type" : 'ERROR CHECK',
+                      "ResourceRecordSetCount" : 'ERROR CHECK',
+                      "CallerReference" : 'ERROR CHECK',
+                      "ResourceRecordSetCount" : 'ERROR CHECK',
+                      "LinkedService" : list('ERROR CHECK'),
+                     })
+  finally:
+    return results
 
 def list_resource_record_sets(searchHostZoneids):
   '''
@@ -132,12 +150,35 @@ def list_resource_record_sets(searchHostZoneids):
                             "CallerReference" : ' ',
                             "ResourceRecordSetCount" : list(' '),
                            })
-        
-        # klogger.debug(results)
       else:
         klogger.error("call error : %d", records["ResponseMetadata"]["HTTPStatusCode"])
+        results.append( { "HostedZoneId" : 'ERROR CHECK',
+                          "Name": 'ERROR CHECK',
+                          "Type" : 'ERROR CHECK',
+                          "ResourceRecords" : 'ERROR CHECK',
+                          "AliasTarget" : 'ERROR CHECK',
+                          "EvaluateTargetHealth" : 'ERROR CHECK',
+                          "SetIdentifier" : 'ERROR CHECK',
+                          "MultiValueAnswer" : 'ERROR CHECK',
+                          "CallerReference" : 'ERROR CHECK',
+                          "ResourceRecordSetCount" : list('ERROR CHECK'),
+                         })
+      # klogger.debug(results)
     except Exception as othererr:
       klogger.error("route53.list_resource_record_sets(),%s", othererr)
+      results.append( { "HostedZoneId" : 'ERROR CHECK',
+                        "Name": 'ERROR CHECK',
+                        "Type" : 'ERROR CHECK',
+                        "ResourceRecords" : 'ERROR CHECK',
+                        "AliasTarget" : 'ERROR CHECK',
+                        "EvaluateTargetHealth" : 'ERROR CHECK',
+                        "SetIdentifier" : 'ERROR CHECK',
+                        "MultiValueAnswer" : 'ERROR CHECK',
+                        "CallerReference" : 'ERROR CHECK',
+                        "ResourceRecordSetCount" : list('ERROR CHECK'),
+                       })
+    finally:
+      pass
   return results
 
 def main(argv):

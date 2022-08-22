@@ -77,19 +77,30 @@ def describe_internet_gateways(searchRegions):
                               "InternetGatewayTName" : tagname,
                               "AttachedVpcId" : attachedvpcid ,
                               "VpcTName" : '',
-                             })
+                            })
         else:  # column list
           results.append( { "InternetGatewayId": ' ',
                             "InternetGatewayTName" : ' ',
                             "AttachedVpcId" : ' ',
                             "VpcTName" : list(' '),
-                           })
-
-        # klogger.debug(results)
+                          })
       else:
         klogger.error("call error : %d", igws["ResponseMetadata"]["HTTPStatusCode"])
+        results.append( { "InternetGatewayId": 'ERROR CHECK',
+                          "InternetGatewayTName" : 'ERROR CHECK',
+                          "AttachedVpcId" : 'ERROR CHECK',
+                          "VpcTName" : list('ERROR CHECK'),
+                        })
+      # klogger.debug(results)
     except Exception as othererr:
-       klogger.error("ec2.describe_internet_gateways(),region[%s],%s", region, othererr)
+      klogger.error("ec2.describe_internet_gateways(),region[%s],%s", region, othererr)
+      results.append( { "InternetGatewayId": 'ERROR CHECK',
+                        "InternetGatewayTName" : 'ERROR CHECK',
+                        "AttachedVpcId" : 'ERROR CHECK',
+                        "VpcTName" : list('ERROR CHECK'),
+                      })
+    finally:
+      pass
   return results
 
 def describe_vpcs(searchRegions):
@@ -129,13 +140,24 @@ def describe_vpcs(searchRegions):
                             "VpcTName" : ' ',
                             "Cidr" : ' ',
                             "State" : list(' '),
-                           })
-
-        #klogger.debug(results)
+                          })
       else:
         klogger.error("call error : %d", vpcs["ResponseMetadata"]["HTTPStatusCode"])
+        results.append( { "VpcId": 'ERROR CHECK',
+                          "VpcTName" : 'ERROR CHECK',
+                          "Cidr" : 'ERROR CHECK',
+                          "State" : list('ERROR CHECK'),
+                        })
+      #klogger.debug(results)
     except Exception as othererr:
-       klogger.error("ec2.describe_vpcs(),region[%s],%s", region, othererr)
+      klogger.error("ec2.describe_vpcs(),region[%s],%s", region, othererr)
+      results.append( { "VpcId": 'ERROR CHECK',
+                        "VpcTName" : 'ERROR CHECK',
+                        "Cidr" : 'ERROR CHECK',
+                        "State" : list('ERROR CHECK'),
+                      })
+    finally:
+      pass
   return results
 
 def describe_nat_gateways(searchRegions):
@@ -192,13 +214,36 @@ def describe_nat_gateways(searchRegions):
                             "SubnetTName" : ' ',
                             "VpcId" : ' ',
                             "VpcTName" : list(' '),
-                           })
-
-        # klogger.debug(results)
+                          })
       else:
         klogger.error("call error : %d", nats["ResponseMetadata"]["HTTPStatusCode"])
+        results.append( { "NatGatewayId": 'ERROR CHECK',
+                          "NatGatewayTName" : 'ERROR CHECK',
+                          "State" : 'ERROR CHECK',
+                          "PublicIp" : 'ERROR CHECK',
+                          "PrivateIp" : 'ERROR CHECK',
+                          "ConnectivityType" : 'ERROR CHECK',
+                          "SubnetId" : 'ERROR CHECK',
+                          "SubnetTName" : 'ERROR CHECK',
+                          "VpcId" : 'ERROR CHECK',
+                          "VpcTName" : list('ERROR CHECK'),
+                        })
+      # klogger.debug(results)
     except Exception as othererr:
       klogger.error("ec2.describe_nat_gateways(),region[%s],%s", region, othererr)
+      results.append( { "NatGatewayId": 'ERROR CHECK',
+                        "NatGatewayTName" : 'ERROR CHECK',
+                        "State" : 'ERROR CHECK',
+                        "PublicIp" : 'ERROR CHECK',
+                        "PrivateIp" : 'ERROR CHECK',
+                        "ConnectivityType" : 'ERROR CHECK',
+                        "SubnetId" : 'ERROR CHECK',
+                        "SubnetTName" : 'ERROR CHECK',
+                        "VpcId" : 'ERROR CHECK',
+                        "VpcTName" : list('ERROR CHECK'),
+                      })
+    finally:
+      pass
   return results
 
 def describe_subnets(searchRegions):
@@ -241,13 +286,32 @@ def describe_subnets(searchRegions):
                             "AvailableIpAddressCount" : ' ',
                             "VpcId" : ' ',
                             "VpcTName" : list(' '),
-                           })
-
-        # klogger.debug(results)
+                          })
       else:
         klogger.error("call error : %d", subnets["ResponseMetadata"]["HTTPStatusCode"])
+        results.append( { "SubnetId": 'ERROR CHECK',
+                          "SubnetTName" : 'ERROR CHECK',
+                          "State" : 'ERROR CHECK',
+                          "CidrBlock" : 'ERROR CHECK',
+                          "AvailabilityZone" : 'ERROR CHECK',
+                          "AvailableIpAddressCount" : 'ERROR CHECK',
+                          "VpcId" : 'ERROR CHECK',
+                          "VpcTName" : list('ERROR CHECK'),
+                        })
+      # klogger.debug(results)
     except Exception as othererr:
       klogger.error("ec2.describe_subnets(),region[%s],%s", region, othererr)
+      results.append( { "SubnetId": 'ERROR CHECK',
+                        "SubnetTName" : 'ERROR CHECK',
+                        "State" : 'ERROR CHECK',
+                        "CidrBlock" : 'ERROR CHECK',
+                        "AvailabilityZone" : 'ERROR CHECK',
+                        "AvailableIpAddressCount" : 'ERROR CHECK',
+                        "VpcId" : 'ERROR CHECK',
+                        "VpcTName" : list('ERROR CHECK'),
+                      })
+    finally:
+      pass
   return results
 
 def describe_route_tables(searchRegions):
@@ -293,7 +357,7 @@ def describe_route_tables(searchRegions):
                                "State" : states,
                                "VpcId" : router["VpcId"] ,
                                "VpcTName" : ''
-                              })
+                             })
             # results2  route
             rstates = []; destcidrs = []; destplids = []; egressgwids = []; rgatewayids = [];
             instanceids = []; natids = []; tgwids = []; localgwids = []; carrgwids = [];
@@ -334,7 +398,18 @@ def describe_route_tables(searchRegions):
                                "VpcTName" : ''
                               })
         else:  # column list
-          results.append( { "RouteTableId": ' ',
+          results1.append( { "RouteTableId": ' ',
+                             "RouteTableTName" : ' ',
+                             "RouteTableAssociationId" : ' ',
+                             "RouteTableId" : ' ',
+                             "SubnetId" : ' ',
+                             "SubnetTName" : ' ',
+                             "GatewayId" : ' ',
+                             "State" : ' ',
+                             "VpcId" : ' ',
+                             "VpcTName" : list(' '),
+                            })
+          results2.append( { "RouteTableId": ' ',
                             "RouteTableTName" : ' ',
                             "State" : ' ',
                             "DestinationCidrBlock" : ' ',
@@ -352,14 +427,75 @@ def describe_route_tables(searchRegions):
                             "Origin" : ' ',
                             "VpcId" : ' ',
                             "VpcTName" : list(' '),
-                           })
-
-        # klogger.debug(results1)
-        # klogger.debug(results2)
+                          })
       else:
         klogger.error("call error : %d", routers["ResponseMetadata"]["HTTPStatusCode"])
+        results1.append( { "RouteTableId": 'ERROR CHECK',
+                           "RouteTableTName" : 'ERROR CHECK',
+                           "RouteTableAssociationId" : 'ERROR CHECK',
+                           "RouteTableId" : 'ERROR CHECK',
+                           "SubnetId" : 'ERROR CHECK',
+                           "SubnetTName" : 'ERROR CHECK',
+                           "GatewayId" : 'ERROR CHECK',
+                           "State" : 'ERROR CHECK',
+                           "VpcId" : 'ERROR CHECK',
+                           "VpcTName" : list('ERROR CHECK'),
+                          })
+        results2.append( { "RouteTableId": 'ERROR CHECK',
+                          "RouteTableTName" : 'ERROR CHECK',
+                          "State" : 'ERROR CHECK',
+                          "DestinationCidrBlock" : 'ERROR CHECK',
+                          "GatewayId" : 'ERROR CHECK',
+                          "NatGatewayId" : 'ERROR CHECK',
+                          "DestinationPrefixListId" : 'ERROR CHECK',
+                          "EgressOnlyInternetGatewayId" : 'ERROR CHECK',
+                          "InstanceId" : 'ERROR CHECK',
+                          "TransitGatewayId" : 'ERROR CHECK',
+                          "LocalGatewayId" : 'ERROR CHECK',
+                          "CarrierGatewayId" : 'ERROR CHECK',
+                          "NetworkInterfaceId" : 'ERROR CHECK',
+                          "VpcPeeringConnectionId" : 'ERROR CHECK',
+                          "CoreNetworkArn" : 'ERROR CHECK',
+                          "Origin" : 'ERROR CHECK',
+                          "VpcId" : 'ERROR CHECK',
+                          "VpcTName" : list('ERROR CHECK'),
+                        })
+      # klogger.debug(results1)
+      # klogger.debug(results2)
     except Exception as othererr:
       klogger.error("ec2.describe_route_tables(),region[%s],%s", region, othererr)
+      results1.append( { "RouteTableId": 'ERROR CHECK',
+                         "RouteTableTName" : 'ERROR CHECK',
+                         "RouteTableAssociationId" : 'ERROR CHECK',
+                         "RouteTableId" : 'ERROR CHECK',
+                         "SubnetId" : 'ERROR CHECK',
+                         "SubnetTName" : 'ERROR CHECK',
+                         "GatewayId" : 'ERROR CHECK',
+                         "State" : 'ERROR CHECK',
+                         "VpcId" : 'ERROR CHECK',
+                         "VpcTName" : list('ERROR CHECK'),
+                        })
+      results2.append( { "RouteTableId": 'ERROR CHECK',
+                        "RouteTableTName" : 'ERROR CHECK',
+                        "State" : 'ERROR CHECK',
+                        "DestinationCidrBlock" : 'ERROR CHECK',
+                        "GatewayId" : 'ERROR CHECK',
+                        "NatGatewayId" : 'ERROR CHECK',
+                        "DestinationPrefixListId" : 'ERROR CHECK',
+                        "EgressOnlyInternetGatewayId" : 'ERROR CHECK',
+                        "InstanceId" : 'ERROR CHECK',
+                        "TransitGatewayId" : 'ERROR CHECK',
+                        "LocalGatewayId" : 'ERROR CHECK',
+                        "CarrierGatewayId" : 'ERROR CHECK',
+                        "NetworkInterfaceId" : 'ERROR CHECK',
+                        "VpcPeeringConnectionId" : 'ERROR CHECK',
+                        "CoreNetworkArn" : 'ERROR CHECK',
+                        "Origin" : 'ERROR CHECK',
+                        "VpcId" : 'ERROR CHECK',
+                        "VpcTName" : list('ERROR CHECK'),
+                      })
+    finally:
+      pass
   return results1, results2
 
 def describe_security_groups(searchRegions):
@@ -660,11 +796,83 @@ def describe_security_groups(searchRegions):
                             "VpcId" : ' ',
                             "VpcTName" : list(' '),
                         })
-       # klogger.debug(results)
       else:
         klogger.error("call error : %d", sgs["ResponseMetadata"]["HTTPStatusCode"])
+        results.append( { "SGroupId": 'ERROR CHECK',
+                          "SGroupName" : 'ERROR CHECK',
+                          "SGroupTName" : 'ERROR CHECK',
+                          "Description" : 'ERROR CHECK',
+                          "In_IpProtocol" : 'ERROR CHECK',
+                          "In_FromPort" : 'ERROR CHECK',
+                          "In_ToPort" : 'ERROR CHECK',
+                          "In_CidrIp" : 'ERROR CHECK',
+                          "In_GroupId" : 'ERROR CHECK',
+                          "In_GroupName" : 'ERROR CHECK',
+                          "In_UserIdGroupPairs_Description" : 'ERROR CHECK',
+                          "In_Description" : 'ERROR CHECK',
+                          "In_PrefixListId" : 'ERROR CHECK',
+                          "In_PLDescription" : 'ERROR CHECK',
+                          "In_PeeringStatus" : 'ERROR CHECK',
+                          "In_UserId" : 'ERROR CHECK',
+                          "In_VpcId" : 'ERROR CHECK',
+                          "In_VpcPeeringConnectionId" : 'ERROR CHECK',
+                          "Out_IpProtocol" : 'ERROR CHECK',
+                          "Out_FromPort" : 'ERROR CHECK',
+                          "Out_ToPort" : 'ERROR CHECK',
+                          "Out_CidrIp" : 'ERROR CHECK',
+                          "Out_Description" : 'ERROR CHECK',
+                          "Out_GroupId" : 'ERROR CHECK',
+                          "Out_GroupName" : 'ERROR CHECK',
+                          "Out_UserIdGroupPairs_Description" : 'ERROR CHECK',
+                          "Out_PrefixListId" : 'ERROR CHECK',
+                          "Out_PLDescription" : 'ERROR CHECK',
+                          "Out_PeeringStatus" : 'ERROR CHECK',
+                          "Out_UserId" : 'ERROR CHECK',
+                          "Out_VpcId" : 'ERROR CHECK',
+                          "Out_VpcPeeringConnectionId" : 'ERROR CHECK',
+                          "VpcId" : 'ERROR CHECK',
+                          "VpcTName" : list('ERROR CHECK'),
+                      })
+      # klogger.debug(results)
     except Exception as othererr:
       klogger.error("ec2.describe_security_groups(),region[%s],%s", region, othererr)
+      results.append( { "SGroupId": 'ERROR CHECK',
+                        "SGroupName" : 'ERROR CHECK',
+                        "SGroupTName" : 'ERROR CHECK',
+                        "Description" : 'ERROR CHECK',
+                        "In_IpProtocol" : 'ERROR CHECK',
+                        "In_FromPort" : 'ERROR CHECK',
+                        "In_ToPort" : 'ERROR CHECK',
+                        "In_CidrIp" : 'ERROR CHECK',
+                        "In_GroupId" : 'ERROR CHECK',
+                        "In_GroupName" : 'ERROR CHECK',
+                        "In_UserIdGroupPairs_Description" : 'ERROR CHECK',
+                        "In_Description" : 'ERROR CHECK',
+                        "In_PrefixListId" : 'ERROR CHECK',
+                        "In_PLDescription" : 'ERROR CHECK',
+                        "In_PeeringStatus" : 'ERROR CHECK',
+                        "In_UserId" : 'ERROR CHECK',
+                        "In_VpcId" : 'ERROR CHECK',
+                        "In_VpcPeeringConnectionId" : 'ERROR CHECK',
+                        "Out_IpProtocol" : 'ERROR CHECK',
+                        "Out_FromPort" : 'ERROR CHECK',
+                        "Out_ToPort" : 'ERROR CHECK',
+                        "Out_CidrIp" : 'ERROR CHECK',
+                        "Out_Description" : 'ERROR CHECK',
+                        "Out_GroupId" : 'ERROR CHECK',
+                        "Out_GroupName" : 'ERROR CHECK',
+                        "Out_UserIdGroupPairs_Description" : 'ERROR CHECK',
+                        "Out_PrefixListId" : 'ERROR CHECK',
+                        "Out_PLDescription" : 'ERROR CHECK',
+                        "Out_PeeringStatus" : 'ERROR CHECK',
+                        "Out_UserId" : 'ERROR CHECK',
+                        "Out_VpcId" : 'ERROR CHECK',
+                        "Out_VpcPeeringConnectionId" : 'ERROR CHECK',
+                        "VpcId" : 'ERROR CHECK',
+                        "VpcTName" : list('ERROR CHECK'),
+                    })
+    finally:
+      pass
   return results
 
 def describe_network_interfaces(searchRegions):
@@ -771,13 +979,56 @@ def describe_network_interfaces(searchRegions):
                             "SubnetTName" : ' ',
                             "VpcId" : ' ',
                             "VpcTName" : list(' '),
-                        })
-
-        # klogger.debug(results)
+                          })
       else:
         klogger.error("call error : %d", nets["ResponseMetadata"]["HTTPStatusCode"])
+        results.append( { "NetworkInterfaceId": 'ERROR CHECK',
+                          "Status" : 'ERROR CHECK',
+                          "InterfaceType" : 'ERROR CHECK',
+                          "Description" : 'ERROR CHECK',
+                          "AvailabilityZone" : 'ERROR CHECK',
+                          "PrivateIpAddress" : 'ERROR CHECK',
+                          "PublicIp" : 'ERROR CHECK',
+                          "PublicDnsName" : 'ERROR CHECK',
+                          "Attach_InstanceID" : 'ERROR CHECK',
+                          "Attach_InstanceOwnerID" : 'ERROR CHECK',
+                          "Attach_DeviceIndex" : 'ERROR CHECK',
+                          "Attach_NetworkCardIndex" : 'ERROR CHECK',
+                          "ENITName" : 'ERROR CHECK',
+                          "PrivateIpAddresses" : 'ERROR CHECK',
+                          "SGroupId" : 'ERROR CHECK',
+                          "SGroupName": 'ERROR CHECK',
+                          "SubnetId" : 'ERROR CHECK',
+                          "SubnetTName" : 'ERROR CHECK',
+                          "VpcId" : 'ERROR CHECK',
+                          "VpcTName" : list('ERROR CHECK'),
+                        })
+      # klogger.debug(results)
     except Exception as othererr:
       klogger.error("ec2.describe_network_interfaces(),region[%s],%s", region, othererr)
+      results.append( { "NetworkInterfaceId": 'ERROR CHECK',
+                        "Status" : 'ERROR CHECK',
+                        "InterfaceType" : 'ERROR CHECK',
+                        "Description" : 'ERROR CHECK',
+                        "AvailabilityZone" : 'ERROR CHECK',
+                        "PrivateIpAddress" : 'ERROR CHECK',
+                        "PublicIp" : 'ERROR CHECK',
+                        "PublicDnsName" : 'ERROR CHECK',
+                        "Attach_InstanceID" : 'ERROR CHECK',
+                        "Attach_InstanceOwnerID" : 'ERROR CHECK',
+                        "Attach_DeviceIndex" : 'ERROR CHECK',
+                        "Attach_NetworkCardIndex" : 'ERROR CHECK',
+                        "ENITName" : 'ERROR CHECK',
+                        "PrivateIpAddresses" : 'ERROR CHECK',
+                        "SGroupId" : 'ERROR CHECK',
+                        "SGroupName": 'ERROR CHECK',
+                        "SubnetId" : 'ERROR CHECK',
+                        "SubnetTName" : 'ERROR CHECK',
+                        "VpcId" : 'ERROR CHECK',
+                        "VpcTName" : list('ERROR CHECK'),
+                      })
+    finally:
+      pass
   return results
 
 
@@ -851,12 +1102,48 @@ def describe_instances(searchRegions):
                             "EbsOptimized" : ' ',
                             "IamInstanceProfile" : ' ',
                             "SecurityGroups" : list(' '),
-                        })
-        # klogger.debug(results)
+                          })
       else:
         klogger.error("call error : %d", inss["ResponseMetadata"]["HTTPStatusCode"])
+        results.append( { "InstanceId": 'ERROR CHECK',
+                          "InstanceTName" : 'ERROR CHECK',
+                          "Platform" : 'ERROR CHECK',
+                          "Architecture" : 'ERROR CHECK',
+                          "InstanceType" : 'ERROR CHECK',
+                          "KeyName" : 'ERROR CHECK',
+                          "Placement" : 'ERROR CHECK',
+                          "PrivateIpAddress" : 'ERROR CHECK',
+                          "PublicIpAddress" : 'ERROR CHECK',
+                          "SubnetId" : 'ERROR CHECK',
+                          "SubnetTName" : 'ERROR CHECK',
+                          "VpcId" : 'ERROR CHECK',
+                          "VpcTName" : 'ERROR CHECK',
+                          "EbsOptimized" : 'ERROR CHECK',
+                          "IamInstanceProfile" : 'ERROR CHECK',
+                          "SecurityGroups" : list('ERROR CHECK'),
+                        })
+      # klogger.debug(results)
     except Exception as othererr:
       klogger.error("ec2.describe_instances(),region[%s],%s", region, othererr)
+      results.append( { "InstanceId": 'ERROR CHECK',
+                        "InstanceTName" : 'ERROR CHECK',
+                        "Platform" : 'ERROR CHECK',
+                        "Architecture" : 'ERROR CHECK',
+                        "InstanceType" : 'ERROR CHECK',
+                        "KeyName" : 'ERROR CHECK',
+                        "Placement" : 'ERROR CHECK',
+                        "PrivateIpAddress" : 'ERROR CHECK',
+                        "PublicIpAddress" : 'ERROR CHECK',
+                        "SubnetId" : 'ERROR CHECK',
+                        "SubnetTName" : 'ERROR CHECK',
+                        "VpcId" : 'ERROR CHECK',
+                        "VpcTName" : 'ERROR CHECK',
+                        "EbsOptimized" : 'ERROR CHECK',
+                        "IamInstanceProfile" : 'ERROR CHECK',
+                        "SecurityGroups" : list('ERROR CHECK'),
+                      })
+    finally:
+      pass
   return results
 
 def main(argv):

@@ -102,12 +102,37 @@ def list_buckets():
                          "KMSMasterKeyID" : ' ',
                          "CreationDate" : list(' '),
                        })
-    #   klogger.debug(results)
     else:
       klogger.error("call error : %d", buckets["ResponseMetadata"]["HTTPStatusCode"])
+      results.append({ "Name": 'ERROR CHECK',
+                       "Location" : 'ERROR CHECK',
+                       "BlockPublicAcls" : 'ERROR CHECK',
+                       "IgnorePublicAcls" : 'ERROR CHECK',
+                       "BlockPublicPolicy" : 'ERROR CHECK',
+                       "RestrictPublicBuckets" : 'ERROR CHECK',
+                       "SSEAlgorithm" : 'ERROR CHECK',
+                       "BucketKeyEnabled" : 'ERROR CHECK',
+                       "KMSMasterKeyAlias" : 'ERROR CHECK',
+                       "KMSMasterKeyID" : 'ERROR CHECK',
+                       "CreationDate" : list('ERROR CHECK'),
+                     })
+    # klogger.debug(results)
   except Exception as othererr:
     klogger.error("s3.list_buckets(),%s", othererr)
-  return results
+    results.append({ "Name": 'ERROR CHECK',
+                     "Location" : 'ERROR CHECK',
+                     "BlockPublicAcls" : 'ERROR CHECK',
+                     "IgnorePublicAcls" : 'ERROR CHECK',
+                     "BlockPublicPolicy" : 'ERROR CHECK',
+                     "RestrictPublicBuckets" : 'ERROR CHECK',
+                     "SSEAlgorithm" : 'ERROR CHECK',
+                     "BucketKeyEnabled" : 'ERROR CHECK',
+                     "KMSMasterKeyAlias" : 'ERROR CHECK',
+                     "KMSMasterKeyID" : 'ERROR CHECK',
+                     "CreationDate" : list('ERROR CHECK'),
+                   })
+  finally:
+    return results
 
 def get_bucket_location(bucket):
   '''
@@ -115,7 +140,7 @@ def get_bucket_location(bucket):
   '''
 #   klogger_dat.debug('s3-location')
   try:
-    result = '' 
+    result = 'Error Check' 
     s3=boto3.client('s3')
     location = s3.get_bucket_location(Bucket=bucket)
     # klogger.debug(location)
@@ -124,12 +149,13 @@ def get_bucket_location(bucket):
         result = 'us-east-1'
       else :
         result = location['LocationConstraint']
-    #   klogger.debug(result)
     else:
       klogger.error("call error : %d", location["ResponseMetadata"]["HTTPStatusCode"])
+    # klogger.debug(result)
   except Exception as othererr:
     klogger.error("s3.get_bucket_location(),%s", othererr)
-  return result
+  finally:
+    return result
 
 def get_public_access_block(bucket):
   '''
@@ -154,9 +180,9 @@ def get_public_access_block(bucket):
         "BlockPublicPolicy" : "True" if accessblock['PublicAccessBlockConfiguration']['BlockPublicPolicy'] else "False",
         "RestrictPublicBuckets" : "True" if accessblock['PublicAccessBlockConfiguration']['RestrictPublicBuckets'] else "False"
       }
-      # klogger.debug(result)
     else:
       klogger.error("call error : %d", accessblock["ResponseMetadata"]["HTTPStatusCode"])
+    # klogger.debug(result)
   except Exception as othererr:
     if str(othererr.args).count('NoSuchPublicAccessBlockConfiguration') > 0 :
       result = {
@@ -205,9 +231,14 @@ def get_bucket_encryption(bucket):
             "BucketKeyEnabled" : "False",
             "KMSMasterKeyID" : " "
          })
-      # klogger.debug(results)
     else:
       klogger.error("call error : %d", encrypt["ResponseMetadata"]["HTTPStatusCode"])
+      results.append({
+          "SSEAlgorithm" : "Error Check",
+          "BucketKeyEnabled" : "Error Check",
+          "KMSMasterKeyID" : "Error Check"
+        })
+    # klogger.debug(results)
   except Exception as othererr:
     if str(othererr.args).count('ServerSideEncryptionConfigurationNotFoundError') > 0 :
       # klogger.error("##################")

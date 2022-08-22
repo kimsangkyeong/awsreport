@@ -122,13 +122,53 @@ def describe_load_balancers():
                           "LoadBalancerArn" : ' ',
                           "CreatedTime" : list(' '),
                          })
-        
-    #   klogger.debug(results)
     else:
       klogger.error("call error : %d", loadbalancers["ResponseMetadata"]["HTTPStatusCode"])
+      results.append( { "LoadBalancerName": 'ERROR CHECK',
+                        "Scheme" : 'ERROR CHECK',
+                        "Type" : 'ERROR CHECK',
+                        "Scheme" : 'ERROR CHECK',
+                        "IpAddressType" : 'ERROR CHECK',
+                        "State" : 'ERROR CHECK',
+                        "AvailableZoneName" : 'ERROR CHECK',
+                        "SubnetId" : 'ERROR CHECK',
+                        "SubnetTName" : 'ERROR CHECK',
+                        "ELB_IpAddress" : 'ERROR CHECK',
+                        "ELB_AllocationId" : 'ERROR CHECK',
+                        "PrivateIPv4Address" : 'ERROR CHECK',
+                        "SecurityGroupId" : 'ERROR CHECK',
+                        "SecurityGroupName" : 'ERROR CHECK',
+                        "VpcId" : 'ERROR CHECK',
+                        "VpcTName" : 'ERROR CHECK',
+                        "DNSName" : 'ERROR CHECK',
+                        "LoadBalancerArn" : 'ERROR CHECK',
+                        "CreatedTime" : list('ERROR CHECK'),
+                       })
+    # klogger.debug(results)
   except Exception as othererr:
     klogger.error("elbv2.describe_load_balancers(),%s", othererr)
-  return results
+    results.append( { "LoadBalancerName": 'ERROR CHECK',
+                      "Scheme" : 'ERROR CHECK',
+                      "Type" : 'ERROR CHECK',
+                      "Scheme" : 'ERROR CHECK',
+                      "IpAddressType" : 'ERROR CHECK',
+                      "State" : 'ERROR CHECK',
+                      "AvailableZoneName" : 'ERROR CHECK',
+                      "SubnetId" : 'ERROR CHECK',
+                      "SubnetTName" : 'ERROR CHECK',
+                      "ELB_IpAddress" : 'ERROR CHECK',
+                      "ELB_AllocationId" : 'ERROR CHECK',
+                      "PrivateIPv4Address" : 'ERROR CHECK',
+                      "SecurityGroupId" : 'ERROR CHECK',
+                      "SecurityGroupName" : 'ERROR CHECK',
+                      "VpcId" : 'ERROR CHECK',
+                      "VpcTName" : 'ERROR CHECK',
+                      "DNSName" : 'ERROR CHECK',
+                      "LoadBalancerArn" : 'ERROR CHECK',
+                      "CreatedTime" : list('ERROR CHECK'),
+                     })
+  finally:
+    return results
 
 def describe_listeners(LoadBalancerArns):
   '''
@@ -312,14 +352,89 @@ def describe_listeners(LoadBalancerArns):
                             "Act_cognito_AuthExtraParams" : ' ',
                             "Act_cognito_OnUnauthRequest" : list(' '),
                            })
-          
-        # klogger.debug(results)
       else:
         klogger.error("call error : %d", listeners["ResponseMetadata"]["HTTPStatusCode"])
+        results.append( { "LoadBalancerName": 'ERROR CHECK',
+                          "LoadBalancerArn" : 'ERROR CHECK',
+                          "Protocol" : 'ERROR CHECK',
+                          "Port" : 'ERROR CHECK',
+                          "ListenerArn" : 'ERROR CHECK',
+                          "SslPolicy" : 'ERROR CHECK',
+                          "Certificates" : 'ERROR CHECK',
+                          "AlpnPolicy" : 'ERROR CHECK',
+                          "Order" : 'ERROR CHECK',
+                          "Act_Type" : 'ERROR CHECK',
+                          "Act_TargetGroupArn" : 'ERROR CHECK',
+                          "Forward_TargetGroupArn" : 'ERROR CHECK',
+                          "Forward_TargetGroupWeight" : 'ERROR CHECK',
+                          "Forward_TargetGroupStickiness" : 'ERROR CHECK',
+                          "Forward_TargetGroupStickinessDuration" : 'ERROR CHECK',
+                          "Redir_Protocol" : 'ERROR CHECK',
+                          "Redir_Port" : 'ERROR CHECK',
+                          "Redir_Host" : 'ERROR CHECK',
+                          "Redir_Path" : 'ERROR CHECK',
+                          "Redir_Query" : 'ERROR CHECK',
+                          "Redir_StatusCode" : 'ERROR CHECK',
+                          "FixRep_MessageBody" : 'ERROR CHECK',
+                          "FixRep_StatusCode" : 'ERROR CHECK',
+                          "FixRep_ContentType" : 'ERROR CHECK',
+                          "Act_oidc_Issuer" : 'ERROR CHECK',
+                          "Act_oidc_AuthorizationEndpoint" : 'ERROR CHECK',
+                          "Act_oidc_Scope" : 'ERROR CHECK',
+                          "Act_oidc_SessionCookieName" : 'ERROR CHECK',
+                          "Act_oidc_AuthExtraParams" : 'ERROR CHECK',
+                          "Act_oidc_OnUnauthRequest" : 'ERROR CHECK',
+                          "Act_cognito_UserPoolDomain" : 'ERROR CHECK',
+                          "Act_cognito_UserPoolArn" : 'ERROR CHECK',
+                          "Act_cognito_UserPoolClientId" : 'ERROR CHECK',
+                          "Act_cognito_SessionCookieName" : 'ERROR CHECK',
+                          "Act_cognito_Scope" : 'ERROR CHECK',
+                          "Act_cognito_AuthExtraParams" : 'ERROR CHECK',
+                          "Act_cognito_OnUnauthRequest" : list('ERROR CHECK'),
+                         })
     # klogger.debug(results)
   except Exception as othererr:
     klogger.error("elbv2.describe_listeners(),%s", othererr)
-  return results
+    results.append( { "LoadBalancerName": 'ERROR CHECK',
+                      "LoadBalancerArn" : 'ERROR CHECK',
+                      "Protocol" : 'ERROR CHECK',
+                      "Port" : 'ERROR CHECK',
+                      "ListenerArn" : 'ERROR CHECK',
+                      "SslPolicy" : 'ERROR CHECK',
+                      "Certificates" : 'ERROR CHECK',
+                      "AlpnPolicy" : 'ERROR CHECK',
+                      "Order" : 'ERROR CHECK',
+                      "Act_Type" : 'ERROR CHECK',
+                      "Act_TargetGroupArn" : 'ERROR CHECK',
+                      "Forward_TargetGroupArn" : 'ERROR CHECK',
+                      "Forward_TargetGroupWeight" : 'ERROR CHECK',
+                      "Forward_TargetGroupStickiness" : 'ERROR CHECK',
+                      "Forward_TargetGroupStickinessDuration" : 'ERROR CHECK',
+                      "Redir_Protocol" : 'ERROR CHECK',
+                      "Redir_Port" : 'ERROR CHECK',
+                      "Redir_Host" : 'ERROR CHECK',
+                      "Redir_Path" : 'ERROR CHECK',
+                      "Redir_Query" : 'ERROR CHECK',
+                      "Redir_StatusCode" : 'ERROR CHECK',
+                      "FixRep_MessageBody" : 'ERROR CHECK',
+                      "FixRep_StatusCode" : 'ERROR CHECK',
+                      "FixRep_ContentType" : 'ERROR CHECK',
+                      "Act_oidc_Issuer" : 'ERROR CHECK',
+                      "Act_oidc_AuthorizationEndpoint" : 'ERROR CHECK',
+                      "Act_oidc_Scope" : 'ERROR CHECK',
+                      "Act_oidc_SessionCookieName" : 'ERROR CHECK',
+                      "Act_oidc_AuthExtraParams" : 'ERROR CHECK',
+                      "Act_oidc_OnUnauthRequest" : 'ERROR CHECK',
+                      "Act_cognito_UserPoolDomain" : 'ERROR CHECK',
+                      "Act_cognito_UserPoolArn" : 'ERROR CHECK',
+                      "Act_cognito_UserPoolClientId" : 'ERROR CHECK',
+                      "Act_cognito_SessionCookieName" : 'ERROR CHECK',
+                      "Act_cognito_Scope" : 'ERROR CHECK',
+                      "Act_cognito_AuthExtraParams" : 'ERROR CHECK',
+                      "Act_cognito_OnUnauthRequest" : list('ERROR CHECK'),
+                     })
+  finally:
+    return results
 
 def describe_rules(ListenerArns):
   '''
@@ -546,14 +661,103 @@ def describe_rules(ListenerArns):
                             "Act_cognito_AuthExtraParams" : ' ',
                             "Act_cognito_OnUnauthRequest" : list(' '),
                            })
-          
-        # klogger.debug(results)
       else:
         klogger.error("call error : %d", rules["ResponseMetadata"]["HTTPStatusCode"])
+        results.append( { "LoadBalancerInfo": 'ERROR CHECK',
+                          "ListenerArn" : 'ERROR CHECK',
+                          "RuleArn" : 'ERROR CHECK',
+                          "Priority" : 'ERROR CHECK',
+                          "Cond_Field" : 'ERROR CHECK',
+                          "Cond_Values" : 'ERROR CHECK',
+                          "Cond_HostHeaderConfig" : 'ERROR CHECK',
+                          "Cond_PathPatternConfig" : 'ERROR CHECK',
+                          "Cond_HttpHeaderName" : 'ERROR CHECK',
+                          "Cond_HttpHeaderValue" : 'ERROR CHECK',
+                          "Cond_QueryStringKey" : 'ERROR CHECK',
+                          "Cond_QueryStringValue" : 'ERROR CHECK',
+                          "Cond_HttpRequestMethodConfig" : 'ERROR CHECK',
+                          "Cond_SourceIpConfig" : 'ERROR CHECK',
+                          "Act_Type" : 'ERROR CHECK',
+                          "Act_TargetGroupArn" : 'ERROR CHECK',
+                          "Act_Order" : 'ERROR CHECK',
+                          "Forward_TargetGroupArn" : 'ERROR CHECK',
+                          "Forward_TargetGroupWeight" : 'ERROR CHECK',
+                          "Forward_TargetGroupStickiness" : 'ERROR CHECK',
+                          "Forward_TargetGroupStickinessDuration" : 'ERROR CHECK',
+                          "Redir_Protocol" : 'ERROR CHECK',
+                          "Redir_Port" : 'ERROR CHECK',
+                          "Redir_Host" : 'ERROR CHECK',
+                          "Redir_Path" : 'ERROR CHECK',
+                          "Redir_Query" : 'ERROR CHECK',
+                          "Redir_StatusCode" : 'ERROR CHECK',
+                          "FixRep_MessageBody" : 'ERROR CHECK',
+                          "FixRep_StatusCode" : 'ERROR CHECK',
+                          "FixRep_ContentType" : 'ERROR CHECK',
+                          "Act_oidc_Issuer" : 'ERROR CHECK',
+                          "Act_oidc_AuthorizationEndpoint" : 'ERROR CHECK',
+                          "Act_oidc_Scope" : 'ERROR CHECK',
+                          "Act_oidc_TokenEndpoint" : 'ERROR CHECK',
+                          "Act_oidc_SessionCookieName" : 'ERROR CHECK',
+                          "Act_oidc_AuthExtraParams" : 'ERROR CHECK',
+                          "Act_oidc_OnUnauthRequest" : 'ERROR CHECK',
+                          "Act_cognito_UserPoolDomain" : 'ERROR CHECK',
+                          "Act_cognito_UserPoolArn" : 'ERROR CHECK',
+                          "Act_cognito_UserPoolClientId" : 'ERROR CHECK',
+                          "Act_cognito_SessionCookieName" : 'ERROR CHECK',
+                          "Act_cognito_Scope" : 'ERROR CHECK',
+                          "Act_cognito_AuthExtraParams" : 'ERROR CHECK',
+                          "Act_cognito_OnUnauthRequest" : list('ERROR CHECK'),
+                         })
     # klogger.debug(results)
   except Exception as othererr:
     klogger.error("elbv2.describe_rules(),%s", othererr)
-  return results
+    results.append( { "LoadBalancerInfo": 'ERROR CHECK',
+                      "ListenerArn" : 'ERROR CHECK',
+                      "RuleArn" : 'ERROR CHECK',
+                      "Priority" : 'ERROR CHECK',
+                      "Cond_Field" : 'ERROR CHECK',
+                      "Cond_Values" : 'ERROR CHECK',
+                      "Cond_HostHeaderConfig" : 'ERROR CHECK',
+                      "Cond_PathPatternConfig" : 'ERROR CHECK',
+                      "Cond_HttpHeaderName" : 'ERROR CHECK',
+                      "Cond_HttpHeaderValue" : 'ERROR CHECK',
+                      "Cond_QueryStringKey" : 'ERROR CHECK',
+                      "Cond_QueryStringValue" : 'ERROR CHECK',
+                      "Cond_HttpRequestMethodConfig" : 'ERROR CHECK',
+                      "Cond_SourceIpConfig" : 'ERROR CHECK',
+                      "Act_Type" : 'ERROR CHECK',
+                      "Act_TargetGroupArn" : 'ERROR CHECK',
+                      "Act_Order" : 'ERROR CHECK',
+                      "Forward_TargetGroupArn" : 'ERROR CHECK',
+                      "Forward_TargetGroupWeight" : 'ERROR CHECK',
+                      "Forward_TargetGroupStickiness" : 'ERROR CHECK',
+                      "Forward_TargetGroupStickinessDuration" : 'ERROR CHECK',
+                      "Redir_Protocol" : 'ERROR CHECK',
+                      "Redir_Port" : 'ERROR CHECK',
+                      "Redir_Host" : 'ERROR CHECK',
+                      "Redir_Path" : 'ERROR CHECK',
+                      "Redir_Query" : 'ERROR CHECK',
+                      "Redir_StatusCode" : 'ERROR CHECK',
+                      "FixRep_MessageBody" : 'ERROR CHECK',
+                      "FixRep_StatusCode" : 'ERROR CHECK',
+                      "FixRep_ContentType" : 'ERROR CHECK',
+                      "Act_oidc_Issuer" : 'ERROR CHECK',
+                      "Act_oidc_AuthorizationEndpoint" : 'ERROR CHECK',
+                      "Act_oidc_Scope" : 'ERROR CHECK',
+                      "Act_oidc_TokenEndpoint" : 'ERROR CHECK',
+                      "Act_oidc_SessionCookieName" : 'ERROR CHECK',
+                      "Act_oidc_AuthExtraParams" : 'ERROR CHECK',
+                      "Act_oidc_OnUnauthRequest" : 'ERROR CHECK',
+                      "Act_cognito_UserPoolDomain" : 'ERROR CHECK',
+                      "Act_cognito_UserPoolArn" : 'ERROR CHECK',
+                      "Act_cognito_UserPoolClientId" : 'ERROR CHECK',
+                      "Act_cognito_SessionCookieName" : 'ERROR CHECK',
+                      "Act_cognito_Scope" : 'ERROR CHECK',
+                      "Act_cognito_AuthExtraParams" : 'ERROR CHECK',
+                      "Act_cognito_OnUnauthRequest" : list('ERROR CHECK'),
+                     })
+  finally:
+    return results
 
 def describe_target_groups(LoadBalancerArns):
   '''
@@ -642,14 +846,53 @@ def describe_target_groups(LoadBalancerArns):
                             "VpcId" : ' ',
                             "VpcTName" : list(' '),
                            })
-          
-        # klogger.debug(results)
       else:
         klogger.error("call error : %d", targetgrps["ResponseMetadata"]["HTTPStatusCode"])
+        results.append( { "LoadBalancerName": 'ERROR CHECK',
+                          "LoadBalancerArn" : 'ERROR CHECK',
+                          "Protocol" : 'ERROR CHECK',
+                          "Port" : 'ERROR CHECK',
+                          "TargetGroupName" : 'ERROR CHECK',
+                          "TargetType" : 'ERROR CHECK',
+                          "HealthCheckEnabled" : 'ERROR CHECK',
+                          "HealthCheckProtocol" : 'ERROR CHECK',
+                          "HealthCheckPort" : 'ERROR CHECK',
+                          "HealthCheckIntervalSeconds" : 'ERROR CHECK',
+                          "HealthCheckTimeoutSeconds" : 'ERROR CHECK',
+                          "HealthyThresholdCount" : 'ERROR CHECK',
+                          "UnhealthyThresholdCount" : 'ERROR CHECK',
+                          "HealthCheckPath" : 'ERROR CHECK',
+                          "Matcher_HttpCode" : 'ERROR CHECK',
+                          "Matcher_GrpcCode" : 'ERROR CHECK',
+                          "ProtocolVersion" : 'ERROR CHECK',
+                          "VpcId" : 'ERROR CHECK',
+                          "VpcTName" : list('ERROR CHECK'),
+                         })
     # klogger.debug(results)
   except Exception as othererr:
     klogger.error("elbv2.describe_target_groups(),%s", othererr)
-  return results
+    results.append( { "LoadBalancerName": 'ERROR CHECK',
+                      "LoadBalancerArn" : 'ERROR CHECK',
+                      "Protocol" : 'ERROR CHECK',
+                      "Port" : 'ERROR CHECK',
+                      "TargetGroupName" : 'ERROR CHECK',
+                      "TargetType" : 'ERROR CHECK',
+                      "HealthCheckEnabled" : 'ERROR CHECK',
+                      "HealthCheckProtocol" : 'ERROR CHECK',
+                      "HealthCheckPort" : 'ERROR CHECK',
+                      "HealthCheckIntervalSeconds" : 'ERROR CHECK',
+                      "HealthCheckTimeoutSeconds" : 'ERROR CHECK',
+                      "HealthyThresholdCount" : 'ERROR CHECK',
+                      "UnhealthyThresholdCount" : 'ERROR CHECK',
+                      "HealthCheckPath" : 'ERROR CHECK',
+                      "Matcher_HttpCode" : 'ERROR CHECK',
+                      "Matcher_GrpcCode" : 'ERROR CHECK',
+                      "ProtocolVersion" : 'ERROR CHECK',
+                      "VpcId" : 'ERROR CHECK',
+                      "VpcTName" : list('ERROR CHECK'),
+                     })
+  finally:
+    return results
 
 def main(argv):
 

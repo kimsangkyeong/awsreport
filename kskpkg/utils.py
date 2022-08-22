@@ -42,7 +42,7 @@ def ListSyncCountWithSpace(*lists):
   '''
   try:
     # klogger_dat.debug('utils.ListSyncCountWithSpace')
-    max_len = 0
+    max_len = 1
     for list in lists:
       max_len = max(max_len, len(list))
     #   klogger_dat.debug("max_len : %d, len : %d, %s", max_len, len(list), list)
@@ -53,6 +53,7 @@ def ListSyncCountWithSpace(*lists):
     return True
   except Exception as othererr:
     klogger.error("utils.ListSyncCountWithSpace(),%s", othererr)
+  finally:
     return False
 
 def main(argv):
