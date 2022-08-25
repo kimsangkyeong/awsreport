@@ -1104,7 +1104,7 @@ def describe_instances(searchRegions):
       if 200 == inss["ResponseMetadata"]["HTTPStatusCode"]:
         # klogger_dat.debug("%s",inss["Reservations"])
         if len(inss["Reservations"]) > 0 :
-          ec2_resource = boto3.resource('ec2')
+          ec2_resource = boto3.resource('ec2', region)
           for rsv in inss["Reservations"]:
             if len(rsv["Instances"]) > 0 :
               for ins in rsv["Instances"]:

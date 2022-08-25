@@ -180,8 +180,10 @@ def describe_listeners(LoadBalancerArns):
     results = [] 
     elb=boto3.client('elbv2')
     for LoadBalancerArn in LoadBalancerArns :
+      if (LoadBalancerArn == ' ') : # Not Exist LoadBalancer
+        continue
       listeners = elb.describe_listeners(LoadBalancerArn=LoadBalancerArn)
-    #   klogger_dat.debug(listeners)
+      # klogger_dat.debug(listeners)
       if 200 == listeners["ResponseMetadata"]["HTTPStatusCode"]:
       #   klogger_dat.debug(listeners["Listeners"])
         if len(listeners["Listeners"]) > 0 :
@@ -392,6 +394,45 @@ def describe_listeners(LoadBalancerArns):
                           "Act_cognito_AuthExtraParams" : 'ERROR CHECK',
                           "Act_cognito_OnUnauthRequest" : list('ERROR CHECK'),
                          })
+    if results == [] :
+      results.append( { "LoadBalancerName": ' ',
+                        "LoadBalancerArn" : ' ',
+                        "Protocol" : ' ',
+                        "Port" : ' ',
+                        "ListenerArn" : ' ',
+                        "SslPolicy" : ' ',
+                        "Certificates" : ' ',
+                        "AlpnPolicy" : ' ',
+                        "Order" : ' ',
+                        "Act_Type" : ' ',
+                        "Act_TargetGroupArn" : ' ',
+                        "Forward_TargetGroupArn" : ' ',
+                        "Forward_TargetGroupWeight" : ' ',
+                        "Forward_TargetGroupStickiness" : ' ',
+                        "Forward_TargetGroupStickinessDuration" : ' ',
+                        "Redir_Protocol" : ' ',
+                        "Redir_Port" : ' ',
+                        "Redir_Host" : ' ',
+                        "Redir_Path" : ' ',
+                        "Redir_Query" : ' ',
+                        "Redir_StatusCode" : ' ',
+                        "FixRep_MessageBody" : ' ',
+                        "FixRep_StatusCode" : ' ',
+                        "FixRep_ContentType" : ' ',
+                        "Act_oidc_Issuer" : ' ',
+                        "Act_oidc_AuthorizationEndpoint" : ' ',
+                        "Act_oidc_Scope" : ' ',
+                        "Act_oidc_SessionCookieName" : ' ',
+                        "Act_oidc_AuthExtraParams" : ' ',
+                        "Act_oidc_OnUnauthRequest" : ' ',
+                        "Act_cognito_UserPoolDomain" : ' ',
+                        "Act_cognito_UserPoolArn" : ' ',
+                        "Act_cognito_UserPoolClientId" : ' ',
+                        "Act_cognito_SessionCookieName" : ' ',
+                        "Act_cognito_Scope" : ' ',
+                        "Act_cognito_AuthExtraParams" : ' ',
+                        "Act_cognito_OnUnauthRequest" : list(' '),
+                       })      
     # klogger.debug(results)
   except Exception as othererr:
     klogger.error("elbv2.describe_listeners(),%s", othererr)
@@ -446,6 +487,8 @@ def describe_rules(ListenerArns):
     results = [] 
     elb=boto3.client('elbv2')
     for LisenerArn in ListenerArns :
+      if LisenerArn == ' ' : # Not Exist Listener
+        continue
       rules = elb.describe_rules(ListenerArn=LisenerArn)
     #   klogger_dat.debug(rules)
       if 200 == rules["ResponseMetadata"]["HTTPStatusCode"]:
@@ -708,6 +751,52 @@ def describe_rules(ListenerArns):
                           "Act_cognito_AuthExtraParams" : 'ERROR CHECK',
                           "Act_cognito_OnUnauthRequest" : list('ERROR CHECK'),
                          })
+    if results == []:
+      results.append( { "LoadBalancerInfo": ' ',
+                        "ListenerArn" : ' ',
+                        "RuleArn" : ' ',
+                        "Priority" : ' ',
+                        "Cond_Field" : ' ',
+                        "Cond_Values" : ' ',
+                        "Cond_HostHeaderConfig" : ' ',
+                        "Cond_PathPatternConfig" : ' ',
+                        "Cond_HttpHeaderName" : ' ',
+                        "Cond_HttpHeaderValue" : ' ',
+                        "Cond_QueryStringKey" : ' ',
+                        "Cond_QueryStringValue" : ' ',
+                        "Cond_HttpRequestMethodConfig" : ' ',
+                        "Cond_SourceIpConfig" : ' ',
+                        "Act_Type" : ' ',
+                        "Act_TargetGroupArn" : ' ',
+                        "Act_Order" : ' ',
+                        "Forward_TargetGroupArn" : ' ',
+                        "Forward_TargetGroupWeight" : ' ',
+                        "Forward_TargetGroupStickiness" : ' ',
+                        "Forward_TargetGroupStickinessDuration" : ' ',
+                        "Redir_Protocol" : ' ',
+                        "Redir_Port" : ' ',
+                        "Redir_Host" : ' ',
+                        "Redir_Path" : ' ',
+                        "Redir_Query" : ' ',
+                        "Redir_StatusCode" : ' ',
+                        "FixRep_MessageBody" : ' ',
+                        "FixRep_StatusCode" : ' ',
+                        "FixRep_ContentType" : ' ',
+                        "Act_oidc_Issuer" : ' ',
+                        "Act_oidc_AuthorizationEndpoint" : ' ',
+                        "Act_oidc_Scope" : ' ',
+                        "Act_oidc_TokenEndpoint" : ' ',
+                        "Act_oidc_SessionCookieName" : ' ',
+                        "Act_oidc_AuthExtraParams" : ' ',
+                        "Act_oidc_OnUnauthRequest" : ' ',
+                        "Act_cognito_UserPoolDomain" : ' ',
+                        "Act_cognito_UserPoolArn" : ' ',
+                        "Act_cognito_UserPoolClientId" : ' ',
+                        "Act_cognito_SessionCookieName" : ' ',
+                        "Act_cognito_Scope" : ' ',
+                        "Act_cognito_AuthExtraParams" : ' ',
+                        "Act_cognito_OnUnauthRequest" : list(' '),
+                       })
     # klogger.debug(results)
   except Exception as othererr:
     klogger.error("elbv2.describe_rules(),%s", othererr)
@@ -769,6 +858,8 @@ def describe_target_groups(LoadBalancerArns):
     results = [] 
     elb=boto3.client('elbv2')
     for LoadBalancerArn in LoadBalancerArns :
+      if LoadBalancerArn == ' ': # Not Exist LoadBalancer
+        continue
       targetgrps = elb.describe_target_groups(LoadBalancerArn=LoadBalancerArn)
     #   klogger_dat.debug(targetgrps)
       if 200 == targetgrps["ResponseMetadata"]["HTTPStatusCode"]:
@@ -868,6 +959,27 @@ def describe_target_groups(LoadBalancerArns):
                           "VpcId" : 'ERROR CHECK',
                           "VpcTName" : list('ERROR CHECK'),
                          })
+    if results == [] :
+      results.append( { "LoadBalancerName": ' ',
+                        "LoadBalancerArn" : ' ',
+                        "Protocol" : ' ',
+                        "Port" : ' ',
+                        "TargetGroupName" : ' ',
+                        "TargetType" : ' ',
+                        "HealthCheckEnabled" : ' ',
+                        "HealthCheckProtocol" : ' ',
+                        "HealthCheckPort" : ' ',
+                        "HealthCheckIntervalSeconds" : ' ',
+                        "HealthCheckTimeoutSeconds" : ' ',
+                        "HealthyThresholdCount" : ' ',
+                        "UnhealthyThresholdCount" : ' ',
+                        "HealthCheckPath" : ' ',
+                        "Matcher_HttpCode" : ' ',
+                        "Matcher_GrpcCode" : ' ',
+                        "ProtocolVersion" : ' ',
+                        "VpcId" : ' ',
+                        "VpcTName" : list(' '),
+                       })
     # klogger.debug(results)
   except Exception as othererr:
     klogger.error("elbv2.describe_target_groups(),%s", othererr)
