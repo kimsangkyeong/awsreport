@@ -186,6 +186,11 @@ def get_keyalias(df, x):
     if x == keyarn :
       return keyalias
 
+def get_ecsclustername(df, x):
+  for clusterarn, clustername in df[['ClusterArn','ECSClusterName']].value_counts().index:
+    if x == clusterarn :
+      return clustername
+
 def main(argv):
   # logger setting 
   global_config_init()
@@ -265,6 +270,13 @@ def main(argv):
   df_ekscluster['ClusterSecurityGroupName'] = df_ekscluster['ClusterSecurityGroupId'].apply(lambda x : get_sgname(df_sg,x)) # get Security Group TagName
   df_ekscluster['EncryptKeyAlias'] = df_ekscluster['EncryptKeyArn'].apply(lambda x : get_keyalias(df_kms,x)) # get KMS Key alias
   # klogger_dat.debug(df_ekscluster)
+  df_ecscluster = results_to_dataframe(executefunc_p1("kskpkg.ecs.list_clusters"))
+  # klogger_dat.debug(df_ecscluster)
+  df_ecs_service = results_to_dataframe(executefunc("kskpkg.ecs.list_services", list(df_ecscluster['ClusterArn'].value_counts().index)))
+  df_ecs_service['ECSClusterName'] = df_ecs_service['ClusterArn'].apply(lambda x : get_ecsclustername(df_ecscluster,x)) # get Subnet TagName
+  df_ecs_service['SubnetTName'] = df_ecs_service['SubnetId'].apply(lambda x : get_subnetname(df_subnet,x)) # get Subnet TagName
+  df_ecs_service['SecurityGroupName'] = df_ecs_service['SecurityGroup'].apply(lambda x : get_sgname(df_sg,x)) # get Security Group TagName
+  # klogger_dat.debug(df_ecs_service)
   df_s3 = results_to_dataframe(executefunc_p1("kskpkg.s3.list_buckets"))
   df_s3['KMSMasterKeyAlias'] = df_s3['KMSMasterKeyID'].apply(lambda x : get_keyalias(df_kms,x)) # get KMS Key alias
   # klogger_dat.debug(df_s3)
@@ -299,6 +311,8 @@ def main(argv):
       df_elb_listener_rule.to_excel(writer, sheet_name='elb_listener_rule', index=False) 
       df_elb_targetgroup.to_excel(writer, sheet_name='elb_targetgroup', index=False) 
       df_ekscluster.to_excel(writer, sheet_name='eks', index=False) 
+      df_ecscluster.to_excel(writer, sheet_name='ecs', index=False) 
+      df_ecs_service.to_excel(writer, sheet_name='ecs-service', index=False) 
       df_ins.to_excel(writer, sheet_name='instance', index=False) 
       df_sg.to_excel(writer, sheet_name='securegroup', index=False) 
       df_eni.to_excel(writer, sheet_name='eni', index=False) 
@@ -325,6 +339,8 @@ def main(argv):
       df_elb_listener_rule.to_excel(writer, sheet_name='elb_listener_rule', index=False) 
       df_elb_targetgroup.to_excel(writer, sheet_name='elb_targetgroup', index=False) 
       df_ekscluster.to_excel(writer, sheet_name='eks', index=False) 
+      df_ecscluster.to_excel(writer, sheet_name='ecs', index=False) 
+      df_ecs_service.to_excel(writer, sheet_name='ecs-service', index=False) 
       df_ins.to_excel(writer, sheet_name='instance', index=False) 
       df_sg.to_excel(writer, sheet_name='securegroup', index=False) 
       df_eni.to_excel(writer, sheet_name='eni', index=False) 
