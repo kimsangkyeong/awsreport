@@ -195,6 +195,7 @@ def main(argv):
   # logger setting 
   global_config_init()
 
+
   df_route53 = results_to_dataframe(executefunc_p1("kskpkg.route53.list_hosted_zones"))
   # klogger_dat.debug(df_route53)
   df_route53_record = results_to_dataframe(executefunc("kskpkg.route53.list_resource_record_sets",list(df_route53['Id'].value_counts().index)))
@@ -283,6 +284,9 @@ def main(argv):
   df_efs = results_to_dataframe(executefunc_p1("kskpkg.efs.describe_file_systems"))
   df_efs['KmsKeyAlias'] = df_efs['KmsKeyId'].apply(lambda x : get_keyalias(df_kms,x)) # get KMS Key alias
   # klogger_dat.debug(df_efs)
+  df_ecr = results_to_dataframe(executefunc_p1("kskpkg.ecr.describe_repositories"))
+  df_ecr['KmsKeyAlias'] = df_ecr['KmsKeyId'].apply(lambda x : get_keyalias(df_kms,x)) # get KMS Key alias
+  # klogger_dat.debug(df_ecr)
   df_rdscluser = results_to_dataframe(executefunc_p1("kskpkg.rds.describe_db_clusters"))
   df_rdscluser['KmsKeyAlias'] = df_rdscluser['KmsKeyId'].apply(lambda x : get_keyalias(df_kms,x)) # get KMS Key alias
   df_rdscluser['ActivityStreamKmsKeyAlias'] = df_rdscluser['ActivityStreamKmsKeyId'].apply(lambda x : get_keyalias(df_kms,x)) # get KMS Key alias
@@ -318,6 +322,7 @@ def main(argv):
       df_eni.to_excel(writer, sheet_name='eni', index=False) 
       df_efs.to_excel(writer, sheet_name='efs', index=False) 
       df_s3.to_excel(writer, sheet_name='s3', index=False) 
+      df_ecr.to_excel(writer, sheet_name='ecr', index=False) 
       df_kms.to_excel(writer, sheet_name='kms', index=False) 
       df_rdscluser.to_excel(writer, sheet_name='rds', index=False) 
   else:
@@ -346,6 +351,7 @@ def main(argv):
       df_eni.to_excel(writer, sheet_name='eni', index=False) 
       df_efs.to_excel(writer, sheet_name='efs', index=False) 
       df_s3.to_excel(writer, sheet_name='s3', index=False) 
+      df_ecr.to_excel(writer, sheet_name='ecr', index=False) 
       df_kms.to_excel(writer, sheet_name='kms', index=False) 
       df_rdscluser.to_excel(writer, sheet_name='rds', index=False) 
   klogger_dat.debug("finished")
