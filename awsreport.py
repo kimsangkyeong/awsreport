@@ -195,11 +195,16 @@ def main(argv):
   # logger setting 
   global_config_init()
 
+  df_cloudfront_dist = results_to_dataframe(executefunc_p1("kskpkg.cloudfront.list_distributions"))
+  klogger_dat.debug(df_cloudfront_dist)
 
+  exit(1)
   df_route53 = results_to_dataframe(executefunc_p1("kskpkg.route53.list_hosted_zones"))
   # klogger_dat.debug(df_route53)
   df_route53_record = results_to_dataframe(executefunc("kskpkg.route53.list_resource_record_sets",list(df_route53['Id'].value_counts().index)))
   # klogger_dat.debug(df_route53_record)
+  df_cloudfront_oid = results_to_dataframe(executefunc_p1("kskpkg.cloudfront.list_cloud_front_origin_access_identities"))
+  # klogger_dat.debug(df_cloudfront_oid)
   df_cloudmap = results_to_dataframe(executefunc_p1("kskpkg.servicediscovery.list_namespaces"))
   # klogger_dat.debug(df_cloudmap)
   df_acm = results_to_dataframe(executefunc_p1("kskpkg.acm.list_certificates"))

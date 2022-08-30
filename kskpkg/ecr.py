@@ -48,7 +48,7 @@ else:
 
 def describe_repositories():
   '''
-    search KMS 
+    search ECR 
   '''
   klogger_dat.debug('ecr')
   try:
