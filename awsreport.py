@@ -199,10 +199,10 @@ def main(argv):
   # klogger_dat.debug(df_route53)
   df_route53_record = results_to_dataframe(executefunc("kskpkg.route53.list_resource_record_sets",list(df_route53['Id'].value_counts().index)))
   # klogger_dat.debug(df_route53_record)
-  df_cloudfront_oid = results_to_dataframe(executefunc_p1("kskpkg.cloudfront.list_cloud_front_origin_access_identities"))
-  # klogger_dat.debug(df_cloudfront_oid)
   df_cloudfront_dist = results_to_dataframe(executefunc_p1("kskpkg.cloudfront.list_distributions"))
   # klogger_dat.debug(df_cloudfront_dist)
+  df_cloudfront_oid = results_to_dataframe(executefunc_p1("kskpkg.cloudfront.list_cloud_front_origin_access_identities"))
+  # klogger_dat.debug(df_cloudfront_oid)
   df_cloudmap = results_to_dataframe(executefunc_p1("kskpkg.servicediscovery.list_namespaces"))
   # klogger_dat.debug(df_cloudmap)
   df_acm = results_to_dataframe(executefunc_p1("kskpkg.acm.list_certificates"))
@@ -296,6 +296,9 @@ def main(argv):
   df_rdscluser['PerformanceInsightsKMSKeyAlias'] = df_rdscluser['PerformanceInsightsKMSKeyId'].apply(lambda x : get_keyalias(df_kms,x)) # get KMS Key alias
   df_rdscluser['VpcSecurityGroupName'] = df_rdscluser['VpcSecurityGroupId'].apply(lambda x : get_sgname(df_sg,x)) # get Security Group TagName
   # klogger_dat.debug(df_rdscluser)
+  df_secretmanager = results_to_dataframe(executefunc_p1("kskpkg.secretsmanager.list_secrets"))
+  df_secretmanager['KmsKeyAlias'] = df_secretmanager['KmsKeyId'].apply(lambda x : get_keyalias(df_kms,x)) # get KMS Key alias
+  # klogger_dat.debug(df_secretmanager)
 
   # to_excel 
   klogger_dat.debug("%s\n%s","-"*20,"save to excel")
@@ -303,8 +306,8 @@ def main(argv):
     with pd.ExcelWriter(output_file, mode='a', if_sheet_exists='replace', engine='openpyxl') as writer:
       df_route53.to_excel(writer, sheet_name='route53', index=False) 
       df_route53_record.to_excel(writer, sheet_name='route53_record', index=False) 
-      df_cloudfront_oid.to_excel(writer, sheet_name='cloudfront_oid', index=False) 
       df_cloudfront_dist.to_excel(writer, sheet_name='cloudfront_dist', index=False) 
+      df_cloudfront_oid.to_excel(writer, sheet_name='cloudfront_oid', index=False) 
       df_cloudmap.to_excel(writer, sheet_name='cloudmap', index=False) 
       df_acm.to_excel(writer, sheet_name='acm', index=False)
       df_vpc.to_excel(writer, sheet_name='vpc', index=False)
@@ -330,12 +333,13 @@ def main(argv):
       df_ecr.to_excel(writer, sheet_name='ecr', index=False) 
       df_kms.to_excel(writer, sheet_name='kms', index=False) 
       df_rdscluser.to_excel(writer, sheet_name='rds', index=False) 
+      df_secretmanager.to_excel(writer, sheet_name='secretmanager', index=False) 
   else:
     with pd.ExcelWriter(output_file, engine='openpyxl') as writer:
       df_route53.to_excel(writer, sheet_name='route53', index=False)
       df_route53_record.to_excel(writer, sheet_name='route53_record', index=False) 
-      df_cloudfront_oid.to_excel(writer, sheet_name='cloudfront_oid', index=False) 
       df_cloudfront_dist.to_excel(writer, sheet_name='cloudfront_dist', index=False) 
+      df_cloudfront_oid.to_excel(writer, sheet_name='cloudfront_oid', index=False) 
       df_cloudmap.to_excel(writer, sheet_name='cloudmap', index=False) 
       df_acm.to_excel(writer, sheet_name='acm', index=False)
       df_vpc.to_excel(writer, sheet_name='vpc', index=False)
@@ -361,6 +365,7 @@ def main(argv):
       df_ecr.to_excel(writer, sheet_name='ecr', index=False) 
       df_kms.to_excel(writer, sheet_name='kms', index=False) 
       df_rdscluser.to_excel(writer, sheet_name='rds', index=False) 
+      df_secretmanager.to_excel(writer, sheet_name='secretmanager', index=False) 
   klogger_dat.debug("finished")
 
 if __name__ == "__main__":
