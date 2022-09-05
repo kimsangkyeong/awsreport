@@ -71,7 +71,7 @@ def list_secrets():
           deleteddate = ''
           if 'DeletedDate' in secret :
             deleteddate = secret['DeletedDate'].strftime("%Y-%m-%d")
-          # ins Tag중 Name 값
+          # secret Tag중 Name 값
           tagname = ['Not Exist Name Tag']
           if 'Tags' in ins:
             for tag in ins['Tags']:

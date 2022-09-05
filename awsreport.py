@@ -299,6 +299,8 @@ def main(argv):
   df_secretmanager = results_to_dataframe(executefunc_p1("kskpkg.secretsmanager.list_secrets"))
   df_secretmanager['KmsKeyAlias'] = df_secretmanager['KmsKeyId'].apply(lambda x : get_keyalias(df_kms,x)) # get KMS Key alias
   # klogger_dat.debug(df_secretmanager)
+  df_ssm_params = results_to_dataframe(executefunc_p1("kskpkg.ssm.describe_parameters"))
+  # klogger_dat.debug(df_ssm_params)
 
   # to_excel 
   klogger_dat.debug("%s\n%s","-"*20,"save to excel")
@@ -334,6 +336,7 @@ def main(argv):
       df_kms.to_excel(writer, sheet_name='kms', index=False) 
       df_rdscluser.to_excel(writer, sheet_name='rds', index=False) 
       df_secretmanager.to_excel(writer, sheet_name='secretmanager', index=False) 
+      df_ssm_params.to_excel(writer, sheet_name='ssm_parameterstore', index=False) 
   else:
     with pd.ExcelWriter(output_file, engine='openpyxl') as writer:
       df_route53.to_excel(writer, sheet_name='route53', index=False)
@@ -366,6 +369,7 @@ def main(argv):
       df_kms.to_excel(writer, sheet_name='kms', index=False) 
       df_rdscluser.to_excel(writer, sheet_name='rds', index=False) 
       df_secretmanager.to_excel(writer, sheet_name='secretmanager', index=False) 
+      df_ssm_params.to_excel(writer, sheet_name='ssm_parameterstore', index=False) 
   klogger_dat.debug("finished")
 
 if __name__ == "__main__":
