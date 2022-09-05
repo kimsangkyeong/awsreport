@@ -104,7 +104,7 @@ def list_distributions():
     distributions = cloudfront.list_distributions()
     # klogger_dat.debug(distributions)
     if 200 == distributions["ResponseMetadata"]["HTTPStatusCode"]:
-    #   klogger_dat.debug(distributions["DistributionList"])
+      # klogger_dat.debug(distributions["DistributionList"])
       if len(distributions["DistributionList"]['Items']) > 0 :
         ids = []; arns = []; status = []; domainnames = []; aliasitems = []; originitems =[];
         origingroupitems = []; defaultcachebehavior = []; cachebehaviors = []; customerrresponses = [];
@@ -120,9 +120,12 @@ def list_distributions():
           httpversions.append(distribution['HttpVersion'])
           priceclass.append(distribution['PriceClass'])
           enableds.append('True' if distribution['Enabled'] else 'False')
-          comments.append(distribution['Comment'] if 'Comment' in distribution else 'False')
+          comments.append(distribution['Comment'] if 'Comment' in distribution else '')
           if 'ViewerCertificate' in distribution :
-            cdcertificate = 'True' if distribution['ViewerCertificate']['CloudFrontDefaultCertificate'] else 'False'
+            cdcertificate = 'False'
+            if 'CloudFrontDefaultCertificate' in distribution['ViewerCertificate'] :
+              if distribution['ViewerCertificate']['CloudFrontDefaultCertificate'] :
+                cdcertificate = 'True'
             iamcertificate = distribution['ViewerCertificate']['IAMCertificateId'] if 'IAMCertificateId' in  distribution['ViewerCertificate'] else ' '
             acmcertificate = distribution['ViewerCertificate']['ACMCertificateArn'] if 'ACMCertificateArn' in  distribution['ViewerCertificate'] else ' '
             certificate = distribution['ViewerCertificate']['Certificate'] if 'Certificate' in  distribution['ViewerCertificate'] else ' '
@@ -169,10 +172,48 @@ def list_distributions():
                                     'OriginShield' : originshield,
                                     'OriginAccessControlId' : item['OriginAccessControlId'] if 'OriginAccessControlId' in item else ''
                                    })
-                
-
-
-
+          if 'OriginGroups' in distribution :
+            if 'Items' in distribution['OriginGroups'] :
+              for item in distribution['OriginGroups']['Items'] :
+                members = ''
+                if 'Members' in item:
+                  for originid in item['Members']['Items']:
+                    members = members + originid + ','
+                origingroupitems.append({
+                  'Id' : item['Id'] if 'Id' in item else '',
+                  'MembersOriginIds' : members
+                })
+          if 'DefaultCacheBehavior' in distribution :
+            defaultcachebehavior.append({
+              'TargetOriginId' : distribution['DefaultCacheBehavior']['TargetOriginId'],
+              'ViewerProtocolPolicy' : distribution['DefaultCacheBehavior']['ViewerProtocolPolicy'],
+              'MinTTL' : distribution['DefaultCacheBehavior']['MinTTL'] if 'MinTTL' in distribution['DefaultCacheBehavior'] else '',
+              'DefaultTTL' : distribution['DefaultCacheBehavior']['DefaultTTL'] if 'DefaultTTL' in distribution['DefaultCacheBehavior'] else '',
+              'MaxTTL' : distribution['DefaultCacheBehavior']['MaxTTL'] if 'MaxTTL' in distribution['DefaultCacheBehavior'] else ''
+            })
+          if 'CacheBehaviors' in distribution :
+            if 'Items' in distribution['CacheBehaviors'] :
+              for item in distribution['CacheBehaviors']['Items']:
+                cachebehaviors.append({
+                  'PathPattern' : item['PathPattern'] if 'PathPattern' in item else '',
+                  'TargetOriginId' : item['TargetOriginId'] if 'TargetOriginId' in item else '',
+                  'ViewerProtocolPolicy' : item['ViewerProtocolPolicy'] if 'ViewerProtocolPolicy' in item else '',
+                  'RealtimeLogConfigArn' : item['RealtimeLogConfigArn'] if 'RealtimeLogConfigArn' in item else '',
+                  'CachePolicyId' : item['CachePolicyId'] if 'CachePolicyId' in item else '',
+                  'OriginRequestPolicyId' : item['OriginRequestPolicyId'] if 'OriginRequestPolicyId' in item else '',
+                  'MinTTL' : item['MinTTL'] if 'MinTTL' in item else '',
+                  'DefaultTTL' : item['DefaultTTL'] if 'DefaultTTL' in item else '',
+                  'MaxTTL' : item['MaxTTL'] if 'MaxTTL' in item else ''
+                })
+          if 'CustomErrorResponses' in distribution :
+            if 'Items' in distribution['CustomErrorResponses'] :
+              for item in distribution['CustomErrorResponses']['Items']:
+                customerrresponses.append({
+                  'ErrorCode' : item['ErrorCode'] if 'ErrorCode' in item else '',
+                  'ResponsePagePath' : item['ResponsePagePath'] if 'ResponsePagePath' in item else '',
+                  'ResponseCode' : item['ResponseCode'] if 'ResponseCode' in item else '',
+                  'ErrorCachingMinTTL' : item['ErrorCachingMinTTL'] if 'ErrorCachingMinTTL' in item else ''
+                })
         # list count sync with space
         utils.ListSyncCountWithSpace(ids, arns, status, domainnames, webaclids, httpversions, priceclass,
                                      enableds, aliasitems, originitems, origingroupitems, defaultcachebehavior,
