@@ -1,9 +1,9 @@
 ####################################################################################################
 # 
-# Purpose : get list s3 info
-# Source  : s3.py
-# Usage   : python s3.py 
-# Develop : ksk
+# Purpose   : get list s3 info
+# Source    : s3.py
+# Usage     : python s3.py 
+# Developer : ksk
 # --------  -----------   -------------------------------------------------
 # Version :     date    :  reason
 #  1.0      2022.08.20     first create

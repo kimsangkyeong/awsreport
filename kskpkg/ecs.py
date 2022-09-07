@@ -1,9 +1,9 @@
 ####################################################################################################
 # 
-# Purpose : get list ecs info
-# Source  : ecs.py
-# Usage   : python eks.py 
-# Develop : ksk
+# Purpose   : get list ecs info
+# Source    : ecs.py
+# Usage     : python eks.py 
+# Developer : ksk
 # --------  -----------   -------------------------------------------------
 # Version :     date    :  reason
 #  1.0      2022.08.25     first create

@@ -1,9 +1,9 @@
 ####################################################################################################
 # 
-# Purpose : get list cloudfront info
-# Source  : cloudfront.py
-# Usage   : python cloudfront.py 
-# Develop : ksk
+# Purpose   : get list cloudfront info
+# Source    : cloudfront.py
+# Usage     : python cloudfront.py 
+# Developer : ksk
 # --------  -----------   -------------------------------------------------
 # Version :     date    :  reason
 #  1.0      2022.08.30     first create

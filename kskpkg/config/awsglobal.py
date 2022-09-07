@@ -1,9 +1,9 @@
 ###################################################################################################
 #
-# Purpose : define global variables. 
-# Source  : awsglobal.py
-# Usage   : import awsglobal
-# Develop : ksk
+# Purpose   : define global variables. 
+# Source    : awsglobal.py
+# Usage     : import awsglobal
+# Developer : ksk
 # --------  -----------   -------------------------------------------------
 # Version :     date    :  reason
 #  1.0      2019.09.15     first create

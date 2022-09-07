@@ -1,9 +1,9 @@
 ####################################################################################################
 # 
-# Purpose : get list ssm info
-# Source  : ssm.py
-# Usage   : python ssm.py 
-# Develop : ksk
+# Purpose   : get list ssm info
+# Source    : ssm.py
+# Usage     : python ssm.py 
+# Developer : ksk
 # --------  -----------   -------------------------------------------------
 # Version :     date    :  reason
 #  1.0      2022.09.06     first create
@@ -63,10 +63,17 @@ def describe_parameters():
         #   klogger_dat.debug(parameter)
           name = []
           name.append(parameter['Name'])
+          info = get_parameter(parameter['Name'])
+          # klogger.debug(info)
+          if info != None :
+            value = info['Value']
+          else:
+            value = ''
           results.append( { "Name": name,
                             "Type" : parameter['Type'] if 'Type' in parameter else '',
                             "KeyId" : parameter['KeyId'] if 'KeyId' in parameter else '',
                             "Description": parameter['Description'] if 'Description' in parameter else '',
+                            "Value" : value,
                             "AllowedPattern": parameter['AllowedPattern'] if 'AllowedPattern' in parameter else '',
                             "DataType" : parameter['DataType'] if 'DataType' in parameter else '',
                             "LastModifiedUser": parameter['LastModifiedUser'] if 'LastModifiedUser' in parameter else '',
@@ -77,6 +84,7 @@ def describe_parameters():
                           "Type" : ' ',
                           "KeyId" : ' ',
                           "Description": ' ',
+                          "Value": ' ',
                           "AllowedPattern": ' ',
                           "DataType" : ' ',
                           "LastModifiedUser": ' ',
@@ -88,6 +96,7 @@ def describe_parameters():
                         "Type" : 'ERROR CHECK',
                         "KeyId" : 'ERROR CHECK',
                         "Description": 'ERROR CHECK',
+                        "Value": 'ERROR CHECK',
                         "AllowedPattern": 'ERROR CHECK',
                         "DataType" : 'ERROR CHECK',
                         "LastModifiedUser": 'ERROR CHECK',
@@ -100,6 +109,7 @@ def describe_parameters():
                       "Type" : 'ERROR CHECK',
                       "KeyId" : 'ERROR CHECK',
                       "Description": 'ERROR CHECK',
+                      "Value": 'ERROR CHECK',
                       "AllowedPattern": 'ERROR CHECK',
                       "DataType" : 'ERROR CHECK',
                       "LastModifiedUser": 'ERROR CHECK',
@@ -107,6 +117,25 @@ def describe_parameters():
                     })
   finally:
     return results
+
+def get_parameter(name):
+  '''
+    search ssm parameter store info
+  '''
+  # klogger_dat.debug('ssm-parameter store info')
+  try:
+    result = None 
+    ssm=boto3.client('ssm')
+    parameter = ssm.get_parameter(Name=name)
+    # klogger_dat.debug(parameter)
+    if 200 == parameter["ResponseMetadata"]["HTTPStatusCode"]:
+    #   klogger_dat.debug(parameter["Parameter"])
+      result = parameter["Parameter"]
+    # klogger.debug(result)
+  except Exception as othererr:
+    klogger.error("ssm.get_parameter(),%s", othererr)
+  finally:
+    return result
 
 def main(argv):
 

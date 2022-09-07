@@ -1,9 +1,9 @@
 ####################################################################################################
 # 
-# Purpose : get list eks info
-# Source  : eks.py
-# Usage   : python eks.py 
-# Develop : ksk
+# Purpose   : get list eks info
+# Source    : eks.py
+# Usage     : python eks.py 
+# Developer : ksk
 # --------  -----------   -------------------------------------------------
 # Version :     date    :  reason
 #  1.0      2022.08.22     first create

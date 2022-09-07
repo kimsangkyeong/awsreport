@@ -1,9 +1,9 @@
 ####################################################################################################
 #
-# Purpose : utilities 
-# Source  : utils.py
-# Usage   : python utils.py
-# Develop : ksk
+# Purpose   : utilities 
+# Source    : utils.py
+# Usage     : python utils.py
+# Developer : ksk
 # --------  -----------   -------------------------------------------------
 # Version :     date    :  reason
 #  1.0      2022.08.21     first create

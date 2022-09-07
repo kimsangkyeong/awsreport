@@ -1,9 +1,9 @@
 ####################################################################################################
 # 
-# Purpose : get list secretsmanager info
-# Source  : secretsmanager.py
-# Usage   : python secretsmanager.py 
-# Develop : ksk
+# Purpose   : get list secretsmanager info
+# Source    : secretsmanager.py
+# Usage     : python secretsmanager.py 
+# Developer : ksk
 # --------  -----------   -------------------------------------------------
 # Version :     date    :  reason
 #  1.0      2022.09.06     first create

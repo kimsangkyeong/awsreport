@@ -1,9 +1,9 @@
 ####################################################################################################
 # 
-# Purpose : get list acm info
-# Source  : acm.py
-# Usage   : python acm.py 
-# Develop : ksk
+# Purpose   : get list acm info
+# Source    : acm.py
+# Usage     : python acm.py 
+# Developer : ksk
 # --------  -----------   -------------------------------------------------
 # Version :     date    :  reason
 #  1.0      2022.08.20     first create

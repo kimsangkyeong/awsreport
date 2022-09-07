@@ -1,9 +1,9 @@
 ####################################################################################################
 # 
-# Purpose : get list EFS info
-# Source  : efs.py
-# Usage   : python efs.py 
-# Develop : ksk
+# Purpose   : get list EFS info
+# Source    : efs.py
+# Usage     : python efs.py 
+# Developer : ksk
 # --------  -----------   -------------------------------------------------
 # Version :     date    :  reason
 #  1.0      2022.08.21     first create

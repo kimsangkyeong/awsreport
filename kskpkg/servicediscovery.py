@@ -1,9 +1,9 @@
 ####################################################################################################
 # 
-# Purpose : get list servicediscovery info
-# Source  : servicediscovery.py
-# Usage   : python servicediscovery.py 
-# Develop : ksk
+# Purpose   : get list servicediscovery info
+# Source    : servicediscovery.py
+# Usage     : python servicediscovery.py 
+# Developer : ksk
 # --------  -----------   -------------------------------------------------
 # Version :     date    :  reason
 #  1.0      2022.08.20     first create

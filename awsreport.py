@@ -1,9 +1,9 @@
 ####################################################################################################
 # 
-# Purpose : aws operator main program
-# Source  : awsreport.py
-# Usage   : python awsreport.py 
-# Develop : ksk
+# Purpose   : aws operator main program
+# Source    : awsreport.py
+# Usage     : python awsreport.py 
+# Developer : ksk
 # --------  -----------   -------------------------------------------------
 # Version :     date    :  reason
 #  1.0      2019.09.06     first create
@@ -191,6 +191,9 @@ def get_ecsclustername(df, x):
     if x == clusterarn :
       return clustername
 
+def df_to_excel(writer, df, sheetname):
+  df.to_excel(writer, sheet_name=sheetname, index=False)
+
 def main(argv):
   # logger setting 
   global_config_init()
@@ -301,75 +304,86 @@ def main(argv):
   # klogger_dat.debug(df_secretmanager)
   df_ssm_params = results_to_dataframe(executefunc_p1("kskpkg.ssm.describe_parameters"))
   # klogger_dat.debug(df_ssm_params)
+  df_backup = results_to_dataframe(executefunc_p1("kskpkg.backup.list_backup_plans"))
+  # klogger_dat.debug(df_backup)
+  df_backup_vault = results_to_dataframe(executefunc_p1("kskpkg.backup.list_backup_vaults"))
+  df_backup_vault['KmsKeyAlias'] = df_backup_vault['EncryptionKeyArn'].apply(lambda x : get_keyalias(df_kms,x)) # get KMS Key alias
+  # klogger_dat.debug(df_backup_vault)
 
   # to_excel 
   klogger_dat.debug("%s\n%s","-"*20,"save to excel")
   if os.path.exists(output_file):
     with pd.ExcelWriter(output_file, mode='a', if_sheet_exists='replace', engine='openpyxl') as writer:
-      df_route53.to_excel(writer, sheet_name='route53', index=False) 
-      df_route53_record.to_excel(writer, sheet_name='route53_record', index=False) 
-      df_cloudfront_dist.to_excel(writer, sheet_name='cloudfront_dist', index=False) 
-      df_cloudfront_oid.to_excel(writer, sheet_name='cloudfront_oid', index=False) 
-      df_cloudmap.to_excel(writer, sheet_name='cloudmap', index=False) 
-      df_acm.to_excel(writer, sheet_name='acm', index=False)
-      df_vpc.to_excel(writer, sheet_name='vpc', index=False)
-      df_igw.to_excel(writer, sheet_name='igw', index=False) 
-      df_nat.to_excel(writer, sheet_name='nat', index=False) 
-      df_eip.to_excel(writer, sheet_name='eip', index=False) 
-      df_subnet.to_excel(writer, sheet_name='subnet', index=False) 
-      df_routea.to_excel(writer, sheet_name='router', index=False) 
-      df_routet.to_excel(writer, sheet_name='routeinfo', index=False) 
-      df_mplist.to_excel(writer, sheet_name='managed_prefixlist', index=False) 
-      df_elb.to_excel(writer, sheet_name='elb', index=False) 
-      df_elb_listener.to_excel(writer, sheet_name='elb_listener', index=False) 
-      df_elb_listener_rule.to_excel(writer, sheet_name='elb_listener_rule', index=False) 
-      df_elb_targetgroup.to_excel(writer, sheet_name='elb_targetgroup', index=False) 
-      df_ekscluster.to_excel(writer, sheet_name='eks', index=False) 
-      df_ecscluster.to_excel(writer, sheet_name='ecs', index=False) 
-      df_ecs_service.to_excel(writer, sheet_name='ecs-service', index=False) 
-      df_ins.to_excel(writer, sheet_name='instance', index=False) 
-      df_sg.to_excel(writer, sheet_name='securegroup', index=False) 
-      df_eni.to_excel(writer, sheet_name='eni', index=False) 
-      df_efs.to_excel(writer, sheet_name='efs', index=False) 
-      df_s3.to_excel(writer, sheet_name='s3', index=False) 
-      df_ecr.to_excel(writer, sheet_name='ecr', index=False) 
-      df_kms.to_excel(writer, sheet_name='kms', index=False) 
-      df_rdscluser.to_excel(writer, sheet_name='rds', index=False) 
-      df_secretmanager.to_excel(writer, sheet_name='secretmanager', index=False) 
-      df_ssm_params.to_excel(writer, sheet_name='ssm_parameterstore', index=False) 
+      df_to_excel(writer, df_route53           , 'route53')
+      df_to_excel(writer, df_route53_record    , 'route53_record')
+      df_to_excel(writer, df_cloudfront_dist   , 'cloudfront_dist')
+      df_to_excel(writer, df_cloudfront_oid    , 'cloudfront_oid')
+      df_to_excel(writer, df_cloudmap          , 'cloudmap')
+      df_to_excel(writer, df_acm               , 'acm')
+      df_to_excel(writer, df_vpc               , 'vpc')
+      df_to_excel(writer, df_igw               , 'igw')
+      df_to_excel(writer, df_nat               , 'nat')
+      df_to_excel(writer, df_eip               , 'eip')
+      df_to_excel(writer, df_subnet            , 'subnet')
+      df_to_excel(writer, df_routea            , 'router')
+      df_to_excel(writer, df_routet            , 'routeinfo')
+      df_to_excel(writer, df_mplist            , 'managed_prefixlist')
+      df_to_excel(writer, df_elb               , 'elb')
+      df_to_excel(writer, df_elb_listener      , 'elb_listener')
+      df_to_excel(writer, df_elb_listener_rule , 'elb_listener_rule')
+      df_to_excel(writer, df_elb_targetgroup   , 'elb_targetgroup')
+      df_to_excel(writer, df_ekscluster        , 'eks')
+      df_to_excel(writer, df_ecscluster        , 'ecs')
+      df_to_excel(writer, df_ecs_service       , 'ecs-service')
+      df_to_excel(writer, df_ins               , 'instance')
+      df_to_excel(writer, df_sg                , 'securegroup')
+      df_to_excel(writer, df_eni               , 'eni')
+      df_to_excel(writer, df_efs               , 'efs')
+      df_to_excel(writer, df_s3                , 's3')
+      df_to_excel(writer, df_ecr               , 'ecr')
+      df_to_excel(writer, df_kms               , 'kms')
+      df_to_excel(writer, df_rdscluser         , 'rds')
+      df_to_excel(writer, df_secretmanager     , 'secretmanager')
+      df_to_excel(writer, df_ssm_params        , 'ssm_parameterstore')
+      df_to_excel(writer, df_backup            , 'backup')
+      df_to_excel(writer, df_backup_vault      , 'backup_vault')
+      
   else:
     with pd.ExcelWriter(output_file, engine='openpyxl') as writer:
-      df_route53.to_excel(writer, sheet_name='route53', index=False)
-      df_route53_record.to_excel(writer, sheet_name='route53_record', index=False) 
-      df_cloudfront_dist.to_excel(writer, sheet_name='cloudfront_dist', index=False) 
-      df_cloudfront_oid.to_excel(writer, sheet_name='cloudfront_oid', index=False) 
-      df_cloudmap.to_excel(writer, sheet_name='cloudmap', index=False) 
-      df_acm.to_excel(writer, sheet_name='acm', index=False)
-      df_vpc.to_excel(writer, sheet_name='vpc', index=False)
-      df_igw.to_excel(writer, sheet_name='igw', index=False) 
-      df_nat.to_excel(writer, sheet_name='nat', index=False) 
-      df_eip.to_excel(writer, sheet_name='eip', index=False) 
-      df_subnet.to_excel(writer, sheet_name='subnet', index=False) 
-      df_routea.to_excel(writer, sheet_name='router', index=False) 
-      df_routet.to_excel(writer, sheet_name='routeinfo', index=False) 
-      df_mplist.to_excel(writer, sheet_name='managed_prefixlist', index=False) 
-      df_elb.to_excel(writer, sheet_name='elb', index=False) 
-      df_elb_listener.to_excel(writer, sheet_name='elb_listener', index=False) 
-      df_elb_listener_rule.to_excel(writer, sheet_name='elb_listener_rule', index=False) 
-      df_elb_targetgroup.to_excel(writer, sheet_name='elb_targetgroup', index=False) 
-      df_ekscluster.to_excel(writer, sheet_name='eks', index=False) 
-      df_ecscluster.to_excel(writer, sheet_name='ecs', index=False) 
-      df_ecs_service.to_excel(writer, sheet_name='ecs-service', index=False) 
-      df_ins.to_excel(writer, sheet_name='instance', index=False) 
-      df_sg.to_excel(writer, sheet_name='securegroup', index=False) 
-      df_eni.to_excel(writer, sheet_name='eni', index=False) 
-      df_efs.to_excel(writer, sheet_name='efs', index=False) 
-      df_s3.to_excel(writer, sheet_name='s3', index=False) 
-      df_ecr.to_excel(writer, sheet_name='ecr', index=False) 
-      df_kms.to_excel(writer, sheet_name='kms', index=False) 
-      df_rdscluser.to_excel(writer, sheet_name='rds', index=False) 
-      df_secretmanager.to_excel(writer, sheet_name='secretmanager', index=False) 
-      df_ssm_params.to_excel(writer, sheet_name='ssm_parameterstore', index=False) 
+      df_to_excel(writer, df_route53           , 'route53')
+      df_to_excel(writer, df_route53_record    , 'route53_record')
+      df_to_excel(writer, df_cloudfront_dist   , 'cloudfront_dist')
+      df_to_excel(writer, df_cloudfront_oid    , 'cloudfront_oid')
+      df_to_excel(writer, df_cloudmap          , 'cloudmap')
+      df_to_excel(writer, df_acm               , 'acm')
+      df_to_excel(writer, df_vpc               , 'vpc')
+      df_to_excel(writer, df_igw               , 'igw')
+      df_to_excel(writer, df_nat               , 'nat')
+      df_to_excel(writer, df_eip               , 'eip')
+      df_to_excel(writer, df_subnet            , 'subnet')
+      df_to_excel(writer, df_routea            , 'router')
+      df_to_excel(writer, df_routet            , 'routeinfo')
+      df_to_excel(writer, df_mplist            , 'managed_prefixlist')
+      df_to_excel(writer, df_elb               , 'elb')
+      df_to_excel(writer, df_elb_listener      , 'elb_listener')
+      df_to_excel(writer, df_elb_listener_rule , 'elb_listener_rule')
+      df_to_excel(writer, df_elb_targetgroup   , 'elb_targetgroup')
+      df_to_excel(writer, df_ekscluster        , 'eks')
+      df_to_excel(writer, df_ecscluster        , 'ecs')
+      df_to_excel(writer, df_ecs_service       , 'ecs-service')
+      df_to_excel(writer, df_ins               , 'instance')
+      df_to_excel(writer, df_sg                , 'securegroup')
+      df_to_excel(writer, df_eni               , 'eni')
+      df_to_excel(writer, df_efs               , 'efs')
+      df_to_excel(writer, df_s3                , 's3')
+      df_to_excel(writer, df_ecr               , 'ecr')
+      df_to_excel(writer, df_kms               , 'kms')
+      df_to_excel(writer, df_rdscluser         , 'rds')
+      df_to_excel(writer, df_secretmanager     , 'secretmanager')
+      df_to_excel(writer, df_ssm_params        , 'ssm_parameterstore')
+      df_to_excel(writer, df_backup            , 'backup')
+      df_to_excel(writer, df_backup_vault      , 'backup_vault')
+
   klogger_dat.debug("finished")
 
 if __name__ == "__main__":

@@ -1,9 +1,9 @@
 ####################################################################################################
 # 
-# Purpose : get list rds info
-# Source  : rds.py
-# Usage   : python rds.py 
-# Develop : ksk
+# Purpose   : get list rds info
+# Source    : rds.py
+# Usage     : python rds.py 
+# Developer : ksk
 # --------  -----------   -------------------------------------------------
 # Version :     date    :  reason
 #  1.0      2022.08.22     first create

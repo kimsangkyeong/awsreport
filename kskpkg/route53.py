@@ -1,9 +1,9 @@
 ####################################################################################################
 # 
-# Purpose : get list route53 info
-# Source  : route53.py
-# Usage   : python route53.py 
-# Develop : ksk
+# Purpose   : get list route53 info
+# Source    : route53.py
+# Usage     : python route53.py 
+# Developer : ksk
 # --------  -----------   -------------------------------------------------
 # Version :     date    :  reason
 #  1.0      2022.08.20     first create

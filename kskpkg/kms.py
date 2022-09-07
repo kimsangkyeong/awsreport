@@ -1,9 +1,9 @@
 ####################################################################################################
 # 
-# Purpose : get list kms info
-# Source  : kms.py
-# Usage   : python kms.py 
-# Develop : ksk
+# Purpose   : get list kms info
+# Source    : kms.py
+# Usage     : python kms.py 
+# Developer : ksk
 # --------  -----------   -------------------------------------------------
 # Version :     date    :  reason
 #  1.0      2022.08.21     first create

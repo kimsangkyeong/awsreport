@@ -1,9 +1,9 @@
 ####################################################################################################
 # 
-# Purpose : get list ElasticLoadBalancer info
-# Source  : elb.py
-# Usage   : python elb.py 
-# Develop : ksk
+# Purpose   : get list ElasticLoadBalancer info
+# Source    : elb.py
+# Usage     : python elb.py 
+# Developer : ksk
 # --------  -----------   -------------------------------------------------
 # Version :     date    :  reason
 #  1.0      2022.08.20     first create

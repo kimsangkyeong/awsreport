@@ -1,9 +1,9 @@
 ####################################################################################################
 # 
-# Purpose : get list vpcs info
-# Source  : ec.py
-# Usage   : python ec.py 
-# Develop : ksk
+# Purpose   : get list vpcs info
+# Source    : ec.py
+# Usage     : python ec.py 
+# Developer : ksk
 # --------  -----------   -------------------------------------------------
 # Version :     date    :  reason
 #  1.0      2019.09.06     first create

@@ -1,9 +1,9 @@
 ####################################################################################################
 # 
-# Purpose : get list ecr info
-# Source  : ecr.py
-# Usage   : python ecr.py 
-# Develop : ksk
+# Purpose   : get list ecr info
+# Source    : ecr.py
+# Usage     : python ecr.py 
+# Developer : ksk
 # --------  -----------   -------------------------------------------------
 # Version :     date    :  reason
 #  1.0      2022.08.30     first create
