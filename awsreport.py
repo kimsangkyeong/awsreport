@@ -310,6 +310,10 @@ def main(argv):
   df_rdscluser['PerformanceInsightsKMSKeyAlias'] = df_rdscluser['PerformanceInsightsKMSKeyId'].apply(lambda x : get_keyalias(df_kms,x)) # get KMS Key alias
   df_rdscluser['VpcSecurityGroupName'] = df_rdscluser['VpcSecurityGroupId'].apply(lambda x : get_sgname(df_sg,x)) # get Security Group TagName
   # klogger_dat.debug(df_rdscluser)
+  df_elasticache = results_to_dataframe(executefunc_p1("kskpkg.elasticache.describe_cache_clusters"))
+  df_elasticache['CacheSGroupTName'] = df_elasticache['CacheSecurityGroup'].apply(lambda x : get_sgname(df_sg,x)) # get Security Group TagName
+  df_elasticache['SGroupTName'] = df_elasticache['SecurityGroup'].apply(lambda x : get_sgname(df_sg,x)) # get Security Group TagName
+  # klogger_dat.debug(df_elasticache)
   df_secretmanager = results_to_dataframe(executefunc_p1("kskpkg.secretsmanager.list_secrets"))
   df_secretmanager['KmsKeyAlias'] = df_secretmanager['KmsKeyId'].apply(lambda x : get_keyalias(df_kms,x)) # get KMS Key alias
   # klogger_dat.debug(df_secretmanager)
@@ -368,6 +372,7 @@ def main(argv):
       df_to_excel(writer, df_ecr               , 'ecr')
       df_to_excel(writer, df_kms               , 'kms')
       df_to_excel(writer, df_rdscluser         , 'rds')
+      df_to_excel(writer, df_elasticache       , 'elasticache')
       df_to_excel(writer, df_secretmanager     , 'secretmanager')
       df_to_excel(writer, df_ssm_params        , 'ssm_parameterstore')
       df_to_excel(writer, df_backup            , 'backup')
@@ -406,6 +411,7 @@ def main(argv):
       df_to_excel(writer, df_ecr               , 'ecr')
       df_to_excel(writer, df_kms               , 'kms')
       df_to_excel(writer, df_rdscluser         , 'rds')
+      df_to_excel(writer, df_elasticache       , 'elasticache')
       df_to_excel(writer, df_secretmanager     , 'secretmanager')
       df_to_excel(writer, df_ssm_params        , 'ssm_parameterstore')
       df_to_excel(writer, df_backup            , 'backup')
