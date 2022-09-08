@@ -347,6 +347,8 @@ def main(argv):
   # klogger_dat.debug(df_codedeployappl)
   df_codedeployment = results_to_dataframe(executefunc_p1("kskpkg.codedeploy.list_deployments"))
   # klogger_dat.debug(df_codedeployment)
+  df_codepipeline = results_to_dataframe(executefunc_p1("kskpkg.codepipeline.list_pipelines"))
+  # klogger_dat.debug(df_codepipeline)
 
   # to_excel 
   klogger_dat.debug("%s\n%s","-"*20,"save to excel")
@@ -391,7 +393,9 @@ def main(argv):
       df_to_excel(writer, df_codecommit        , 'codecommit')                  # 37
       df_to_excel(writer, df_codebuild         , 'codebuild')                   # 38
       df_to_excel(writer, df_codedeployappl    , 'codedeploy_application')      # 39
-      df_to_excel(writer, df_codedeployment    , 'codedeploy_deployment')       # 40
+      df_to_excel(writer, df_codedeployment    , 'codedeploy_deployment')       # 40 
+      df_to_excel(writer, df_codepipeline      , 'codepipeline')                # 41 
+      
   else:
     with pd.ExcelWriter(output_file, engine='openpyxl') as writer:
       df_to_excel(writer, df_route53           , 'route53')                     # 1
@@ -434,6 +438,7 @@ def main(argv):
       df_to_excel(writer, df_codebuild         , 'codebuild')                   # 38
       df_to_excel(writer, df_codedeployappl    , 'codedeploy_application')      # 39
       df_to_excel(writer, df_codedeployment    , 'codedeploy_deployment')       # 40
+      df_to_excel(writer, df_codepipeline      , 'codepipeline')                # 41 
 
   klogger_dat.debug("finished")
 
