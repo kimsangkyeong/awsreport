@@ -343,90 +343,97 @@ def main(argv):
   df_codebuild['SubnetTName'] = df_codebuild['Subnets'].apply(lambda x : get_subnetname(df_subnet,x)) # get Subnet TagName
   df_codebuild['SGroupTName'] = df_codebuild['SecurityGroup'].apply(lambda x : get_sgname(df_sg,x)) # get Security Group TagName
   # klogger_dat.debug(df_codebuild)
+  df_codedeployappl = results_to_dataframe(executefunc_p1("kskpkg.codedeploy.list_applications"))
+  # klogger_dat.debug(df_codedeployappl)
+  df_codedeployment = results_to_dataframe(executefunc_p1("kskpkg.codedeploy.list_deployments"))
+  # klogger_dat.debug(df_codedeployment)
 
   # to_excel 
   klogger_dat.debug("%s\n%s","-"*20,"save to excel")
   if os.path.exists(output_file):
     with pd.ExcelWriter(output_file, mode='a', if_sheet_exists='replace', engine='openpyxl') as writer:
-      df_to_excel(writer, df_route53           , 'route53')
-      df_to_excel(writer, df_route53_record    , 'route53_record')
-      df_to_excel(writer, df_cloudfront_dist   , 'cloudfront_dist')
-      df_to_excel(writer, df_cloudfront_oid    , 'cloudfront_oid')
-      df_to_excel(writer, df_cloudmap          , 'cloudmap')
-      df_to_excel(writer, df_acm               , 'acm')
-      df_to_excel(writer, df_vpc               , 'vpc')
-      df_to_excel(writer, df_igw               , 'igw')
-      df_to_excel(writer, df_nat               , 'nat')
-      df_to_excel(writer, df_eip               , 'eip')
-      df_to_excel(writer, df_subnet            , 'subnet')
-      df_to_excel(writer, df_routea            , 'router')
-      df_to_excel(writer, df_routet            , 'routeinfo')
-      df_to_excel(writer, df_mplist            , 'managed_prefixlist')
-      df_to_excel(writer, df_elb               , 'elb')
-      df_to_excel(writer, df_elb_listener      , 'elb_listener')
-      df_to_excel(writer, df_elb_listener_rule , 'elb_listener_rule')
-      df_to_excel(writer, df_elb_targetgroup   , 'elb_targetgroup')
-      df_to_excel(writer, df_ekscluster        , 'eks')
-      df_to_excel(writer, df_ecscluster        , 'ecs')
-      df_to_excel(writer, df_ecs_service       , 'ecs-service')
-      df_to_excel(writer, df_ins               , 'instance')
-      df_to_excel(writer, df_sg                , 'securegroup')
-      df_to_excel(writer, df_eni               , 'eni')
-      df_to_excel(writer, df_efs               , 'efs')
-      df_to_excel(writer, df_s3                , 's3')
-      df_to_excel(writer, df_ecr               , 'ecr')
-      df_to_excel(writer, df_kms               , 'kms')
-      df_to_excel(writer, df_rdscluser         , 'rds')
-      df_to_excel(writer, df_elasticache       , 'elasticache')
-      df_to_excel(writer, df_secretmanager     , 'secretmanager')
-      df_to_excel(writer, df_ssm_params        , 'ssm_parameterstore')
-      df_to_excel(writer, df_backup            , 'backup')
-      df_to_excel(writer, df_backup_vault      , 'backup_vault')
-      df_to_excel(writer, df_lambda            , 'lambda')
-      df_to_excel(writer, df_lambda_edge       , 'Lambda@Edge')
-      df_to_excel(writer, df_codecommit        , 'codecommit')
-      df_to_excel(writer, df_codebuild         , 'codebuild')
-      
+      df_to_excel(writer, df_route53           , 'route53')                     # 1
+      df_to_excel(writer, df_route53_record    , 'route53_record')              # 2
+      df_to_excel(writer, df_cloudfront_dist   , 'cloudfront_dist')             # 3
+      df_to_excel(writer, df_cloudfront_oid    , 'cloudfront_oid')              # 4
+      df_to_excel(writer, df_cloudmap          , 'cloudmap')                    # 5
+      df_to_excel(writer, df_acm               , 'acm')                         # 6
+      df_to_excel(writer, df_vpc               , 'vpc')                         # 7
+      df_to_excel(writer, df_igw               , 'igw')                         # 8
+      df_to_excel(writer, df_nat               , 'nat')                         # 9
+      df_to_excel(writer, df_eip               , 'eip')                         # 10
+      df_to_excel(writer, df_subnet            , 'subnet')                      # 11
+      df_to_excel(writer, df_routea            , 'router')                      # 12
+      df_to_excel(writer, df_routet            , 'routeinfo')                   # 13
+      df_to_excel(writer, df_mplist            , 'managed_prefixlist')          # 14
+      df_to_excel(writer, df_elb               , 'elb')                         # 15
+      df_to_excel(writer, df_elb_listener      , 'elb_listener')                # 16
+      df_to_excel(writer, df_elb_listener_rule , 'elb_listener_rule')           # 17
+      df_to_excel(writer, df_elb_targetgroup   , 'elb_targetgroup')             # 18
+      df_to_excel(writer, df_ekscluster        , 'eks')                         # 19
+      df_to_excel(writer, df_ecscluster        , 'ecs')                         # 20
+      df_to_excel(writer, df_ecs_service       , 'ecs-service')                 # 21
+      df_to_excel(writer, df_ins               , 'instance')                    # 22
+      df_to_excel(writer, df_sg                , 'securegroup')                 # 23
+      df_to_excel(writer, df_eni               , 'eni')                         # 24
+      df_to_excel(writer, df_efs               , 'efs')                         # 25
+      df_to_excel(writer, df_s3                , 's3')                          # 26
+      df_to_excel(writer, df_ecr               , 'ecr')                         # 27
+      df_to_excel(writer, df_kms               , 'kms')                         # 28
+      df_to_excel(writer, df_rdscluser         , 'rds')                         # 29
+      df_to_excel(writer, df_elasticache       , 'elasticache')                 # 30
+      df_to_excel(writer, df_secretmanager     , 'secretmanager')               # 31
+      df_to_excel(writer, df_ssm_params        , 'ssm_parameterstore')          # 32
+      df_to_excel(writer, df_backup            , 'backup')                      # 33
+      df_to_excel(writer, df_backup_vault      , 'backup_vault')                # 34
+      df_to_excel(writer, df_lambda            , 'lambda')                      # 35
+      df_to_excel(writer, df_lambda_edge       , 'Lambda@Edge')                 # 36
+      df_to_excel(writer, df_codecommit        , 'codecommit')                  # 37
+      df_to_excel(writer, df_codebuild         , 'codebuild')                   # 38
+      df_to_excel(writer, df_codedeployappl    , 'codedeploy_application')      # 39
+      df_to_excel(writer, df_codedeployment    , 'codedeploy_deployment')       # 40
   else:
     with pd.ExcelWriter(output_file, engine='openpyxl') as writer:
-      df_to_excel(writer, df_route53           , 'route53')
-      df_to_excel(writer, df_route53_record    , 'route53_record')
-      df_to_excel(writer, df_cloudfront_dist   , 'cloudfront_dist')
-      df_to_excel(writer, df_cloudfront_oid    , 'cloudfront_oid')
-      df_to_excel(writer, df_cloudmap          , 'cloudmap')
-      df_to_excel(writer, df_acm               , 'acm')
-      df_to_excel(writer, df_vpc               , 'vpc')
-      df_to_excel(writer, df_igw               , 'igw')
-      df_to_excel(writer, df_nat               , 'nat')
-      df_to_excel(writer, df_eip               , 'eip')
-      df_to_excel(writer, df_subnet            , 'subnet')
-      df_to_excel(writer, df_routea            , 'router')
-      df_to_excel(writer, df_routet            , 'routeinfo')
-      df_to_excel(writer, df_mplist            , 'managed_prefixlist')
-      df_to_excel(writer, df_elb               , 'elb')
-      df_to_excel(writer, df_elb_listener      , 'elb_listener')
-      df_to_excel(writer, df_elb_listener_rule , 'elb_listener_rule')
-      df_to_excel(writer, df_elb_targetgroup   , 'elb_targetgroup')
-      df_to_excel(writer, df_ekscluster        , 'eks')
-      df_to_excel(writer, df_ecscluster        , 'ecs')
-      df_to_excel(writer, df_ecs_service       , 'ecs-service')
-      df_to_excel(writer, df_ins               , 'instance')
-      df_to_excel(writer, df_sg                , 'securegroup')
-      df_to_excel(writer, df_eni               , 'eni')
-      df_to_excel(writer, df_efs               , 'efs')
-      df_to_excel(writer, df_s3                , 's3')
-      df_to_excel(writer, df_ecr               , 'ecr')
-      df_to_excel(writer, df_kms               , 'kms')
-      df_to_excel(writer, df_rdscluser         , 'rds')
-      df_to_excel(writer, df_elasticache       , 'elasticache')
-      df_to_excel(writer, df_secretmanager     , 'secretmanager')
-      df_to_excel(writer, df_ssm_params        , 'ssm_parameterstore')
-      df_to_excel(writer, df_backup            , 'backup')
-      df_to_excel(writer, df_backup_vault      , 'backup_vault')
-      df_to_excel(writer, df_lambda            , 'lambda')
-      df_to_excel(writer, df_lambda_edge       , 'Lambda@Edge')
-      df_to_excel(writer, df_codecommit        , 'codecommit')
-      df_to_excel(writer, df_codebuild         , 'codebuild')
+      df_to_excel(writer, df_route53           , 'route53')                     # 1
+      df_to_excel(writer, df_route53_record    , 'route53_record')              # 2
+      df_to_excel(writer, df_cloudfront_dist   , 'cloudfront_dist')             # 3
+      df_to_excel(writer, df_cloudfront_oid    , 'cloudfront_oid')              # 4
+      df_to_excel(writer, df_cloudmap          , 'cloudmap')                    # 5
+      df_to_excel(writer, df_acm               , 'acm')                         # 6
+      df_to_excel(writer, df_vpc               , 'vpc')                         # 7
+      df_to_excel(writer, df_igw               , 'igw')                         # 8
+      df_to_excel(writer, df_nat               , 'nat')                         # 9
+      df_to_excel(writer, df_eip               , 'eip')                         # 10
+      df_to_excel(writer, df_subnet            , 'subnet')                      # 11
+      df_to_excel(writer, df_routea            , 'router')                      # 12
+      df_to_excel(writer, df_routet            , 'routeinfo')                   # 13
+      df_to_excel(writer, df_mplist            , 'managed_prefixlist')          # 14
+      df_to_excel(writer, df_elb               , 'elb')                         # 15
+      df_to_excel(writer, df_elb_listener      , 'elb_listener')                # 16
+      df_to_excel(writer, df_elb_listener_rule , 'elb_listener_rule')           # 17
+      df_to_excel(writer, df_elb_targetgroup   , 'elb_targetgroup')             # 18
+      df_to_excel(writer, df_ekscluster        , 'eks')                         # 19
+      df_to_excel(writer, df_ecscluster        , 'ecs')                         # 20
+      df_to_excel(writer, df_ecs_service       , 'ecs-service')                 # 21
+      df_to_excel(writer, df_ins               , 'instance')                    # 22
+      df_to_excel(writer, df_sg                , 'securegroup')                 # 23
+      df_to_excel(writer, df_eni               , 'eni')                         # 24
+      df_to_excel(writer, df_efs               , 'efs')                         # 25
+      df_to_excel(writer, df_s3                , 's3')                          # 26
+      df_to_excel(writer, df_ecr               , 'ecr')                         # 27
+      df_to_excel(writer, df_kms               , 'kms')                         # 28
+      df_to_excel(writer, df_rdscluser         , 'rds')                         # 29
+      df_to_excel(writer, df_elasticache       , 'elasticache')                 # 30
+      df_to_excel(writer, df_secretmanager     , 'secretmanager')               # 31
+      df_to_excel(writer, df_ssm_params        , 'ssm_parameterstore')          # 32
+      df_to_excel(writer, df_backup            , 'backup')                      # 33
+      df_to_excel(writer, df_backup_vault      , 'backup_vault')                # 34
+      df_to_excel(writer, df_lambda            , 'lambda')                      # 35
+      df_to_excel(writer, df_lambda_edge       , 'Lambda@Edge')                 # 36
+      df_to_excel(writer, df_codecommit        , 'codecommit')                  # 37
+      df_to_excel(writer, df_codebuild         , 'codebuild')                   # 38
+      df_to_excel(writer, df_codedeployappl    , 'codedeploy_application')      # 39
+      df_to_excel(writer, df_codedeployment    , 'codedeploy_deployment')       # 40
 
   klogger_dat.debug("finished")
 
