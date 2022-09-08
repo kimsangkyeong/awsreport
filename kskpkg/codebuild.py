@@ -222,7 +222,7 @@ def batch_get_projects(project):
   '''
     search codebuild project
   '''
-  klogger_dat.debug('codebuild project')
+#   klogger_dat.debug('codebuild project')
 
   try:
     results = [] 
