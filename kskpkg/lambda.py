@@ -221,7 +221,8 @@ def list_functions(filter):
 
 def main(argv):
 
-  list_functions('ap-northeast-2') 
+  list_functions({'Condition':'General','Region':''}) 
+  list_functions({'Condition':'Lambda@Edge','Region':'ap-northeast-2'}) 
 
   sys.exit(0)
 

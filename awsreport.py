@@ -332,6 +332,8 @@ def main(argv):
   df_lambda_edge['SecurityGroupName'] = df_lambda_edge['SecurityGroup'].apply(lambda x : get_sgname(df_sg,x)) # get Security Group TagName
   df_lambda_edge['KeyAlias'] = df_lambda_edge['KMSKeyArn'].apply(lambda x : get_keyalias(df_kms,x)) # get KMS Key alias
   # klogger_dat.debug(df_lambda_edge)
+  df_codecommit = results_to_dataframe(executefunc_p1("kskpkg.codecommit.list_repositories"))
+  # klogger_dat.debug(df_codecommit)
 
   # to_excel 
   klogger_dat.debug("%s\n%s","-"*20,"save to excel")
@@ -372,7 +374,7 @@ def main(argv):
       df_to_excel(writer, df_backup_vault      , 'backup_vault')
       df_to_excel(writer, df_lambda            , 'lambda')
       df_to_excel(writer, df_lambda_edge       , 'Lambda@Edge')
-      
+      df_to_excel(writer, df_codecommit        , 'codecommit')
   else:
     with pd.ExcelWriter(output_file, engine='openpyxl') as writer:
       df_to_excel(writer, df_route53           , 'route53')
@@ -410,6 +412,7 @@ def main(argv):
       df_to_excel(writer, df_backup_vault      , 'backup_vault')
       df_to_excel(writer, df_lambda            , 'lambda')
       df_to_excel(writer, df_lambda_edge       , 'Lambda@Edge')
+      df_to_excel(writer, df_codecommit        , 'codecommit')
 
   klogger_dat.debug("finished")
 
