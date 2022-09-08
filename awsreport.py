@@ -140,11 +140,13 @@ def get_vpcname(df, x):
   for vpcid, vpctname in df[['VpcId','VpcTName']].value_counts().index:
     if x == vpcid:
       return vpctname
+  return ' '
 
 def get_subnetname(df, x):
   for subnetid, subnettname in df[['SubnetId','SubnetTName']].value_counts().index:
     if x == subnetid:
       return subnettname
+  return ' '
 
 def get_sgname(df, x, tagname=False):
   if tagname :
@@ -155,41 +157,49 @@ def get_sgname(df, x, tagname=False):
     for sgid, sgname in df[['SGroupId','SGroupName']].value_counts().index:
       if x == sgid:
         return sgname
+  return ' '
 
 def get_elbname(df, x):
   for loadbalacerarn, loadbalancername in df[['LoadBalancerArn','LoadBalancerName']].value_counts().index:
     if x == loadbalacerarn :
       return loadbalancername
+  return ' '
 
 def get_elbinfo(df, x):
   for listenerarn, loadbalacerarn, loadbalancername, protocol, port in df[['ListenerArn','LoadBalancerArn','LoadBalancerName', 'Protocol', 'Port']].value_counts().index:
     if x == listenerarn :
       return { loadbalancername : loadbalacerarn, protocol : port }
+  return ' '
 
 def get_eniname(df, x):
   for netinfid, enitname in df[['NetworkInterfaceId','ENITName']].value_counts().index:
     if x == netinfid :
       return enitname
+  return ' '
 
 def get_eipname(df, x):
   for allocationid, eiptname in df[['AllocationId','EIPTName']].value_counts().index:
     if x == allocationid :
       return eiptname
+  return ' '
 
 def get_insname(df, x):
   for instanceid, instname in df[['InstanceId','InstanceTName']].value_counts().index:
     if x == instanceid :
       return instname
+  return ' '
 
 def get_keyalias(df, x):
   for keyarn, keyalias in df[['KeyArn','KeyAlias']].value_counts().index:
     if x == keyarn :
       return keyalias
+  return ' '
 
 def get_ecsclustername(df, x):
   for clusterarn, clustername in df[['ClusterArn','ECSClusterName']].value_counts().index:
     if x == clusterarn :
       return clustername
+  return ' '
 
 def df_to_excel(writer, df, sheetname):
   df.to_excel(writer, sheet_name=sheetname, index=False)
@@ -227,13 +237,14 @@ def main(argv):
   df_eni = results_to_dataframe(executefunc("kskpkg.ec2.describe_network_interfaces", ['ap-northeast-2']))
   df_eni['VpcTName'] = df_eni['VpcId'].apply(lambda x : get_vpcname(df_vpc,x)) # get VpcTagName
   df_eni['SubnetTName'] = df_eni['SubnetId'].apply(lambda x : get_subnetname(df_subnet,x)) # get Subnet TagName
-  df_kms = results_to_dataframe(executefunc_p1("kskpkg.kms.list_keys"))
-  # klogger_dat.debug(df_kms)
+  # klogger_dat.debug(df_eni)
   df_ins = results_to_dataframe(executefunc("kskpkg.ec2.describe_instances", ['ap-northeast-2']))
   df_ins['VpcTName'] = df_ins['VpcId'].apply(lambda x : get_vpcname(df_vpc,x)) # get VpcTagName
   df_ins['SubnetTName'] = df_ins['SubnetId'].apply(lambda x : get_subnetname(df_subnet,x)) # get Subnet TagName
   df_ins['ENITName'] = df_ins['NetworkInterfaceId'].apply(lambda x : get_eniname(df_eni,x)) # get ENI TagName
   # klogger_dat.debug(df_ins)
+  df_kms = results_to_dataframe(executefunc_p1("kskpkg.kms.list_keys"))
+  # klogger_dat.debug(df_kms)
   df_mplist = results_to_dataframe(executefunc("kskpkg.ec2.describe_prefix_lists", ['ap-northeast-2']))
   # klogger_dat.debug(df_mplist)
   df_sg = results_to_dataframe(executefunc("kskpkg.ec2.describe_security_groups", ['ap-northeast-2']))
@@ -309,6 +320,18 @@ def main(argv):
   df_backup_vault = results_to_dataframe(executefunc_p1("kskpkg.backup.list_backup_vaults"))
   df_backup_vault['KmsKeyAlias'] = df_backup_vault['EncryptionKeyArn'].apply(lambda x : get_keyalias(df_kms,x)) # get KMS Key alias
   # klogger_dat.debug(df_backup_vault)
+  df_lambda = results_to_dataframe(executefunc("kskpkg.lambda.list_functions", {'Condition':'General','Region':''}))
+  df_lambda['VpcTName'] = df_lambda['VpcId'].apply(lambda x : get_vpcname(df_vpc,x)) # get VpcTagName
+  df_lambda['SubnetTName'] = df_lambda['SubnetId'].apply(lambda x : get_subnetname(df_subnet,x)) # get Subnet TagName
+  df_lambda['SecurityGroupName'] = df_lambda['SecurityGroup'].apply(lambda x : get_sgname(df_sg,x)) # get Security Group TagName
+  df_lambda['KeyAlias'] = df_lambda['KMSKeyArn'].apply(lambda x : get_keyalias(df_kms,x)) # get KMS Key alias
+  # klogger_dat.debug(df_lambda)
+  df_lambda_edge = results_to_dataframe(executefunc("kskpkg.lambda.list_functions", {'Condition':'Lambda@Edge','Region':'ap-northeast-2'}))
+  df_lambda_edge['VpcTName'] = df_lambda_edge['VpcId'].apply(lambda x : get_vpcname(df_vpc,x)) # get VpcTagName
+  df_lambda_edge['SubnetTName'] = df_lambda_edge['SubnetId'].apply(lambda x : get_subnetname(df_subnet,x)) # get Subnet TagName
+  df_lambda_edge['SecurityGroupName'] = df_lambda_edge['SecurityGroup'].apply(lambda x : get_sgname(df_sg,x)) # get Security Group TagName
+  df_lambda_edge['KeyAlias'] = df_lambda_edge['KMSKeyArn'].apply(lambda x : get_keyalias(df_kms,x)) # get KMS Key alias
+  # klogger_dat.debug(df_lambda_edge)
 
   # to_excel 
   klogger_dat.debug("%s\n%s","-"*20,"save to excel")
@@ -347,6 +370,8 @@ def main(argv):
       df_to_excel(writer, df_ssm_params        , 'ssm_parameterstore')
       df_to_excel(writer, df_backup            , 'backup')
       df_to_excel(writer, df_backup_vault      , 'backup_vault')
+      df_to_excel(writer, df_lambda            , 'lambda')
+      df_to_excel(writer, df_lambda_edge       , 'Lambda@Edge')
       
   else:
     with pd.ExcelWriter(output_file, engine='openpyxl') as writer:
@@ -383,6 +408,8 @@ def main(argv):
       df_to_excel(writer, df_ssm_params        , 'ssm_parameterstore')
       df_to_excel(writer, df_backup            , 'backup')
       df_to_excel(writer, df_backup_vault      , 'backup_vault')
+      df_to_excel(writer, df_lambda            , 'lambda')
+      df_to_excel(writer, df_lambda_edge       , 'Lambda@Edge')
 
   klogger_dat.debug("finished")
 
