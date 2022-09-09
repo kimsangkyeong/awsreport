@@ -221,7 +221,13 @@ def df_to_excel(writer, df, sheetname):
   col_width_list = []
   for col_num, value in enumerate(df.columns.values):
     worksheet.write(2, col_num, value, header_format)
-    col_width_list.append(max(12, len(df.columns[col_num])))
+    if type(df.columns[col_num]) == type(str()) :
+      col_width_list.append(max(12, len(df.columns[col_num])))
+    elif type(df.columns[col_num]) == type(dict()) :
+      col_width_list.append(max(12, 20))
+    else : 
+      col_width_list.append(max(12, 0))
+
   # klogger_dat.debug(f'col_width_list : {col_width_list}')
   # Set the Column Width
   for col, colwidth in enumerate(col_width_list):
@@ -235,7 +241,11 @@ def df_to_excel(writer, df, sheetname):
   row_idx, col_idx = df.shape
   for r in range(row_idx):
     for c in range(col_idx):
-      worksheet.write(r + 3, c, df.values[r, c], data_format)
+      if type(df.values[r, c]) == type(dict()) :
+        worksheet.write(r + 3, c, str(df.values[r, c]), data_format)
+      else : 
+        worksheet.write(r + 3, c, df.values[r, c], data_format)
+
   # Add the remark to the excel
   worksheet.write(len(df)+4, 0, 'Remark:', workbook.add_format({'bold': True}))
   worksheet.write(len(df)+5, 0, 'The last update time is ' + datetime.now().strftime('%Y-%m-%d %H:%M') + '.')
