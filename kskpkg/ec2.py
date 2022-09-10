@@ -1375,52 +1375,113 @@ def describe_addresses(searchRegions):
       pass
   return results
 
-def describe_prefix_lists(searchRegions):
+def describe_managed_prefix_lists(searchRegions):
   '''
-    search Prefix List
+    search Managed Prefix List
   '''
   klogger_dat.debug('managed prefix list')
   for region in searchRegions:
     try:
       results = [] 
       ec2=boto3.client('ec2', region )
-      plss = ec2.describe_prefix_lists()
+      plss = ec2.describe_managed_prefix_lists()
       # klogger.debug("%s",plss["PrefixLists"])
       if 200 == plss["ResponseMetadata"]["HTTPStatusCode"]:
         # klogger_dat.debug("%s",plss["PrefixLists"])
         if len(plss["PrefixLists"]) > 0 :
           for pls in plss["PrefixLists"]:
-            cidrs = [];
-            if ('Cidrs' in pls) and (len(pls['Cidrs']) > 0):
-              for cidr in pls['Cidrs']:
-                cidrs.append(cidr)
-            else: # Not Exists
-              cidrs.append(' ')
+            tagname = 'Not Exist Name Tag'
+            if 'Tags' in pls:
+              for tag in pls['Tags']:
+                if tag['Key'] == 'Name':
+                  tagname = tag['Value']
+                  break
+            mplentries = get_managed_prefix_list_entries(region, pls['PrefixListId'])
+            # klogger.debug(mplentries)
+            cidrs = []; descriptions = [];
+            for mplent in mplentries :
+              cidrs.append(mplent['Cidr'] if 'Cidr' in mplent else ' ')
+              descriptions.append(mplent['Description'] if 'Description' in mplent else ' ')
+            # list count sync with space
+            utils.ListSyncCountWithSpace(cidrs, descriptions)
+
             results.append( { "PrefixListName": pls['PrefixListName'] if 'PrefixListName' in pls else ' ',
                               "PrefixListId" : pls['PrefixListId'] if 'PrefixListId' in pls else ' ',
+                              "AddressFamily" : pls['AddressFamily'] if 'AddressFamily' in pls else ' ',
+                              "MaxEntries" : pls['MaxEntries'] if 'MaxEntries' in pls else ' ',
+                              "OwnerId" : pls['OwnerId'] if 'OwnerId' in pls else ' ',
                               "Cidrs" : cidrs,
+                              "Description" : descriptions,
+                              "PrefixListArn" : pls['PrefixListArn'] if 'PrefixListArn' in pls else ' ',
+                              "PrefixListTName" : tagname,
+                              "State" : pls['State'] if 'State' in pls else ' ',
+                              "StateMessage" : pls['StateMessage'] if 'StateMessage' in pls else ' ',
                             })
         else:  # Not Exists
           results.append( { "PrefixListName": ' ',
                             "PrefixListId" : ' ',
+                            "AddressFamily" : ' ',
+                            "MaxEntries" : ' ',
+                            "OwnerId" : ' ',
                             "Cidrs" : list(' '),
+                            "Description" : ' ',
+                            "PrefixListArn" : ' ',
+                            "PrefixListTName" : ' ',
+                            "State" : ' ',
+                            "StateMessage" : ' ',
                           })
       else:
         klogger.error("call error : %d", plss["ResponseMetadata"]["HTTPStatusCode"])
         results.append( { "PrefixListName": 'ERROR CHECK',
                           "PrefixListId" : 'ERROR CHECK',
+                          "AddressFamily" : 'ERROR CHECK',
+                          "MaxEntries" : 'ERROR CHECK',
+                          "OwnerId" : 'ERROR CHECK',
                           "Cidrs" : list('ERROR CHECK'),
+                          "Description" : 'ERROR CHECK',
+                          "PrefixListArn" : 'ERROR CHECK',
+                          "PrefixListTName" : 'ERROR CHECK',
+                          "State" : 'ERROR CHECK',
+                          "StateMessage" : 'ERROR CHECK',
                         })
       # klogger.debug(results)
     except Exception as othererr:
-      klogger.error("ec2.describe_prefix_lists(),region[%s],%s", region, othererr)
+      klogger.error("ec2.describe_managed_prefix_lists(),region[%s],%s", region, othererr)
       results.append( { "PrefixListName": 'ERROR CHECK',
                         "PrefixListId" : 'ERROR CHECK',
+                        "AddressFamily" : 'ERROR CHECK',
+                        "MaxEntries" : 'ERROR CHECK',
+                        "OwnerId" : 'ERROR CHECK',
                         "Cidrs" : list('ERROR CHECK'),
+                        "Description" : 'ERROR CHECK',
+                        "PrefixListArn" : 'ERROR CHECK',
+                        "PrefixListTName" : 'ERROR CHECK',
+                        "State" : 'ERROR CHECK',
+                        "StateMessage" : 'ERROR CHECK',
                       })
     finally:
       pass
   return results
+
+def get_managed_prefix_list_entries(region, PrefixListId):
+  '''
+    search Prefix List
+  '''
+  # klogger_dat.debug('managed prefix list entries')
+  try:
+    results = [] 
+    ec2=boto3.client('ec2', region )
+    plent = ec2.get_managed_prefix_list_entries(PrefixListId=PrefixListId)
+    # klogger.debug("%s",plss["Entries"])
+    if 200 == plent["ResponseMetadata"]["HTTPStatusCode"]:
+      # klogger_dat.debug("%s",plent["Entries"])
+      if 'Entries' in plent :
+        results = plent['Entries']
+    # klogger.debug(results)
+  except Exception as othererr:
+    klogger.error("ec2.get_managed_prefix_list_entries(),region[%s],PrefixListId[%s],%s", region, PrefixListId, othererr)
+  finally:
+    return results
 
 def main(argv):
   ###  set search region name to variable of searchRegions

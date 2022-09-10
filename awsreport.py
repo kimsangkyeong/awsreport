@@ -9,6 +9,7 @@
 #  1.0      2019.09.06     first create
 # ref     : https://pandas.pydata.org/docs/reference/api/pandas.ExcelWriter.html, .to_excel.html
 # ref     : https://towardsdatascience.com/use-python-to-stylize-the-excel-formatting-916e00e33302
+#           https://xlsxwriter.readthedocs.io/index.html
 # required install package : # pip install numpy, pandas, xlsxwriter, openpyxl
 #
 ####################################################################################################
@@ -216,17 +217,12 @@ def df_to_excel(writer, df, sheetname):
                                        'valign': 'vcenter', 
                                        'font_size': 10,
                                        'text_wrap': True, 
-                                       'fg_color': '#FDE9D9', 
+                                       'fg_color': '#D9D9D9', 
                                        'border': 1})
   col_width_list = []
   for col_num, value in enumerate(df.columns.values):
     worksheet.write(2, col_num, value, header_format)
-    if type(df.columns[col_num]) == type(str()) :
-      col_width_list.append(max(12, len(df.columns[col_num])))
-    elif type(df.columns[col_num]) == type(dict()) :
-      col_width_list.append(max(12, 20))
-    else : 
-      col_width_list.append(max(12, 0))
+    col_width_list.append(12) # initialize
 
   # klogger_dat.debug(f'col_width_list : {col_width_list}')
   # Set the Column Width
@@ -239,12 +235,28 @@ def df_to_excel(writer, df, sheetname):
                                      'font_size': 9,
                                      'border': 1})
   row_idx, col_idx = df.shape
-  for r in range(row_idx):
-    for c in range(col_idx):
-      if type(df.values[r, c]) == type(dict()) :
-        worksheet.write(r + 3, c, str(df.values[r, c]), data_format)
-      else : 
-        worksheet.write(r + 3, c, df.values[r, c], data_format)
+  for row in range(row_idx):
+    for col in range(col_idx):
+      if type(df.values[row, col]) == type(dict()) :
+        if col_width_list[col] < np.ceil(len(str(df.values[row, col])) / 4) :
+          col_width_list[col] = np.ceil(len(str(df.values[row, col])) / 4)
+          worksheet.set_column(col,col+1, col_width_list[col])
+        worksheet.write(row + 3, col, str(df.values[row, col]), data_format)
+      elif type(df.values[row, col]) == type(str()) : 
+        data_len = len(df.values[row, col]) 
+        if col_width_list[col] < data_len :
+          if data_len >= 60 :
+            col_width_list[col] = 50
+          elif data_len >= 40 :
+                col_width_list[col] = 40
+          elif data_len >= 30 :
+            col_width_list[col] = 25
+          else :
+            col_width_list[col] = data_len
+          worksheet.set_column(col,col+1, col_width_list[col])
+        worksheet.write(row + 3, col, df.values[row, col], data_format)
+      else :
+        worksheet.write(row + 3, col, df.values[row, col], data_format)
 
   # Add the remark to the excel
   worksheet.write(len(df)+4, 0, 'Remark:', workbook.add_format({'bold': True}))
@@ -291,7 +303,7 @@ def main(argv):
   # klogger_dat.debug(df_ins)
   df_kms = results_to_dataframe(executefunc_p1("kskpkg.kms.list_keys"))
   # klogger_dat.debug(df_kms)
-  df_mplist = results_to_dataframe(executefunc("kskpkg.ec2.describe_prefix_lists", ['ap-northeast-2']))
+  df_mplist = results_to_dataframe(executefunc("kskpkg.ec2.describe_managed_prefix_lists", ['ap-northeast-2']))
   # klogger_dat.debug(df_mplist)
   df_sg = results_to_dataframe(executefunc("kskpkg.ec2.describe_security_groups", ['ap-northeast-2']))
   df_sg['VpcTName'] = df_sg['VpcId'].apply(lambda x : get_vpcname(df_vpc,x)) # get VpcTagName
