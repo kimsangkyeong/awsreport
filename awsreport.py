@@ -411,6 +411,8 @@ def main(argv):
   # klogger_dat.debug(df_codepipeline)
   df_codedeployment = results_to_dataframe(executefunc_p1("kskpkg.codedeploy.list_deployments"))
   # klogger_dat.debug(df_codedeployment)
+  df_sqs = results_to_dataframe(executefunc("kskpkg.sqs.list_queues",1000))
+  # klogger_dat.debug(df_sqs)
 
   # to_excel 
   klogger_dat.debug("%s\n%s","-"*20,"save to excel")
@@ -457,8 +459,9 @@ def main(argv):
     df_to_excel(writer, df_codecommit        , 'codecommit')                  # 39
     df_to_excel(writer, df_codebuild         , 'codebuild')                   # 40
     df_to_excel(writer, df_codedeployappl    , 'codedeploy_application')      # 41
-    df_to_excel(writer, df_codepipeline      , 'codepipeline')                # 43 
-    df_to_excel(writer, df_codedeployment    , 'codedeploy_deployment')       # 42 
+    df_to_excel(writer, df_codepipeline      , 'codepipeline')                # 42 
+    df_to_excel(writer, df_codedeployment    , 'codedeploy_deployment')       # 43 
+    df_to_excel(writer, df_sqs               , 'sqs')                         # 44 
 
   klogger_dat.debug("finished")
 
