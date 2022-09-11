@@ -427,6 +427,8 @@ def main(argv):
   # klogger_dat.debug(df_sns)
   df_ses = results_to_dataframe(executefunc_p1("kskpkg.ses.list_identities"))
   # klogger_dat.debug(df_ses)
+  df_athena = results_to_dataframe(executefunc_p1("kskpkg.athena.list_data_catalogs"))
+  # klogger_dat.debug(df_athena)
 
 
   # to_excel 
@@ -479,6 +481,7 @@ def main(argv):
     df_to_excel(writer, df_sqs               , 'sqs')                         # 44 
     df_to_excel(writer, df_sns               , 'sns')                         # 45
     df_to_excel(writer, df_ses               , 'ses')                         # 46
+    df_to_excel(writer, df_athena            , 'athena')                      # 47
 
   klogger_dat.debug("finished")
 
