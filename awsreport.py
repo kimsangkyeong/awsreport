@@ -394,6 +394,10 @@ def main(argv):
   df_lambda_edge['SecurityGroupName'] = df_lambda_edge['SecurityGroup'].apply(lambda x : get_sgname(df_sg,x)) # get Security Group TagName
   df_lambda_edge['KeyAlias'] = df_lambda_edge['KMSKeyArn'].apply(lambda x : get_keyalias(df_kms,x)) # get KMS Key alias
   # klogger_dat.debug(df_lambda_edge)
+  df_cognito_id_pool = results_to_dataframe(executefunc("kskpkg.cognito.list_identity_pools", 60))
+  # klogger_dat.debug(df_cognito_id_pool)
+  df_cognito_idp = results_to_dataframe(executefunc("kskpkg.cognito.list_user_pools", 60))
+  # klogger_dat.debug(df_cognito_idp)
   df_codecommit = results_to_dataframe(executefunc_p1("kskpkg.codecommit.list_repositories"))
   # klogger_dat.debug(df_codecommit)
   df_codebuild = results_to_dataframe(executefunc_p1("kskpkg.codebuild.list_projects"))
@@ -403,10 +407,10 @@ def main(argv):
   # klogger_dat.debug(df_codebuild)
   df_codedeployappl = results_to_dataframe(executefunc_p1("kskpkg.codedeploy.list_applications"))
   # klogger_dat.debug(df_codedeployappl)
-  df_codedeployment = results_to_dataframe(executefunc_p1("kskpkg.codedeploy.list_deployments"))
-  # klogger_dat.debug(df_codedeployment)
   df_codepipeline = results_to_dataframe(executefunc_p1("kskpkg.codepipeline.list_pipelines"))
   # klogger_dat.debug(df_codepipeline)
+  df_codedeployment = results_to_dataframe(executefunc_p1("kskpkg.codedeploy.list_deployments"))
+  # klogger_dat.debug(df_codedeployment)
 
   # to_excel 
   klogger_dat.debug("%s\n%s","-"*20,"save to excel")
@@ -448,11 +452,13 @@ def main(argv):
     df_to_excel(writer, df_backup_vault      , 'backup_vault')                # 34
     df_to_excel(writer, df_lambda            , 'lambda')                      # 35
     df_to_excel(writer, df_lambda_edge       , 'Lambda@Edge')                 # 36
-    df_to_excel(writer, df_codecommit        , 'codecommit')                  # 37
-    df_to_excel(writer, df_codebuild         , 'codebuild')                   # 38
-    df_to_excel(writer, df_codedeployappl    , 'codedeploy_application')      # 39
-    df_to_excel(writer, df_codedeployment    , 'codedeploy_deployment')       # 40 
-    df_to_excel(writer, df_codepipeline      , 'codepipeline')                # 41 
+    df_to_excel(writer, df_cognito_id_pool   , 'cognito-federated-id-pool')   # 37
+    df_to_excel(writer, df_cognito_idp       , 'cognito-user-pool')           # 38
+    df_to_excel(writer, df_codecommit        , 'codecommit')                  # 39
+    df_to_excel(writer, df_codebuild         , 'codebuild')                   # 40
+    df_to_excel(writer, df_codedeployappl    , 'codedeploy_application')      # 41
+    df_to_excel(writer, df_codepipeline      , 'codepipeline')                # 43 
+    df_to_excel(writer, df_codedeployment    , 'codedeploy_deployment')       # 42 
 
   klogger_dat.debug("finished")
 
