@@ -172,6 +172,7 @@ def list_subscriptions():
                     })
   finally:
     return results
+    
 def main(argv):
 
   list_topics()

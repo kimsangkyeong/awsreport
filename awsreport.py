@@ -425,6 +425,9 @@ def main(argv):
   df_sns['Attributes'] = df_sns['Attributes'].fillna('Status : Deleted')
   df_sns = df_sns.fillna('  No Subscriber  ')
   # klogger_dat.debug(df_sns)
+  df_ses = results_to_dataframe(executefunc_p1("kskpkg.ses.list_identities"))
+  # klogger_dat.debug(df_ses)
+
 
   # to_excel 
   klogger_dat.debug("%s\n%s","-"*20,"save to excel")
@@ -475,6 +478,7 @@ def main(argv):
     df_to_excel(writer, df_codedeployment    , 'codedeploy_deployment')       # 43 
     df_to_excel(writer, df_sqs               , 'sqs')                         # 44 
     df_to_excel(writer, df_sns               , 'sns')                         # 45
+    df_to_excel(writer, df_ses               , 'ses')                         # 46
 
   klogger_dat.debug("finished")
 
