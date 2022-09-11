@@ -238,8 +238,12 @@ def df_to_excel(writer, df, sheetname):
   for row in range(row_idx):
     for col in range(col_idx):
       if type(df.values[row, col]) == type(dict()) :
-        if col_width_list[col] < np.ceil(len(str(df.values[row, col])) / 4) :
-          col_width_list[col] = np.ceil(len(str(df.values[row, col])) / 4)
+        data_len = np.ceil(len(str(df.values[row, col])) / 4)
+        if col_width_list[col] < data_len:
+          if data_len >= 100 :
+            col_width_list[col] = 100
+          else :
+            col_width_list[col] = data_len
           worksheet.set_column(col,col+1, col_width_list[col])
         worksheet.write(row + 3, col, str(df.values[row, col]), data_format)
       elif type(df.values[row, col]) == type(str()) : 
@@ -413,6 +417,14 @@ def main(argv):
   # klogger_dat.debug(df_codedeployment)
   df_sqs = results_to_dataframe(executefunc("kskpkg.sqs.list_queues",1000))
   # klogger_dat.debug(df_sqs)
+  df_sns_topic = results_to_dataframe(executefunc_p1("kskpkg.sns.list_topics"))
+  # klogger_dat.debug(df_sns_topic)
+  df_sns_subscription = results_to_dataframe(executefunc_p1("kskpkg.sns.list_subscriptions"))
+  # klogger_dat.debug(df_sns_subscription)
+  df_sns = pd.merge(df_sns_topic, df_sns_subscription, how='outer')
+  df_sns['Attributes'] = df_sns['Attributes'].fillna('Status : Deleted')
+  df_sns = df_sns.fillna('  No Subscriber  ')
+  # klogger_dat.debug(df_sns)
 
   # to_excel 
   klogger_dat.debug("%s\n%s","-"*20,"save to excel")
@@ -462,6 +474,7 @@ def main(argv):
     df_to_excel(writer, df_codepipeline      , 'codepipeline')                # 42 
     df_to_excel(writer, df_codedeployment    , 'codedeploy_deployment')       # 43 
     df_to_excel(writer, df_sqs               , 'sqs')                         # 44 
+    df_to_excel(writer, df_sns               , 'sns')                         # 45
 
   klogger_dat.debug("finished")
 
