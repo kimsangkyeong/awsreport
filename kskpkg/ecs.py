@@ -180,7 +180,7 @@ def list_services(clusterArns):
       #   klogger_dat.debug(services["serviceArns"])
         if 'serviceArns' in services and len(services["serviceArns"]) > 0 : 
           for service in services["serviceArns"]:
-          #   klogger_dat.debug(service)
+            # klogger_dat.debug(service)
             service_desc = describe_services(clusterArn, service)
             if service_desc != None :
               # klogger.debug(service_desc)
@@ -259,8 +259,8 @@ def list_services(clusterArns):
                                 "AssignPublicIp": ' ',
                                 "CreatedBy": list(' '),
                               })
-        else: # Not Exists
-          results.append( { "ClusterArn" : clusterArns,
+        else: # Not Exists Service Info
+          results.append( { "ClusterArn" : clusterArn,
                             "ECSClusterName" : ' ',
                             "ServiceArn" : ' ',
                             "ServiceName": ' ',
@@ -288,7 +288,7 @@ def list_services(clusterArns):
                           })
       else:
         klogger.error("call error : %d", services["ResponseMetadata"]["HTTPStatusCode"])
-        results.append( { "ClusterArn" : clusterArns,
+        results.append( { "ClusterArn" : 'ERROR CHECK',
                           "ECSClusterName" : 'ERROR CHECK',
                           "ServiceArn" : 'ERROR CHECK',
                           "ServiceName": 'ERROR CHECK',
@@ -340,12 +340,12 @@ def list_services(clusterArns):
                         "SecurityGroup": ' ',
                         "SecurityGroupName": ' ',
                         "AssignPublicIp": ' ',
-                        "CreatedBy": list(' '),
+                        "CreatedBy": ' ',
                       })
     # klogger.debug(results)
   except Exception as othererr:
     klogger.error("ecs.list_services(),%s", othererr)
-    results.append( { "ClusterArn" : clusterArns,
+    results.append( { "ClusterArn" : 'ERROR CHECK',
                       "ECSClusterName" : 'ERROR CHECK',
                       "ServiceArn" : 'ERROR CHECK',
                       "ServiceName": 'ERROR CHECK',
@@ -402,7 +402,7 @@ def describe_services(clusterArn, service):
 def main(argv):
 
   list_clusters() 
-  list_services(clusterArns)
+  list_services([' '])
 
   sys.exit(0)
 
