@@ -262,6 +262,28 @@ def df_to_excel(writer, df, sheetname):
       else :
         worksheet.write(row + 3, col, df.values[row, col], data_format)
 
+  # Merge Cell in column 'A' only
+  # Merge cell format
+  merge_format = workbook.add_format({'font_size': 9,
+                                      'border': 1,
+                                      'align': 'left',
+                                      'valign': 'vcenter',
+                                      'text_wrap': True})
+  col = 0; # column 'A' 
+  befdata = ''; startrow = 0;
+  for row in range(row_idx):
+    if befdata == df.values[row, col] :
+      continue
+    else :
+      if befdata != '' and (row - startrow >= 2) :
+        # klogger.debug(f'startrow : [{startrow}], row : [{row}], befdata : [{befdata}], data : [{df.values[row, col]}]')
+        worksheet.merge_range(f'A{startrow+4}:A{(row-1)+4}', str(befdata) if type(befdata) == type(dict()) else befdata, merge_format)
+      startrow = row
+      befdata = df.values[row, col]
+  # klogger.debug(f'for loop : startrow : [{startrow}], row : [{row}], befdata : [{befdata}], data : [{df.values[row, col]}]')
+  if row - startrow >= 1 : # last merge cell check
+    worksheet.merge_range(f'A{startrow+4}:A{row+4}', str(befdata) if type(befdata) == type(dict()) else befdata, merge_format)
+    
   # Add the remark to the excel
   worksheet.write(len(df)+4, 0, 'Remark:', workbook.add_format({'bold': True}))
   worksheet.write(len(df)+5, 0, 'The last update time is ' + datetime.now().strftime('%Y-%m-%d %H:%M') + '.')
@@ -270,6 +292,19 @@ def main(argv):
   # logger setting 
   global_config_init()
 
+  # df_elb = results_to_dataframe(executefunc_p1("kskpkg.elb.describe_load_balancers"))
+  # # df_elb['VpcTName'] = df_elb['VpcId'].apply(lambda x : get_vpcname(df_vpc,x)) # get VpcTagName
+  # # df_elb['SubnetTName'] = df_elb['SubnetId'].apply(lambda x : get_subnetname(df_subnet,x)) # get Subnet TagName
+  # # df_elb['SecurityGroupName'] = df_elb['SecurityGroupId'].apply(lambda x : get_sgname(df_sg,x)) # get Security Group TagName
+  # # klogger_dat.debug(df_elb)
+  # df_elb_listener = results_to_dataframe(executefunc("kskpkg.elb.describe_listeners", list(df_elb['LoadBalancerArn'].value_counts().index)))
+  # df_elb_listener['LoadBalancerName'] = df_elb_listener['LoadBalancerArn'].apply(lambda x : get_elbname(df_elb,x)) # get ELB Name
+
+  # df_elb_listener_rule = results_to_dataframe(executefunc("kskpkg.elb.describe_rules", list(df_elb_listener['ListenerArn'].value_counts().index)))
+  # df_elb_listener_rule['LoadBalancerInfo'] = df_elb_listener_rule['ListenerArn'].apply(lambda x : get_elbinfo(df_elb_listener,x)) # get ELB Info
+  # # klogger_dat.debug(df_elb_listener_rule)
+  # exit(1)
+  
   df_route53 = results_to_dataframe(executefunc_p1("kskpkg.route53.list_hosted_zones"))
   # klogger_dat.debug(df_route53)
   df_route53_record = results_to_dataframe(executefunc("kskpkg.route53.list_resource_record_sets",list(df_route53['Id'].value_counts().index)))
@@ -433,12 +468,12 @@ def main(argv):
   df_sns = pd.merge(df_sns_topic, df_sns_subscription, how='outer')
   df_sns['Attributes'] = df_sns['Attributes'].fillna('Status : Deleted')
   df_sns = df_sns.fillna('  No Subscriber  ')
+  df_sns = df_sns.loc[df_sns['TopicArn'] != ' ']
   # klogger_dat.debug(df_sns)
   df_ses = results_to_dataframe(executefunc_p1("kskpkg.ses.list_identities"))
   # klogger_dat.debug(df_ses)
   df_athena = results_to_dataframe(executefunc_p1("kskpkg.athena.list_data_catalogs"))
   # klogger_dat.debug(df_athena)
-
 
   # to_excel 
   klogger_dat.debug("%s\n%s","-"*20,"save to excel")
