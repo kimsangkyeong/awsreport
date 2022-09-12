@@ -58,7 +58,7 @@ def describe_load_balancers():
     # klogger_dat.debug(loadbalancers)
     if 200 == loadbalancers["ResponseMetadata"]["HTTPStatusCode"]:
     #   klogger_dat.debug(loadbalancers["LoadBalancers"])
-      if len(loadbalancers["LoadBalancers"]) > 0 :
+      if 'LoadBalancers' in loadbalancers and len(loadbalancers["LoadBalancers"]) > 0 :
         for loadbalancer in loadbalancers["LoadBalancers"]:
         #   klogger_dat.debug(loadbalancer)
           availzons = []; availsubnetids = []; availsubnetnames = []; eip_ipaddrs = []; 
@@ -186,7 +186,7 @@ def describe_listeners(LoadBalancerArns):
       # klogger_dat.debug(listeners)
       if 200 == listeners["ResponseMetadata"]["HTTPStatusCode"]:
       #   klogger_dat.debug(listeners["Listeners"])
-        if len(listeners["Listeners"]) > 0 :
+        if 'Listeners' in listeners and len(listeners["Listeners"]) > 0 :
           for listener in listeners["Listeners"]:
             # klogger_dat.debug(listener)
             certificates = []; alpnpolicys = []; orders = []; types = []; acttgrparn =[]; tgrparns = [];
@@ -493,7 +493,7 @@ def describe_rules(ListenerArns):
     #   klogger_dat.debug(rules)
       if 200 == rules["ResponseMetadata"]["HTTPStatusCode"]:
       #   klogger_dat.debug(rules["Rules"])
-        if len(rules["Rules"]) > 0 :
+        if 'Rules' in rules and len(rules["Rules"]) > 0 :
           for rule in rules["Rules"]:
             # klogger_dat.debug(rule)
             actorders = []; acttypes = []; acttgrparn =[]; tgrparns = [];
@@ -864,7 +864,7 @@ def describe_target_groups(LoadBalancerArns):
     #   klogger_dat.debug(targetgrps)
       if 200 == targetgrps["ResponseMetadata"]["HTTPStatusCode"]:
       #   klogger_dat.debug(targetgrps["TargetGroups"])
-        if len(targetgrps["TargetGroups"]) > 0 :
+        if 'TargetGroups' in targetgrps and  len(targetgrps["TargetGroups"]) > 0 :
           for targetgrp in targetgrps["TargetGroups"]:
             # klogger_dat.debug(targetgrp)
             protocols = []; ports = []; tgrpnames = []; tgrparns = [];

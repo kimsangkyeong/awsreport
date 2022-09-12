@@ -58,7 +58,7 @@ def list_clusters():
     # klogger_dat.debug(ecsclusters)
     if 200 == ecsclusters["ResponseMetadata"]["HTTPStatusCode"]:
     #   klogger_dat.debug(ecsclusters["clusterArns"])
-      if len(ecsclusters["clusterArns"]) > 0 : 
+      if 'clusterArns' in ecsclusters and len(ecsclusters["clusterArns"]) > 0 : 
         for ecscluster in ecsclusters["clusterArns"]:
         #   klogger_dat.debug(ecscluster)
           cluster_desc = describe_clusters(ecscluster)
@@ -99,7 +99,7 @@ def list_clusters():
                               "capacityProviders": list(' '),
                             })
       else: # Not Exists
-        results.append( { "ClusterArn" : ecscluster,
+        results.append( { "ClusterArn" : ' ',
                           "ECSClusterName" : ' ',
                           "ECSClusterTName" : ' ',
                           "Status": ' ',
@@ -178,7 +178,7 @@ def list_services(clusterArns):
       # klogger_dat.debug(services)
       if 200 == services["ResponseMetadata"]["HTTPStatusCode"]:
       #   klogger_dat.debug(services["serviceArns"])
-        if len(services["serviceArns"]) > 0 : 
+        if 'serviceArns' in services and len(services["serviceArns"]) > 0 : 
           for service in services["serviceArns"]:
           #   klogger_dat.debug(service)
             service_desc = describe_services(clusterArn, service)
@@ -260,7 +260,7 @@ def list_services(clusterArns):
                                 "CreatedBy": list(' '),
                               })
         else: # Not Exists
-          results.append( { "ClusterArn" : clusterArn,
+          results.append( { "ClusterArn" : clusterArns,
                             "ECSClusterName" : ' ',
                             "ServiceArn" : ' ',
                             "ServiceName": ' ',
@@ -288,7 +288,7 @@ def list_services(clusterArns):
                           })
       else:
         klogger.error("call error : %d", services["ResponseMetadata"]["HTTPStatusCode"])
-        results.append( { "ClusterArn" : clusterArn,
+        results.append( { "ClusterArn" : clusterArns,
                           "ECSClusterName" : 'ERROR CHECK',
                           "ServiceArn" : 'ERROR CHECK',
                           "ServiceName": 'ERROR CHECK',
@@ -316,7 +316,7 @@ def list_services(clusterArns):
                         })
 
     if results == []: # Not Exist Service
-      results.append( { "ClusterArn" : clusterArn,
+      results.append( { "ClusterArn" : clusterArns,
                         "ECSClusterName" : ' ',
                         "ServiceArn" : ' ',
                         "ServiceName": ' ',
@@ -345,7 +345,7 @@ def list_services(clusterArns):
     # klogger.debug(results)
   except Exception as othererr:
     klogger.error("ecs.list_services(),%s", othererr)
-    results.append( { "ClusterArn" : clusterArn,
+    results.append( { "ClusterArn" : clusterArns,
                       "ECSClusterName" : 'ERROR CHECK',
                       "ServiceArn" : 'ERROR CHECK',
                       "ServiceName": 'ERROR CHECK',

@@ -55,7 +55,7 @@ def describe_internet_gateways(searchRegions):
       igws = ec2.describe_internet_gateways()
       if 200 == igws["ResponseMetadata"]["HTTPStatusCode"]:
         # klogger_dat.debug(igws["InternetGateways"])
-        if len(igws["InternetGateways"]) > 0:
+        if 'InternetGateways' in igws and len(igws["InternetGateways"]) > 0:
           for igw in igws["InternetGateways"]:
             # klogger_dat.debug(igw)
             # igw assigned vcpid 값
@@ -115,7 +115,7 @@ def describe_vpcs(searchRegions):
       vpcs = ec2.describe_vpcs()
       if 200 == vpcs["ResponseMetadata"]["HTTPStatusCode"]:
         #klogger_dat.debug(vpcs["Vpcs"])
-        if len(vpcs["Vpcs"]) > 0:
+        if 'Vpcs' in vpcs and len(vpcs["Vpcs"]) > 0:
           for vpc in vpcs["Vpcs"]:
             # vpc 할당 CIDR 값
             associateCidr = []; states = []
@@ -172,7 +172,7 @@ def describe_nat_gateways(searchRegions):
       nats = ec2.describe_nat_gateways()
       if 200 == nats["ResponseMetadata"]["HTTPStatusCode"]:
         # klogger_dat.debug(nats["NatGateways"])
-        if len(nats["NatGateways"]) > 0:
+        if 'NatGateways' in nats and len(nats["NatGateways"]) > 0:
           for nat in nats["NatGateways"]:
             # nat assigned ip 값
             publicips = []; privateips = []; allocationids =[]; netinfids = [];
@@ -282,7 +282,7 @@ def describe_subnets(searchRegions):
       subnets = ec2.describe_subnets()
       if 200 == subnets["ResponseMetadata"]["HTTPStatusCode"]:
         # klogger_dat.debug(subnets["Subnets"])
-        if len(subnets["Subnets"]) > 0:
+        if 'Subnets' in subnets and len(subnets["Subnets"]) > 0:
           for subnet in subnets["Subnets"]:
             # subnet Tag중 Name 값 
             # * subnet 정보가 모두 scalar 형식인 경우 대비 DataFrame 변환오류 회피위해 list 처리함
@@ -351,7 +351,7 @@ def describe_route_tables(searchRegions):
       routers = ec2.describe_route_tables()
       if 200 == routers["ResponseMetadata"]["HTTPStatusCode"]:
         # klogger_dat.debug(routers["RouteTables"])
-        if len(routers["RouteTables"]) > 0:
+        if 'RouteTables' in routers and len(routers["RouteTables"]) > 0:
           for router in routers["RouteTables"]:
             # klogger_dat.debug(router)
             # results1  association
@@ -534,7 +534,7 @@ def describe_security_groups(searchRegions):
       sgs = ec2.describe_security_groups()
       if 200 == sgs["ResponseMetadata"]["HTTPStatusCode"]:
         # klogger_dat.debug("%s",sgs["SecurityGroups"])
-        if len(sgs["SecurityGroups"]) > 0:
+        if 'SecurityGroups' in sgs and len(sgs["SecurityGroups"]) > 0:
           for sg in sgs["SecurityGroups"]:
             # klogger_dat.debug("%s",sg)
             in_fromport = []; in_protocol = []; in_cidrip = []; in_desc = [];
@@ -942,7 +942,7 @@ def describe_network_interfaces(searchRegions):
       nets = ec2.describe_network_interfaces()
       if 200 == nets["ResponseMetadata"]["HTTPStatusCode"]:
         # klogger_dat.debug("%s",nets["NetworkInterfaces"])
-        if len(nets["NetworkInterfaces"]) > 0:
+        if 'NetworkInterfaces' in nets and len(nets["NetworkInterfaces"]) > 0:
           for net in nets["NetworkInterfaces"]:
               desc = net['Description'] if 'Description' in net else ''
               if 'Association' in net :
@@ -1103,7 +1103,7 @@ def describe_instances(searchRegions):
       inss = ec2.describe_instances()
       if 200 == inss["ResponseMetadata"]["HTTPStatusCode"]:
         # klogger_dat.debug("%s",inss["Reservations"])
-        if len(inss["Reservations"]) > 0 :
+        if 'Reservations' in inss and len(inss["Reservations"]) > 0 :
           ec2_resource = boto3.resource('ec2', region)
           for rsv in inss["Reservations"]:
             if len(rsv["Instances"]) > 0 :
@@ -1299,7 +1299,7 @@ def describe_addresses(searchRegions):
       eips = ec2.describe_addresses()
       if 200 == eips["ResponseMetadata"]["HTTPStatusCode"]:
         # klogger_dat.debug("%s",eips["Addresses"])
-        if len(eips["Addresses"]) > 0 :
+        if 'Addresses' in eips and len(eips["Addresses"]) > 0 :
           for eip in eips["Addresses"]:
             # eip Tag중 Name 값
             tagname = ['Not Exist Name Tag']
@@ -1388,7 +1388,7 @@ def describe_managed_prefix_lists(searchRegions):
       # klogger.debug("%s",plss["PrefixLists"])
       if 200 == plss["ResponseMetadata"]["HTTPStatusCode"]:
         # klogger_dat.debug("%s",plss["PrefixLists"])
-        if len(plss["PrefixLists"]) > 0 :
+        if 'PrefixLists' in plss and len(plss["PrefixLists"]) > 0 :
           for pls in plss["PrefixLists"]:
             tagname = 'Not Exist Name Tag'
             if 'Tags' in pls:
@@ -1495,7 +1495,7 @@ def main(argv):
   describe_route_tables(searchRegions) 
   describe_security_groups(searchRegions) 
   describe_addresses(searchRegions) # eip
-  describe_prefix_lists(searchRegions)
+  describe_managed_prefix_lists(searchRegions)
   sys.exit(0)
 
 if __name__ == "__main__":

@@ -58,7 +58,7 @@ def list_clusters():
     # klogger_dat.debug(eksclusters)
     if 200 == eksclusters["ResponseMetadata"]["HTTPStatusCode"]:
     #   klogger_dat.debug(eksclusters["clusters"])
-      if len(eksclusters["clusters"]) > 0 : 
+      if 'clusters' in eksclusters and len(eksclusters["clusters"]) > 0 : 
         for ekscluster in eksclusters["clusters"]:
         #   klogger_dat.debug(ekscluster)
           cluster_desc = describe_cluster(ekscluster)

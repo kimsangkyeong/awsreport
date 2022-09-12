@@ -58,7 +58,7 @@ def list_cloud_front_origin_access_identities():
     # klogger_dat.debug(oids)
     if 200 == oids["ResponseMetadata"]["HTTPStatusCode"]:
     #   klogger_dat.debug(oids["CloudFrontOriginAccessIdentityList"])
-      if len(oids["CloudFrontOriginAccessIdentityList"]['Items']) > 0 :
+      if 'Items' in oids["CloudFrontOriginAccessIdentityList"] and len(oids["CloudFrontOriginAccessIdentityList"]['Items']) > 0 :
         ids = []; s3cuids = []; comments = [];
         for oid in oids["CloudFrontOriginAccessIdentityList"]['Items']:
           # klogger_dat.debug(oid)
@@ -105,7 +105,7 @@ def list_distributions():
     # klogger_dat.debug(distributions)
     if 200 == distributions["ResponseMetadata"]["HTTPStatusCode"]:
       # klogger_dat.debug(distributions["DistributionList"])
-      if len(distributions["DistributionList"]['Items']) > 0 :
+      if 'Items' in distributions["DistributionList"] and len(distributions["DistributionList"]['Items']) > 0 :
         ids = []; arns = []; status = []; domainnames = []; aliasitems = []; originitems =[];
         origingroupitems = []; defaultcachebehavior = []; cachebehaviors = []; customerrresponses = [];
         comments = []; priceclass = []; enableds = []; viewercertificates = []; webaclids = [];

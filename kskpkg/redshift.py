@@ -58,7 +58,7 @@ def describe_clusters():
     # klogger_dat.debug(dbclusters)
     if 200 == clusters["ResponseMetadata"]["HTTPStatusCode"]:
     #   klogger_dat.debug(dbclusters["Clusters"])
-      if len(clusters["Clusters"]) > 0 :
+      if 'Clusters' in clusters and len(clusters["Clusters"]) > 0 :
         for cluster in clusters["Clusters"]:
         #   klogger_dat.debug(cluster)
           endpoints = []; allowversionupgrade = 'False'; publicaccessible = 'Flase'; encrpted = 'False'; enhancedvpcrouting = 'False';
@@ -263,7 +263,7 @@ def describe_clusters():
                         "SnapshotScheduleInfo" : 'ERROR CHECK',
                         "ReservedNodeExchangeStatus" : list('ERROR CHECK'),
                        })
-    klogger.debug(results)
+    # klogger.debug(results)
   except Exception as othererr:
     klogger.error("redshift.describe_clusters(),%s", othererr)
     results.append( { "ClusterIdentifier" : 'ERROR CHECK',

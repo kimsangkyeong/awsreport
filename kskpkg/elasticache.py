@@ -59,7 +59,7 @@ def describe_cache_clusters():
     # klogger_dat.debug(clusters)
     if 200 == clusters["ResponseMetadata"]["HTTPStatusCode"]:
     #   klogger_dat.debug(clusters["CacheClusters"])
-      if len(clusters["CacheClusters"]) > 0 :
+      if 'CacheClusters' in clusters and len(clusters["CacheClusters"]) > 0 :
         for cachecluster in clusters["CacheClusters"]:
         #   klogger_dat.debug(cachecluster)
           

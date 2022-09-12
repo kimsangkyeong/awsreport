@@ -50,7 +50,7 @@ def list_namespaces():
     # klogger_dat.debug(namespaces)
     if 200 == namespaces["ResponseMetadata"]["HTTPStatusCode"]:
     #   klogger_dat.debug(namespaces["Namespaces"])
-      if len(namespaces["Namespaces"]) > 0 :
+      if 'Namespaces' in namespaces and  len(namespaces["Namespaces"]) > 0 :
         for namespace in namespaces["Namespaces"]:
           dnsproperties = list(namespace['DnsProperties']['HostedZoneId'] 
                                if 'DnsProperties' in namespace else ' ')

@@ -60,7 +60,7 @@ def list_identity_pools(MaxResults):
     # klogger_dat.debug("%s", pools)
     if 200 == pools["ResponseMetadata"]["HTTPStatusCode"]:
       # klogger_dat.debug(pools["IdentityPools"])
-      if len(pools["IdentityPools"]) > 0 :
+      if 'IdentityPools' in pools and len(pools["IdentityPools"]) > 0 :
         for idpool in pools["IdentityPools"]:
           # klogger_dat.debug(idpool)
           identities = list_identities(idpool['IdentityPoolId'], 60, True)
@@ -163,7 +163,7 @@ def list_identities(IdentityPoolId, MaxResults, HideDisabled):
     # klogger.debug(ids)
     if 200 == ids["ResponseMetadata"]["HTTPStatusCode"]:
       # klogger_dat.debug(ids["Identities"])
-      if len(ids["Identities"]) > 0 :
+      if 'Identities' in ids and len(ids["Identities"]) > 0 :
         results = ids['Identities']
     else:
       klogger.error("call error : %d", ids["ResponseMetadata"]["HTTPStatusCode"])
@@ -186,7 +186,7 @@ def list_user_pools(MaxResults):
     # klogger.debug(pools)
     if 200 == pools["ResponseMetadata"]["HTTPStatusCode"]:
     #   klogger_dat.debug(pools["UserPools"])
-      if len(pools["UserPools"]) > 0 :
+      if 'UserPools' in pools and len(pools["UserPools"]) > 0 :
         for userpool in pools["UserPools"]:
           # # klogger_dat.debug(userpool)
           lambdacfgs = [];

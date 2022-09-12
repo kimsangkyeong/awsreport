@@ -58,7 +58,7 @@ def list_secrets():
     # klogger_dat.debug(secrets)
     if 200 == secrets["ResponseMetadata"]["HTTPStatusCode"]:
     #   klogger_dat.debug(secrets["SecretList"])
-      if len(secrets["SecretList"]) > 0 :
+      if 'SecretList' in secrets and len(secrets["SecretList"]) > 0 :
         for secret in secrets["SecretList"]:
         #   klogger_dat.debug(secret)
           rotationenabled = 'False'

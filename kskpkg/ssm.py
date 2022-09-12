@@ -58,7 +58,7 @@ def describe_parameters():
     # klogger_dat.debug(parameters)
     if 200 == parameters["ResponseMetadata"]["HTTPStatusCode"]:
     #   klogger_dat.debug(parameters["Parameters"])
-      if len(parameters["Parameters"]) > 0 :
+      if 'Parameters' in parameters and len(parameters["Parameters"]) > 0 :
         for parameter in parameters["Parameters"]:
         #   klogger_dat.debug(parameter)
           name = []

@@ -54,7 +54,7 @@ def list_buckets():
     # klogger.debug(buckets)
     if 200 == buckets["ResponseMetadata"]["HTTPStatusCode"]:
     #   klogger.debug(buckets["Buckets"])
-      if len(buckets["Buckets"]) > 0 :
+      if 'Buckets' in buckets and len(buckets["Buckets"]) > 0 :
         bucketnames = []; createdates = []; locations = []; blockacl = []; ignoreacl = [];
         blockpolicy = []; restrictpublic = []; bucketkeyenabled = []; kmsmasterkeyid = [];
         ssealgorithm = [];

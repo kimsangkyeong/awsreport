@@ -58,7 +58,7 @@ def describe_file_systems():
     # klogger_dat.debug(filesystems)
     if 200 == filesystems["ResponseMetadata"]["HTTPStatusCode"]:
     #   klogger_dat.debug(filesystems["FileSystems"])
-      if len(filesystems["FileSystems"]) > 0 :
+      if 'FileSystems' in filesystems and len(filesystems["FileSystems"]) > 0 :
         for filesystem in filesystems["FileSystems"]:
         #   klogger_dat.debug(filesystem)
           if 'SizeInBytes' in filesystem :

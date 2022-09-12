@@ -58,7 +58,7 @@ def list_backup_plans():
     # klogger_dat.debug(bkplans)
     if 200 == bkplans["ResponseMetadata"]["HTTPStatusCode"]:
     #   klogger_dat.debug(bkplans["BackupPlansList"])
-      if len(bkplans["BackupPlansList"]) > 0 :
+      if 'BackupPlansList' in bkplans and  len(bkplans["BackupPlansList"]) > 0 :
         for bkplan in bkplans["BackupPlansList"]:
         #   klogger_dat.debug(bkplan)
           resorcetypes = []; backupoptions = [];
@@ -282,7 +282,7 @@ def list_backup_vaults():
     # klogger_dat.debug(bkvaults)
     if 200 == bkvaults["ResponseMetadata"]["HTTPStatusCode"]:
     #   klogger_dat.debug(bkvaults["BackupVaultList"])
-      if len(bkvaults["BackupVaultList"]) > 0 :
+      if 'BackupVaultList' in bkvaults and len(bkvaults["BackupVaultList"]) > 0 :
         for bkvault in bkvaults["BackupVaultList"]:
         #   klogger_dat.debug(bkvault)
 

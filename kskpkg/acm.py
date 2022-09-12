@@ -51,7 +51,7 @@ def list_certificates():
     if 200 == certlists["ResponseMetadata"]["HTTPStatusCode"]:
     #   klogger.debug(certlists["CertificateSummaryList"])
       domainnames =[]; certarns = [];
-      if len(certlists["CertificateSummaryList"]) > 0 :
+      if 'CertificateSummaryList' in certlists and len(certlists["CertificateSummaryList"]) > 0 :
         for certificate in certlists["CertificateSummaryList"]:
           domainnames.append(certificate['DomainName'] if 'DomainName' in certificate else ' ')
           certarns.append(certificate['CertificateArn'] if 'CertificateArn' in certificate else ' ')

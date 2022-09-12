@@ -59,7 +59,7 @@ def list_pipelines():
     # klogger_dat.debug(pipelines)
     if 200 == pipelines["ResponseMetadata"]["HTTPStatusCode"]:
     #   klogger_dat.debug(pipelines["pipelines"])
-      if len(pipelines["pipelines"]) > 0 :
+      if 'pipelines' in pipelines and len(pipelines["pipelines"]) > 0 :
         for pipeline in pipelines["pipelines"]:
         #   klogger_dat.debug(pipeline)
           pipelinename = pipeline['name']

@@ -65,7 +65,7 @@ def list_functions(filter):
     # klogger_dat.debug(functions)
     if 200 == functions["ResponseMetadata"]["HTTPStatusCode"]:
     #   klogger_dat.debug(functions["Functions"])
-      if len(functions["Functions"]) > 0 :
+      if 'Functions' in functions and len(functions["Functions"]) > 0 :
         for function in functions["Functions"]:
         #   klogger_dat.debug(function)
           vpcid = ' '; subnetids = []; securitygroups = []; variable = []; error = [];

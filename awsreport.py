@@ -381,6 +381,10 @@ def main(argv):
   df_elasticache['CacheSGroupTName'] = df_elasticache['CacheSecurityGroup'].apply(lambda x : get_sgname(df_sg,x)) # get Security Group TagName
   df_elasticache['SGroupTName'] = df_elasticache['SecurityGroup'].apply(lambda x : get_sgname(df_sg,x)) # get Security Group TagName
   # klogger_dat.debug(df_elasticache)
+  df_dynamodb_tables = results_to_dataframe(executefunc_p1("kskpkg.dynamodb.list_tables"))
+  # klogger_dat.debug(df_dynamodb_tables)
+  df_dynamodb_gtables = results_to_dataframe(executefunc_p1("kskpkg.dynamodb.list_global_tables"))
+  # klogger_dat.debug(df_dynamodb_gtables)
   df_secretmanager = results_to_dataframe(executefunc_p1("kskpkg.secretsmanager.list_secrets"))
   df_secretmanager['KmsKeyAlias'] = df_secretmanager['KmsKeyId'].apply(lambda x : get_keyalias(df_kms,x)) # get KMS Key alias
   # klogger_dat.debug(df_secretmanager)
@@ -469,26 +473,27 @@ def main(argv):
     df_to_excel(writer, df_ecr               , 'ecr')                         # 27
     df_to_excel(writer, df_kms               , 'kms')                         # 28
     df_to_excel(writer, df_rdscluser         , 'rds')                         # 29
-    df_to_excel(writer, df_redshift_cluster  , 'redshift')                         # 29
-
-    df_to_excel(writer, df_elasticache       , 'elasticache')                 # 30
-    df_to_excel(writer, df_secretmanager     , 'secretmanager')               # 31
-    df_to_excel(writer, df_ssm_params        , 'ssm_parameterstore')          # 32
-    df_to_excel(writer, df_backup            , 'backup')                      # 33
-    df_to_excel(writer, df_backup_vault      , 'backup_vault')                # 34
-    df_to_excel(writer, df_lambda            , 'lambda')                      # 35
-    df_to_excel(writer, df_lambda_edge       , 'Lambda@Edge')                 # 36
-    df_to_excel(writer, df_cognito_id_pool   , 'cognito-federated-id-pool')   # 37
-    df_to_excel(writer, df_cognito_idp       , 'cognito-user-pool')           # 38
-    df_to_excel(writer, df_codecommit        , 'codecommit')                  # 39
-    df_to_excel(writer, df_codebuild         , 'codebuild')                   # 40
-    df_to_excel(writer, df_codedeployappl    , 'codedeploy_application')      # 41
-    df_to_excel(writer, df_codepipeline      , 'codepipeline')                # 42 
-    df_to_excel(writer, df_codedeployment    , 'codedeploy_deployment')       # 43 
-    df_to_excel(writer, df_sqs               , 'sqs')                         # 44 
-    df_to_excel(writer, df_sns               , 'sns')                         # 45
-    df_to_excel(writer, df_ses               , 'ses')                         # 46
-    df_to_excel(writer, df_athena            , 'athena')                      # 47
+    df_to_excel(writer, df_redshift_cluster  , 'redshift')                    # 30
+    df_to_excel(writer, df_elasticache       , 'elasticache')                 # 31
+    df_to_excel(writer, df_dynamodb_tables   , 'dynamodb_tables')             # 32
+    df_to_excel(writer, df_dynamodb_gtables  , 'dynamodb_global_tables')      # 33
+    df_to_excel(writer, df_secretmanager     , 'secretmanager')               # 34
+    df_to_excel(writer, df_ssm_params        , 'ssm_parameterstore')          # 35
+    df_to_excel(writer, df_backup            , 'backup')                      # 36
+    df_to_excel(writer, df_backup_vault      , 'backup_vault')                # 37
+    df_to_excel(writer, df_lambda            , 'lambda')                      # 38
+    df_to_excel(writer, df_lambda_edge       , 'Lambda@Edge')                 # 39
+    df_to_excel(writer, df_cognito_id_pool   , 'cognito-federated-id-pool')   # 40
+    df_to_excel(writer, df_cognito_idp       , 'cognito-user-pool')           # 41
+    df_to_excel(writer, df_codecommit        , 'codecommit')                  # 42
+    df_to_excel(writer, df_codebuild         , 'codebuild')                   # 43
+    df_to_excel(writer, df_codedeployappl    , 'codedeploy_application')      # 44
+    df_to_excel(writer, df_codepipeline      , 'codepipeline')                # 45 
+    df_to_excel(writer, df_codedeployment    , 'codedeploy_deployment')       # 46 
+    df_to_excel(writer, df_sqs               , 'sqs')                         # 47 
+    df_to_excel(writer, df_sns               , 'sns')                         # 48
+    df_to_excel(writer, df_ses               , 'ses')                         # 49
+    df_to_excel(writer, df_athena            , 'athena')                      # 50
 
   klogger_dat.debug("finished")
 

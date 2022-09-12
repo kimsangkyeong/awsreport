@@ -60,7 +60,7 @@ def list_projects():
     # klogger_dat.debug(projects)
     if 200 == projects["ResponseMetadata"]["HTTPStatusCode"]:
     #   klogger_dat.debug(projects["projects"])
-      if len(projects["projects"]) > 0 :
+      if 'projects' in projects and len(projects["projects"]) > 0 :
         for project in projects["projects"]:
         #   klogger_dat.debug(project)
           batchgetprjInput = []
@@ -232,7 +232,7 @@ def batch_get_projects(project):
     # klogger_dat.debug(projects)
     if 200 == projects["ResponseMetadata"]["HTTPStatusCode"]:
     #   klogger_dat.debug(projects["projects"])
-      if len(projects["projects"]) > 0 :
+      if 'projects' in projects and len(projects["projects"]) > 0 :
         # klogger_dat.debug(projects["projects"])
         # for project in projects['projects'] :
         #   results.append(project)

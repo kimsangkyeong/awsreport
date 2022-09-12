@@ -49,7 +49,7 @@ def list_hosted_zones():
     hosts = route53.list_hosted_zones()
     if 200 == hosts["ResponseMetadata"]["HTTPStatusCode"]:
       # klogger_dat.debug(hosts["HostedZones"])
-      if len(hosts["HostedZones"]) > 0:
+      if 'HostedZones' in hosts and len(hosts["HostedZones"]) > 0:
         for host in hosts["HostedZones"]:
           linkedservices = list({'ServicePrincipal':host['LinkedService']['ServicePrincipal']}
                                  if 'LinkedService' in host else ' ')
@@ -112,7 +112,7 @@ def list_resource_record_sets(searchHostZoneids):
       records = route53.list_resource_record_sets(HostedZoneId=shostzoneid)
       if 200 == records["ResponseMetadata"]["HTTPStatusCode"]:
         # klogger_dat.debug(records["ResourceRecordSets"])
-        if len(records["ResourceRecordSets"]) > 0:
+        if 'ResourceRecordSets' in records and len(records["ResourceRecordSets"]) > 0:
           for record in records["ResourceRecordSets"]:
             resourcerecords = []
             if 'ResourceRecords' in record :

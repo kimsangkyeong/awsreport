@@ -58,7 +58,7 @@ def describe_repositories():
     # klogger_dat.debug(repositories)
     if 200 == repositories["ResponseMetadata"]["HTTPStatusCode"]:
     #   klogger_dat.debug(repositories["repositories"])
-      if len(repositories["repositories"]) > 0 :
+      if 'repositories' in repositories and len(repositories["repositories"]) > 0 :
         for repository in repositories["repositories"]:
         #   klogger_dat.debug(repository)
           scanonpush = []

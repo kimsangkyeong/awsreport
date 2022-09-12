@@ -58,7 +58,7 @@ def describe_db_clusters():
     # klogger_dat.debug(dbclusters)
     if 200 == dbclusters["ResponseMetadata"]["HTTPStatusCode"]:
     #   klogger_dat.debug(dbclusters["DBClusters"])
-      if len(dbclusters["DBClusters"]) > 0 :
+      if 'DBClusters' in dbclusters and len(dbclusters["DBClusters"]) > 0 :
         for dbcluster in dbclusters["DBClusters"]:
         #   klogger_dat.debug(dbcluster)
           availablezones = []; multiaz = 'FALSE'; dbclusteroptgname = []; dbclusteroptgstatus = [];

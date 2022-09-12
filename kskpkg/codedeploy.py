@@ -59,7 +59,7 @@ def list_applications():
     # klogger_dat.debug(applications)
     if 200 == applications["ResponseMetadata"]["HTTPStatusCode"]:
     #   klogger_dat.debug(applications["applications"])
-      if len(applications["applications"]) > 0 :
+      if 'applications' in applications and len(applications["applications"]) > 0 :
         for application in applications["applications"]:
         #   klogger_dat.debug(application)
           applinfo = get_application(application)
@@ -284,7 +284,7 @@ def list_deployments():
     # klogger_dat.debug(deployments)
     if 200 == deployments["ResponseMetadata"]["HTTPStatusCode"]:
     #   klogger_dat.debug(deployments["deployments"])
-      if len(deployments["deployments"]) > 0 :
+      if 'deployments' in deployments and len(deployments["deployments"]) > 0 :
         for deployment in deployments["deployments"]:
         #   klogger_dat.debug(deployment)
           deployinfo = get_deployment(deployment)

@@ -58,7 +58,7 @@ def list_keys():
     # klogger_dat.debug(keys)
     if 200 == keys["ResponseMetadata"]["HTTPStatusCode"]:
     #   klogger_dat.debug(keys["Keys"])
-      if len(keys["Keys"]) > 0 :
+      if 'Keys' in keys and len(keys["Keys"]) > 0 :
         for key in keys["Keys"]:
         #   klogger_dat.debug(key)
           keyids = []
