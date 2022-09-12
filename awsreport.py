@@ -292,19 +292,6 @@ def main(argv):
   # logger setting 
   global_config_init()
 
-  # df_elb = results_to_dataframe(executefunc_p1("kskpkg.elb.describe_load_balancers"))
-  # # df_elb['VpcTName'] = df_elb['VpcId'].apply(lambda x : get_vpcname(df_vpc,x)) # get VpcTagName
-  # # df_elb['SubnetTName'] = df_elb['SubnetId'].apply(lambda x : get_subnetname(df_subnet,x)) # get Subnet TagName
-  # # df_elb['SecurityGroupName'] = df_elb['SecurityGroupId'].apply(lambda x : get_sgname(df_sg,x)) # get Security Group TagName
-  # # klogger_dat.debug(df_elb)
-  # df_elb_listener = results_to_dataframe(executefunc("kskpkg.elb.describe_listeners", list(df_elb['LoadBalancerArn'].value_counts().index)))
-  # df_elb_listener['LoadBalancerName'] = df_elb_listener['LoadBalancerArn'].apply(lambda x : get_elbname(df_elb,x)) # get ELB Name
-
-  # df_elb_listener_rule = results_to_dataframe(executefunc("kskpkg.elb.describe_rules", list(df_elb_listener['ListenerArn'].value_counts().index)))
-  # df_elb_listener_rule['LoadBalancerInfo'] = df_elb_listener_rule['ListenerArn'].apply(lambda x : get_elbinfo(df_elb_listener,x)) # get ELB Info
-  # # klogger_dat.debug(df_elb_listener_rule)
-  # exit(1)
-  
   df_route53 = results_to_dataframe(executefunc_p1("kskpkg.route53.list_hosted_zones"))
   # klogger_dat.debug(df_route53)
   df_route53_record = results_to_dataframe(executefunc("kskpkg.route53.list_resource_record_sets",list(df_route53['Id'].value_counts().index)))
@@ -474,6 +461,12 @@ def main(argv):
   # klogger_dat.debug(df_ses)
   df_athena = results_to_dataframe(executefunc_p1("kskpkg.athena.list_data_catalogs"))
   # klogger_dat.debug(df_athena)
+  df_waf_ipsets_rg = results_to_dataframe(executefunc("kskpkg.waf.list_ip_sets",'REGIONAL'))
+  # klogger_dat.debug(df_waf_ipsets_rg)
+  df_waf_rulegrps = results_to_dataframe(executefunc("kskpkg.waf.list_rule_groups",'REGIONAL'))
+  # klogger_dat.debug(df_waf_rulegrps)
+  df_waf_webacl = results_to_dataframe(executefunc("kskpkg.waf.list_web_acls",'REGIONAL'))
+  # klogger_dat.debug(df_waf_webacl)
 
   # to_excel 
   klogger_dat.debug("%s\n%s","-"*20,"save to excel")
@@ -529,6 +522,9 @@ def main(argv):
     df_to_excel(writer, df_sns               , 'sns')                         # 48
     df_to_excel(writer, df_ses               , 'ses')                         # 49
     df_to_excel(writer, df_athena            , 'athena')                      # 50
+    df_to_excel(writer, df_waf_ipsets_rg     , 'waf_ip_sets')                 # 51
+    df_to_excel(writer, df_waf_rulegrps      , 'waf_rule_groups')             # 52
+    df_to_excel(writer, df_waf_webacl        , 'waf_web_acls')                # 53
 
   klogger_dat.debug("finished")
 
