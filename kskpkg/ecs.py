@@ -75,7 +75,7 @@ def list_clusters():
             if 'capacityProviders' in cluster_desc:
               capacityproviders = cluster_desc['capacityProviders']
             # list count sync with space
-            utils.ListSyncCountWithSpace(tagname, capacityproviders)
+            utils.ListSyncCountWithSpace(capacityproviders)
 
             results.append( { "ClusterArn" : ecscluster,
                               "ECSClusterName" : cluster_desc['clusterName'],
