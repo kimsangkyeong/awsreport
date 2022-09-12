@@ -65,11 +65,11 @@ def list_clusters():
           if cluster_desc != None :
             # klogger.debug(cluster_desc)
             # ECS Cluster Tag중 Name 값
-            tagname = ['Not Exist Name Tag']
+            tagname = 'Not Exist Name Tag'
             if 'tags' in cluster_desc:
               for tag in cluster_desc['tags']:
                 if 'Name' == tag['key']:
-                  tagname[0] = tag['value']
+                  tagname = tag['value']
                   break
             capacityproviders = [];
             if 'capacityProviders' in cluster_desc:
