@@ -372,6 +372,11 @@ def main(argv):
   df_rdscluser['PerformanceInsightsKMSKeyAlias'] = df_rdscluser['PerformanceInsightsKMSKeyId'].apply(lambda x : get_keyalias(df_kms,x)) # get KMS Key alias
   df_rdscluser['VpcSecurityGroupName'] = df_rdscluser['VpcSecurityGroupId'].apply(lambda x : get_sgname(df_sg,x)) # get Security Group TagName
   # klogger_dat.debug(df_rdscluser)
+  df_redshift_cluster = results_to_dataframe(executefunc_p1("kskpkg.redshift.describe_clusters"))
+  df_redshift_cluster['VpcTName'] = df_redshift_cluster['VpcId'].apply(lambda x : get_vpcname(df_vpc,x)) # get VpcTagName
+  df_redshift_cluster['KmsKeyAlias'] = df_redshift_cluster['KmsKeyId'].apply(lambda x : get_keyalias(df_kms,x)) # get KMS Key alias
+  df_redshift_cluster['VpcSecurityGroupName'] = df_rdscluser['VpcSecurityGroupId'].apply(lambda x : get_sgname(df_sg,x)) # get Security Group TagName
+  # klogger_dat.debug(df_redshift_cluster)
   df_elasticache = results_to_dataframe(executefunc_p1("kskpkg.elasticache.describe_cache_clusters"))
   df_elasticache['CacheSGroupTName'] = df_elasticache['CacheSecurityGroup'].apply(lambda x : get_sgname(df_sg,x)) # get Security Group TagName
   df_elasticache['SGroupTName'] = df_elasticache['SecurityGroup'].apply(lambda x : get_sgname(df_sg,x)) # get Security Group TagName
@@ -464,6 +469,8 @@ def main(argv):
     df_to_excel(writer, df_ecr               , 'ecr')                         # 27
     df_to_excel(writer, df_kms               , 'kms')                         # 28
     df_to_excel(writer, df_rdscluser         , 'rds')                         # 29
+    df_to_excel(writer, df_redshift_cluster  , 'redshift')                         # 29
+
     df_to_excel(writer, df_elasticache       , 'elasticache')                 # 30
     df_to_excel(writer, df_secretmanager     , 'secretmanager')               # 31
     df_to_excel(writer, df_ssm_params        , 'ssm_parameterstore')          # 32
