@@ -355,8 +355,13 @@ def describe_route_tables(searchRegions):
           for router in routers["RouteTables"]:
             # klogger_dat.debug(router)
             # results1  association
-            rtbasids = []; routetableids = []; subnetids = []; gatewayids = []; states = []
+            rtbasids = []; routetableids = []; subnetids = []; gatewayids = []; states = [];
+            mainflag = 'False';
             for associated in router["Associations"]:
+              if associated['Main'] and (associated['AssociationState']['State'] == 'associated') :
+                mainflag = 'True'
+                if len(router["Associations"]) > 1 :
+                  continue
               rtbasids.append(associated['RouteTableAssociationId'])
               routetableids.append(associated['RouteTableId'])
               states.append(associated['AssociationState']['State'])
@@ -373,14 +378,15 @@ def describe_route_tables(searchRegions):
             # RouteTable Assocations info
             results1.append( { "RouteTableId": router["RouteTableId"],
                                "RouteTableTName" : tagname,
-                               "RouteTableAssociationId" : rtbasids,
+                               "Main" : mainflag,
                                "RouteTableId" : routetableids,
                                "SubnetId" : subnetids,
                                "SubnetTName" : subnetids,
                                "GatewayId" : gatewayids,
                                "State" : states,
                                "VpcId" : router["VpcId"] ,
-                               "VpcTName" : ''
+                               "VpcTName" : '',
+                               "RouteTableAssociationId" : rtbasids,
                              })
             # results2  route
             rstates = []; destcidrs = []; destplids = []; egressgwids = []; rgatewayids = [];
@@ -424,7 +430,7 @@ def describe_route_tables(searchRegions):
         else:  # column list
           results1.append( { "RouteTableId": ' ',
                              "RouteTableTName" : ' ',
-                             "RouteTableAssociationId" : ' ',
+                             "Main" : ' ',
                              "RouteTableId" : ' ',
                              "SubnetId" : ' ',
                              "SubnetTName" : ' ',
@@ -432,6 +438,7 @@ def describe_route_tables(searchRegions):
                              "State" : ' ',
                              "VpcId" : ' ',
                              "VpcTName" : list(' '),
+                             "RouteTableAssociationId" : ' ',
                             })
           results2.append( { "RouteTableId": ' ',
                             "RouteTableTName" : ' ',
@@ -456,14 +463,15 @@ def describe_route_tables(searchRegions):
         klogger.error("call error : %d", routers["ResponseMetadata"]["HTTPStatusCode"])
         results1.append( { "RouteTableId": 'ERROR CHECK',
                            "RouteTableTName" : 'ERROR CHECK',
-                           "RouteTableAssociationId" : 'ERROR CHECK',
+                           "Main" : 'ERROR CHECK',
                            "RouteTableId" : 'ERROR CHECK',
                            "SubnetId" : 'ERROR CHECK',
                            "SubnetTName" : 'ERROR CHECK',
                            "GatewayId" : 'ERROR CHECK',
                            "State" : 'ERROR CHECK',
                            "VpcId" : 'ERROR CHECK',
-                           "VpcTName" : list('ERROR CHECK'),
+                           "VpcTName" : list(' '),
+                           "RouteTableAssociationId" : 'ERROR CHECK',
                           })
         results2.append( { "RouteTableId": 'ERROR CHECK',
                           "RouteTableTName" : 'ERROR CHECK',
@@ -490,14 +498,15 @@ def describe_route_tables(searchRegions):
       klogger.error("ec2.describe_route_tables(),region[%s],%s", region, othererr)
       results1.append( { "RouteTableId": 'ERROR CHECK',
                          "RouteTableTName" : 'ERROR CHECK',
-                         "RouteTableAssociationId" : 'ERROR CHECK',
+                         "Main" : 'ERROR CHECK',
                          "RouteTableId" : 'ERROR CHECK',
                          "SubnetId" : 'ERROR CHECK',
                          "SubnetTName" : 'ERROR CHECK',
                          "GatewayId" : 'ERROR CHECK',
                          "State" : 'ERROR CHECK',
                          "VpcId" : 'ERROR CHECK',
-                         "VpcTName" : list('ERROR CHECK'),
+                         "VpcTName" : list(' '),
+                         "RouteTableAssociationId" : 'ERROR CHECK',
                         })
       results2.append( { "RouteTableId": 'ERROR CHECK',
                         "RouteTableTName" : 'ERROR CHECK',
