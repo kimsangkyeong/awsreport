@@ -178,20 +178,17 @@ def describe_nat_gateways(searchRegions):
             publicips = []; privateips = []; allocationids =[]; netinfids = [];
             if ('NatGatewayAddresses' in nat) and (len(nat['NatGatewayAddresses']) > 0):
               for nataddr in nat['NatGatewayAddresses']:
-                publicips.append(nataddr['PublicIp'])
-                privateips.append(nataddr['PrivateIp'])
-                allocationids.append(nataddr['AllocationId'])
-                netinfids.append(nataddr['NetworkInterfaceId'])
+                publicips.append(nataddr['PublicIp'] if 'PublicIp' in nataddr else ' ')
+                privateips.append(nataddr['PrivateIp'] if 'PrivateIp' in nataddr else ' ')
+                allocationids.append(nataddr['AllocationId'] if 'AllocationId' in nataddr else ' ')
+                netinfids.append(nataddr['NetworkInterfaceId'] if 'NetworkInterfaceId' in nataddr else ' ')
             else: # Not Exists
               publicips.append(' ')
               privateips.append(' ')
               allocationids.append(' ')
               netinfids.append(' ')
-              
             # nat ConnectivityType 값
-            connectivitytype = 'Not Setting'
-            if 'ConnectivityType' in nat:
-              connectivitytype = nat['ConnectivityType']
+            connectivitytype = nat['ConnectivityType'] if 'ConnectivityType' in nat else 'Not Setting'
             # nat Tag중 Name 값 
             # * nat 정보가 모두 scalar 형식인 경우 대비 DataFrame 변환오류 회피위해 list 처리함
             tagname = ['Not Exist Name Tag']

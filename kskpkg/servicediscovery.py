@@ -59,13 +59,13 @@ def list_namespaces():
           servicecount = namespace["ServiceCount"] if 'ServiceCount' in namespace else ''
   
           results.append( { "Id": namespace["Id"],
-                            "Name" : namespace['Name'],
-                            "Type" : namespace['Type'],
-                            "Description" : namespace["Description"],
+                            "Name" : namespace['Name'] if 'Name' in namespace else ' ',
+                            "Type" : namespace['Type'] if 'Type' in namespace else ' ',
+                            "Description" : namespace["Description"] if 'Description' in namespace else ' ',
                             "ServiceCount" : servicecount,
                             "DnsProperties" : dnsproperties,
                             "HttpProperties" : httpproperties,
-                            "CreateDate" : namespace['CreateDate'].strftime("%Y-%m-%d %H:%M")
+                            "CreateDate" : namespace['CreateDate'].strftime("%Y-%m-%d %H:%M") if 'CreateDate' in namespace else ' ',
                            })
       else: # column list
         results.append( { "Id": ' ',

@@ -209,7 +209,7 @@ def list_services(clusterArns):
               results.append( { "ClusterArn" : clusterArn,
                                 "ECSClusterName" : ' ',
                                 "ServiceArn" : ' ',
-                                "ServiceName": service_desc['registeredContainerInstancesCount'],
+                                "ServiceName": service_desc['registeredContainerInstancesCount'] if 'registeredContainerInstancesCount' in service_desc else ' ',
                                 "ServiceTName": tagname,
                                 "Status": service_desc['status'],
                                 "LoadBalancers": loadbalancers,
