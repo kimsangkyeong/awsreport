@@ -95,12 +95,12 @@ def list_backup_plans():
                   resources.append(item)
               if 'ListOfTags' in bkselection :
                 for item in bkselection['ListOfTags'] :
-                  listoftags.append(item)
+                  listoftags.append(str(item))
               if 'NotResources' in bkselection :
                 for item in bkselection['NotResources'] :
                   notresources.append(item)
               if 'Conditions' in bkselection :
-                conditions.append(bkselection['Conditions'])
+                conditions.append(str(bkselection['Conditions']))
           # list count sync with space
           utils.ListSyncCountWithSpace(resorcetypes, backupoptions, rulenames, tbkvaultnames, scheduleexpressions,
                                        startminutes, completminutes, lifecycles, recoverpointtags,
