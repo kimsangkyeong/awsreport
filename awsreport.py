@@ -270,8 +270,9 @@ def df_to_excel(writer, df, sheetname):
                                       'valign': 'vcenter',
                                       'text_wrap': True})
   col = 0; # column 'A' 
-  befdata = ''; startrow = 0;
+  befdata = ''; startrow = 0; currrow = 0;
   for row in range(row_idx):
+    currrow = row
     if befdata == df.values[row, col] :
       continue
     else :
@@ -280,9 +281,9 @@ def df_to_excel(writer, df, sheetname):
         worksheet.merge_range(f'A{startrow+4}:A{(row-1)+4}', str(befdata) if type(befdata) == type(dict()) else befdata, merge_format)
       startrow = row
       befdata = df.values[row, col]
-  # klogger.debug(f'for loop : startrow : [{startrow}], row : [{row}], befdata : [{befdata}], data : [{df.values[row, col]}]')
-  if row - startrow >= 1 : # last merge cell check
-    worksheet.merge_range(f'A{startrow+4}:A{row+4}', str(befdata) if type(befdata) == type(dict()) else befdata, merge_format)
+  # klogger.debug(f'for loop : startrow : [{startrow}], row : [{currrow}], befdata : [{befdata}], data : [{df.values[row, col]}]')
+  if currrow - startrow >= 1 : # last merge cell check
+    worksheet.merge_range(f'A{startrow+4}:A{currrow+4}', str(befdata) if type(befdata) == type(dict()) else befdata, merge_format)
     
   # Add the remark to the excel
   worksheet.write(len(df)+4, 0, 'Remark:', workbook.add_format({'bold': True}))

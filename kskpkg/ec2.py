@@ -678,7 +678,7 @@ def describe_security_groups(searchRegions):
                     out_grp_groupid.append(grouppair['GroupId'] if 'GroupId' in grouppair else ' ')
                     out_grp_groupname.append(grouppair['GroupName'] if 'GroupName' in grouppair else ' ')
                     out_grp_peer.append(grouppair['PeeringStatus'] if 'PeeringStatus' in grouppair else ' ')
-                    out_grp_userid.append(inrgrouppairule['UserId'] if 'UserId' in grouppair else ' ')
+                    out_grp_userid.append(grouppair['UserId'] if 'UserId' in grouppair else ' ')
                     out_grp_vpcid.append(grouppair['VpcId'] if 'VpcId' in grouppair else ' ')
                     out_grp_vpcpeer.append(grouppair['VpcPeeringConnectionId'] 
                                           if 'VpcPeeringConnectionId' in grouppair else ' ')
@@ -1149,7 +1149,7 @@ def describe_instances(searchRegions):
                       tagname = tag['Value']
                       break
                 # list count sync with space
-                utils.ListSyncCountWithSpace(netinfids, securitygroups)
+                utils.ListSyncCountWithSpace(netinfids, securitygroups, volumeids, volumeinfo)
 
                 results.append( { "InstanceId": ins["InstanceId"],
                                   "InstanceTName" : tagname,

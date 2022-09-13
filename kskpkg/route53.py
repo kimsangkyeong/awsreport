@@ -106,6 +106,8 @@ def list_resource_record_sets(searchHostZoneids):
   results = [] 
   for searchHostZoneid in searchHostZoneids:
     try:
+      if searchHostZoneid == ' ' :
+        continue
       route53=boto3.client('route53')
       # path에서 id 만 추출
       shostzoneid = searchHostZoneid.split("/")[-1:][0]
@@ -179,6 +181,18 @@ def list_resource_record_sets(searchHostZoneids):
                        })
     finally:
       pass
+  if results == [] : # Not Exist Data
+    results.append( { "HostedZoneId" : ' ',
+                      "Name": ' ',
+                      "Type" : ' ',
+                      "ResourceRecords" : ' ',
+                      "AliasTarget" : ' ',
+                      "EvaluateTargetHealth" : ' ',
+                      "SetIdentifier" : ' ',
+                      "MultiValueAnswer" : ' ',
+                      "CallerReference" : ' ',
+                      "ResourceRecordSetCount" : list(' '),
+                     })
   return results
 
 def main(argv):
