@@ -10,7 +10,7 @@
 # ref     : https://pandas.pydata.org/docs/reference/api/pandas.ExcelWriter.html, .to_excel.html
 # ref     : https://towardsdatascience.com/use-python-to-stylize-the-excel-formatting-916e00e33302
 #           https://xlsxwriter.readthedocs.io/index.html
-# required install package : # pip install numpy, pandas, xlsxwriter, openpyxl
+# required install package : # pip install numpy, pandas, xlsxwriter, openpyxl, ipython
 #
 ####################################################################################################
 ### This first line is for modules to work with Python 2 or 3
