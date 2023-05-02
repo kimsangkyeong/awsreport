@@ -67,7 +67,7 @@ def list_functions(filter):
     #   klogger_dat.debug(functions["Functions"])
       if 'Functions' in functions and len(functions["Functions"]) > 0 :
         for function in functions["Functions"]:
-        #   klogger_dat.debug(function)
+          # klogger_dat.debug(function)
           vpcid = ' '; subnetids = []; securitygroups = []; variable = []; error = [];
           filesystemarns = []; filesystempaths = []; architectures = [];
           if 'VpcConfig' in function :
