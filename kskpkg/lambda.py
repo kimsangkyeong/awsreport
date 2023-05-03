@@ -69,7 +69,7 @@ def list_functions(filter):
         for function in functions["Functions"]:
           # klogger_dat.debug(function)
           vpcid = ' '; subnetids = []; securitygroups = []; variable = []; error = [];
-          filesystemarns = []; filesystempaths = []; architectures = [];
+          filesystemarns = []; filesystempaths = []; architectures = []; ephemeralstorage = [];
           if 'VpcConfig' in function :
             vpcid = function['VpcConfig']['VpcId']
             if 'SubnetIds' in function['VpcConfig'] :
@@ -88,10 +88,12 @@ def list_functions(filter):
           if 'Architectures' in function :
             for item in function['Architectures'] :
               architectures.append(item)
-
+          if 'EphemeralStorage' in function :
+            ephemeralstorage.append(function['EphemeralStorage'])
+            
           # list count sync with space
           utils.ListSyncCountWithSpace(subnetids, securitygroups, filesystemarns, filesystempaths, 
-                                       architectures, variable, error
+                                       architectures, variable, error, ephemeralstorage
                                       )
 
           results.append( { "FunctionName": function['FunctionName'],
@@ -121,7 +123,7 @@ def list_functions(filter):
                             "FileSystemLocalMountPath" : filesystempaths,
                             "SigningProfileVersionArn": function['SigningProfileVersionArn'] if 'SigningProfileVersionArn' in function else ' ',
                             "Architectures" : architectures,
-                            "EphemeralStorage" : function['EphemeralStorage'] if 'EphemeralStorage' in function else ' ',
+                            "EphemeralStorage" : ephemeralstorage,
                           })
       else: # column list
         results.append( { "FunctionName": ' ',
