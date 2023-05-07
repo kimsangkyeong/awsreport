@@ -33,10 +33,10 @@ my_os = sys.platform
 #print(my_os)
 if my_os == "linux":
   path_logconf = path_cwd + '/kskpkg/config/logging.conf'
-  output_file = f'{path_cwd}/output_{date.today().strftime("%Y%m%d")}.xlsx'
+  output_file = f'{path_cwd}/output_{datetime.now().strftime("%Y%m%d-%H%M")}.xlsx'
 else:
   path_logconf = path_cwd + '\kskpkg\config\logging.conf'
-  output_file = f'{path_cwd}\output_{date.today().strftime("%Y%m%d")}.xlsx'
+  output_file = f'{path_cwd}\output_{datetime.now().strftime("%Y%m%d-%H%M")}.xlsx'
 
 pd.set_option("display.max_colwidth", 999)  # 컬럼 정보 보여주기
 pd.set_option("display.max_rows", 150)  # row 정보 보여주기
@@ -413,6 +413,11 @@ def main(argv):
   # klogger_dat.debug(df_secretmanager)
   df_ssm_params = results_to_dataframe(executefunc_p1("kskpkg.ssm.describe_parameters"))
   # klogger_dat.debug(df_ssm_params)
+  df_kafka = results_to_dataframe(executefunc_p1("kskpkg.kafka.list_clusters"))
+  df_kafka['ClientSubnetTName'] = df_kafka['ClientSubnet'].apply(lambda x : get_subnetname(df_subnet,x)) # get Subnet TagName
+  df_kafka['DataVolumeKMSTName'] = df_kafka['DataVolumeKMSKeyId'].apply(lambda x : get_keyalias(df_kms,x)) # get KMS Key alias
+  df_kafka['SecurityGroupTName'] = df_kafka['SecurityGroupId'].apply(lambda x : get_sgname(df_sg,x)) # get Security Group TagName
+  # klogger_dat.debug(df_kafka)
   df_backup = results_to_dataframe(executefunc_p1("kskpkg.backup.list_backup_plans"))
   # klogger_dat.debug(df_backup)
   df_backup_vault = results_to_dataframe(executefunc_p1("kskpkg.backup.list_backup_vaults"))
@@ -506,26 +511,27 @@ def main(argv):
     df_to_excel(writer, df_elasticache       , 'elasticache')                 # 31
     df_to_excel(writer, df_dynamodb_tables   , 'dynamodb_tables')             # 32
     df_to_excel(writer, df_dynamodb_gtables  , 'dynamodb_global_tables')      # 33
-    df_to_excel(writer, df_secretmanager     , 'secretmanager')               # 34
-    df_to_excel(writer, df_ssm_params        , 'ssm_parameterstore')          # 35
-    df_to_excel(writer, df_backup            , 'backup')                      # 36
-    df_to_excel(writer, df_backup_vault      , 'backup_vault')                # 37
-    df_to_excel(writer, df_lambda            , 'lambda')                      # 38
-    df_to_excel(writer, df_lambda_edge       , 'Lambda@Edge')                 # 39
-    df_to_excel(writer, df_cognito_id_pool   , 'cognito-federated-id-pool')   # 40
-    df_to_excel(writer, df_cognito_idp       , 'cognito-user-pool')           # 41
-    df_to_excel(writer, df_codecommit        , 'codecommit')                  # 42
-    df_to_excel(writer, df_codebuild         , 'codebuild')                   # 43
-    df_to_excel(writer, df_codedeployappl    , 'codedeploy_application')      # 44
-    df_to_excel(writer, df_codepipeline      , 'codepipeline')                # 45 
-    df_to_excel(writer, df_codedeployment    , 'codedeploy_deployment')       # 46 
-    df_to_excel(writer, df_sqs               , 'sqs')                         # 47 
-    df_to_excel(writer, df_sns               , 'sns')                         # 48
-    df_to_excel(writer, df_ses               , 'ses')                         # 49
-    df_to_excel(writer, df_athena            , 'athena')                      # 50
-    df_to_excel(writer, df_waf_ipsets_rg     , 'waf_ip_sets')                 # 51
-    df_to_excel(writer, df_waf_rulegrps      , 'waf_rule_groups')             # 52
-    df_to_excel(writer, df_waf_webacl        , 'waf_web_acls')                # 53
+    df_to_excel(writer, df_kafka             , 'kafka_msk')                   # 34
+    df_to_excel(writer, df_secretmanager     , 'secretmanager')               # 35
+    df_to_excel(writer, df_ssm_params        , 'ssm_parameterstore')          # 36
+    df_to_excel(writer, df_backup            , 'backup')                      # 37
+    df_to_excel(writer, df_backup_vault      , 'backup_vault')                # 38
+    df_to_excel(writer, df_lambda            , 'lambda')                      # 39
+    df_to_excel(writer, df_lambda_edge       , 'Lambda@Edge')                 # 40
+    df_to_excel(writer, df_cognito_id_pool   , 'cognito-federated-id-pool')   # 41
+    df_to_excel(writer, df_cognito_idp       , 'cognito-user-pool')           # 42
+    df_to_excel(writer, df_codecommit        , 'codecommit')                  # 43
+    df_to_excel(writer, df_codebuild         , 'codebuild')                   # 44
+    df_to_excel(writer, df_codedeployappl    , 'codedeploy_application')      # 45
+    df_to_excel(writer, df_codepipeline      , 'codepipeline')                # 46 
+    df_to_excel(writer, df_codedeployment    , 'codedeploy_deployment')       # 47 
+    df_to_excel(writer, df_sqs               , 'sqs')                         # 48 
+    df_to_excel(writer, df_sns               , 'sns')                         # 49
+    df_to_excel(writer, df_ses               , 'ses')                         # 50
+    df_to_excel(writer, df_athena            , 'athena')                      # 51
+    df_to_excel(writer, df_waf_ipsets_rg     , 'waf_ip_sets')                 # 52
+    df_to_excel(writer, df_waf_rulegrps      , 'waf_rule_groups')             # 53
+    df_to_excel(writer, df_waf_webacl        , 'waf_web_acls')                # 54
 
   klogger_dat.debug("finished")
 
