@@ -7,6 +7,7 @@
 # --------  -----------   -------------------------------------------------
 # Version :     date    :  reason
 #  1.0      2019.09.15     first create
+#  1.1      2023.05.16     add session handling logic
 #
 ####################################################################################################
 ### This first line is for modules to work with Python 2 or 3
@@ -38,4 +39,12 @@ def update_logger(logtype):
 
 def update_logger_dat(logdat_type):
    klogger_dat  = logging.getLogger( logdat_type )
+
+def init_session(profile_name):
+   global profile_flag
+   global profile
+
+   profile_flag = True if profile_name != None else False
+   profile = profile_name
+
 

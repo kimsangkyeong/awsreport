@@ -7,6 +7,8 @@
 # --------  -----------   -------------------------------------------------
 # Version :     date    :  reason
 #  1.0      2019.09.06     first create
+#  1.1      2023.05.16     add session handling logic
+#
 # ref     : https://pandas.pydata.org/docs/reference/api/pandas.ExcelWriter.html, .to_excel.html
 # ref     : https://towardsdatascience.com/use-python-to-stylize-the-excel-formatting-916e00e33302
 #           https://xlsxwriter.readthedocs.io/index.html
@@ -41,7 +43,25 @@ else:
 pd.set_option("display.max_colwidth", 999)  # 컬럼 정보 보여주기
 pd.set_option("display.max_rows", 150)  # row 정보 보여주기
 
-def global_config_init():
+# command line parsing
+def cmd_parse():
+  cmdlines = [
+      # data means => 0:option, 1:dest , 2:required , 3:action , 4:const , 5:help
+      { '--profile' : ('profile_name'    , False,  'store'     , '',
+                             "AWS Session Profile Name"  )},
+             ]
+
+  parser = argparse.ArgumentParser(description='AWS service information automatic extraction and report generation program.')
+
+  for cmdline in cmdlines:
+    for key, dtuple in cmdline.items():
+      dlist = list(dtuple)
+      parser.add_argument(key, dest=dlist[0], required=dlist[1], action=dlist[2],                 help=dlist[4])
+
+  return parser.parse_args()
+
+#global config info setting
+def global_config_init(args):
   global klogger
   global klogger_dat
 
@@ -50,6 +70,10 @@ def global_config_init():
   klogger     = awsglobal.klogger
   klogger_dat = awsglobal.klogger_dat
 
+  # Main에서 AWS Session Profile Name 전달
+  awsglobal.init_session(args.profile_name) 
+
+  # print(args.profile_name)
   return True
 
 def getobjectstring(content):
@@ -290,9 +314,14 @@ def df_to_excel(writer, df, sheetname):
   worksheet.write(len(df)+5, 0, 'The last update time is ' + datetime.now().strftime('%Y-%m-%d %H:%M') + '.')
 
 def main(argv):
-  # logger setting 
-  global_config_init()
+  args = cmd_parse()
 
+  # logger & session profile info setting 
+  global_config_init(args)
+
+  df_s3 = results_to_dataframe(executefunc_p1("kskpkg.s3.list_buckets"))
+  klogger_dat.debug(df_s3)
+  exit(1)
   df_route53 = results_to_dataframe(executefunc_p1("kskpkg.route53.list_hosted_zones"))
   # klogger_dat.debug(df_route53)
   df_route53_record = results_to_dataframe(executefunc("kskpkg.route53.list_resource_record_sets",list(df_route53['Id'].value_counts().index)))
