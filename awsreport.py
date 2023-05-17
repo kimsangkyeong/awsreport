@@ -56,6 +56,7 @@ def cmd_parse():
 def global_config_init(args):
   global klogger
   global klogger_dat
+  global output_file
   
   # 현재 디렉토리
   path_cwd = os.getcwd()
@@ -75,7 +76,7 @@ def global_config_init(args):
     else :
       output_file = f'{path_cwd}\output_{datetime.now().strftime("%Y%m%d-%H%M")}.xlsx'
 
-  print("path : ", output_file)
+  print("output_file : ", output_file)
   # Main에서 log config 경로 전달
   awsglobal.init_logger(path_logconf)
   klogger     = awsglobal.klogger
