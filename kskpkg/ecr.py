@@ -7,6 +7,7 @@
 # --------  -----------   -------------------------------------------------
 # Version :     date    :  reason
 #  1.0      2022.08.30     first create
+#  1.1      2023.05.17     add session handling logic
 #
 # Ref     : https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/ecr.html
 #          
@@ -53,7 +54,10 @@ def describe_repositories():
   klogger_dat.debug('ecr')
   try:
     results = [] 
-    ecr=boto3.client('ecr')
+    global ECR_session
+
+    ECR_session = utils.get_session('ecr')
+    ecr = ECR_session
     repositories = ecr.describe_repositories()
     # klogger_dat.debug(repositories)
     if 200 == repositories["ResponseMetadata"]["HTTPStatusCode"]:
