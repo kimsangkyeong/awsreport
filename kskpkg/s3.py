@@ -33,9 +33,6 @@ if __name__ == "__main__":
   awsglobal.init_logger(path_logconf)
   klogger     = awsglobal.klogger
   klogger_dat = awsglobal.klogger_dat
-  profile_flag = awsglobal.profile_flag
-  profile      = awsglobal.profile
-
 #   import utils  오류
 #  * global 변수를 공유하는 package 내의 모듈을 Main으로 실행할 때 import 하는 방법 확인 필요.
 
@@ -44,16 +41,7 @@ else:
   from .config import awsglobal
   klogger     = awsglobal.klogger
   klogger_dat = awsglobal.klogger_dat
-  profile_flag = awsglobal.profile_flag
-  profile      = awsglobal.profile
   from . import utils
-
-def get_session(AWSService):
-  if profile_flag :
-    session = boto3.Session(profile_name=profile)
-    return session.client(AWSService)
-  else :
-    return boto3.client(AWSService)
 
 def list_buckets():
   '''
@@ -64,12 +52,12 @@ def list_buckets():
     results = [] 
     global S3_session
 
-    S3_session = get_session('s3')
+    S3_session = utils.get_session('s3')
     s3 = S3_session
     buckets = s3.list_buckets()
     # klogger.debug(buckets)
     if 200 == buckets["ResponseMetadata"]["HTTPStatusCode"]:
-      klogger.debug(buckets["Buckets"])
+      # klogger.debug(buckets["Buckets"])
       if 'Buckets' in buckets and len(buckets["Buckets"]) > 0 :
         bucketnames = []; createdates = []; locations = []; blockacl = []; ignoreacl = [];
         blockpolicy = []; restrictpublic = []; bucketkeyenabled = []; kmsmasterkeyid = [];
@@ -159,7 +147,7 @@ def get_bucket_location(bucket):
     result = 'Error Check' 
     s3 = S3_session
     location = s3.get_bucket_location(Bucket=bucket)
-    klogger.debug(location)
+    # klogger.debug(location)
     if 200 == location["ResponseMetadata"]["HTTPStatusCode"]:
       if type(location['LocationConstraint']) != type('str') :
         result = 'us-east-1'
@@ -186,7 +174,7 @@ def get_public_access_block(bucket):
         "RestrictPublicBuckets" : "Error Check"
       }
     s3 = S3_session
-    klogger.debug(bucket)
+    # klogger.debug(bucket)
     accessblock = s3.get_public_access_block(Bucket=bucket)
     # klogger.debug(accessblock)
     if 200 == accessblock["ResponseMetadata"]["HTTPStatusCode"]:
@@ -220,7 +208,7 @@ def get_bucket_encryption(bucket):
   try:
     results = []
     s3 = S3_session
-    klogger_dat.debug("-------%s",bucket)
+    # klogger_dat.debug("-------%s",bucket)
     encrypt = s3.get_bucket_encryption(Bucket=bucket)
     # klogger_dat.debug(encrypt)
     if 200 == encrypt["ResponseMetadata"]["HTTPStatusCode"]:

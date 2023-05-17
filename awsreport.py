@@ -37,6 +37,8 @@ def cmd_parse():
       # data means => 0:option, 1:dest , 2:required , 3:action , 4:const , 5:help
       { '--profile' : ('profile_name'    , False,  'store'     , '',
                              "AWS Session Profile Name"  )},
+      { '--region' : ('region_name'    , False,  'store'     , '',
+                             "AWS Session Region Name"  )},
       { '-o' : ('output_filename'    , False,  'store'     , '',
                              "AWS Report Output File Name"  )},
              ]
@@ -80,10 +82,10 @@ def global_config_init(args):
   klogger_dat = awsglobal.klogger_dat
 
   # Main에서 AWS Session Profile Name 전달
-  awsglobal.init_session(args.profile_name) 
+  result = awsglobal.init_session(args.profile_name, args.region_name) 
 
   # print(args.profile_name)
-  return True
+  return result
 
 def getobjectstring(content):
   '''
@@ -326,7 +328,9 @@ def main(argv):
   args = cmd_parse()
 
   # logger & session profile info setting 
-  global_config_init(args)
+  if global_config_init(args) ==False :
+    klogger_dat.debug("error finished")
+    exit(1)
 
   df_s3 = results_to_dataframe(executefunc_p1("kskpkg.s3.list_buckets"))
   klogger_dat.debug(df_s3)
