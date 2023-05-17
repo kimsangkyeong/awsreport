@@ -28,18 +28,6 @@ import pandas as pd  # pip install pandas
 from datetime import date, datetime
 import IPython.display as display # pip install ipython
 
-# 현재 디렉토리
-path_cwd = os.getcwd()
-# OS 판단  : win32, linux, cygwin, darwin, aix
-my_os = sys.platform
-#print(my_os)
-if my_os == "linux":
-  path_logconf = path_cwd + '/kskpkg/config/logging.conf'
-  output_file = f'{path_cwd}/output_{datetime.now().strftime("%Y%m%d-%H%M")}.xlsx'
-else:
-  path_logconf = path_cwd + '\kskpkg\config\logging.conf'
-  output_file = f'{path_cwd}\output_{datetime.now().strftime("%Y%m%d-%H%M")}.xlsx'
-
 pd.set_option("display.max_colwidth", 999)  # 컬럼 정보 보여주기
 pd.set_option("display.max_rows", 150)  # row 정보 보여주기
 
@@ -49,6 +37,8 @@ def cmd_parse():
       # data means => 0:option, 1:dest , 2:required , 3:action , 4:const , 5:help
       { '--profile' : ('profile_name'    , False,  'store'     , '',
                              "AWS Session Profile Name"  )},
+      { '-o' : ('output_filename'    , False,  'store'     , '',
+                             "AWS Report Output File Name"  )},
              ]
 
   parser = argparse.ArgumentParser(description='AWS service information automatic extraction and report generation program.')
@@ -56,7 +46,7 @@ def cmd_parse():
   for cmdline in cmdlines:
     for key, dtuple in cmdline.items():
       dlist = list(dtuple)
-      parser.add_argument(key, dest=dlist[0], required=dlist[1], action=dlist[2],                 help=dlist[4])
+      parser.add_argument(key, dest=dlist[0], required=dlist[1], action=dlist[2],help=dlist[4])
 
   return parser.parse_args()
 
@@ -64,7 +54,26 @@ def cmd_parse():
 def global_config_init(args):
   global klogger
   global klogger_dat
+  
+  # 현재 디렉토리
+  path_cwd = os.getcwd()
+  # OS 판단  : win32, linux, cygwin, darwin, aix
+  my_os = sys.platform
+  #print(my_os)
+  if my_os == "linux":
+    path_logconf = path_cwd + '/kskpkg/config/logging.conf'
+    if args.output_filename != None :
+      output_file = f'{path_cwd}/{args.output_filename}_{datetime.now().strftime("%Y%m%d-%H%M")}.xlsx'
+    else :
+      output_file = f'{path_cwd}/output_{datetime.now().strftime("%Y%m%d-%H%M")}.xlsx'
+  else:
+    path_logconf = path_cwd + '\kskpkg\config\logging.conf'
+    if args.output_filename != None :
+      output_file = f'{path_cwd}\{args.output_filename}_{datetime.now().strftime("%Y%m%d-%H%M")}.xlsx'
+    else :
+      output_file = f'{path_cwd}\output_{datetime.now().strftime("%Y%m%d-%H%M")}.xlsx'
 
+  print("path : ", output_file)
   # Main에서 log config 경로 전달
   awsglobal.init_logger(path_logconf)
   klogger     = awsglobal.klogger
