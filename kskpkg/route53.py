@@ -7,6 +7,7 @@
 # --------  -----------   -------------------------------------------------
 # Version :     date    :  reason
 #  1.0      2022.08.20     first create
+#  1.1      2023.05.17     add session handling logic
 #
 # Ref     : https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/route53.html
 #          
@@ -37,6 +38,7 @@ else:
   from .config import awsglobal
   klogger     = awsglobal.klogger
   klogger_dat = awsglobal.klogger_dat
+  from . import utils
 
 def list_hosted_zones():
   '''
@@ -45,7 +47,10 @@ def list_hosted_zones():
   klogger_dat.debug('route53')
   try:
     results = [] 
-    route53=boto3.client('route53')
+    global ROUTE53_session
+
+    ROUTE53_session = utils.get_session('route53')
+    route53 = ROUTE53_session
     hosts = route53.list_hosted_zones()
     if 200 == hosts["ResponseMetadata"]["HTTPStatusCode"]:
       # klogger_dat.debug(hosts["HostedZones"])
@@ -108,7 +113,7 @@ def list_resource_record_sets(searchHostZoneids):
     try:
       if searchHostZoneid == ' ' :
         continue
-      route53=boto3.client('route53')
+      route53 = ROUTE53_session
       # path에서 id 만 추출
       shostzoneid = searchHostZoneid.split("/")[-1:][0]
       records = route53.list_resource_record_sets(HostedZoneId=shostzoneid)

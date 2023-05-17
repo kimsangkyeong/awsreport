@@ -7,6 +7,7 @@
 # --------  -----------   -------------------------------------------------
 # Version :     date    :  reason
 #  1.0      2022.09.11     first create
+#  1.1      2023.05.17     add session handling logic
 #
 # Ref     : https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/ses.html
 #          
@@ -55,7 +56,10 @@ def list_identities():
 
   try:
     results = [] 
-    ses=boto3.client('ses')
+    global SES_session
+
+    SES_session = utils.get_session('ses')
+    ses = SES_session
     identities = ses.list_identities()
     # klogger_dat.debug("%s", identities)
     if 200 == identities["ResponseMetadata"]["HTTPStatusCode"]:
@@ -96,7 +100,7 @@ def list_identity_policies(Identity):
 
   try:
     results = []
-    ses=boto3.client('ses')
+    ses = SES_session
     # klogger.debug(f'{Identity}')
     policies = ses.list_identity_policies(Identity=Identity)
     # klogger.debug("%s", policies)

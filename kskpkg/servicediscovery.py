@@ -7,6 +7,7 @@
 # --------  -----------   -------------------------------------------------
 # Version :     date    :  reason
 #  1.0      2022.08.20     first create
+#  1.1      2023.05.17     add session handling logic
 #
 # Ref     : https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/servicediscovery.html
 #          
@@ -37,6 +38,7 @@ else:
   from .config import awsglobal
   klogger     = awsglobal.klogger
   klogger_dat = awsglobal.klogger_dat
+  from . import utils
 
 def list_namespaces():
   '''
@@ -45,7 +47,10 @@ def list_namespaces():
   klogger_dat.debug('servicediscovery:cloudmap')
   try:
     results = [] 
-    servicediscovery=boto3.client('servicediscovery')
+    global SERVICEDISCOVERY_session
+
+    SERVICEDISCOVERY_session = utils.get_session('servicediscovery')
+    servicediscovery = SERVICEDISCOVERY_session
     namespaces = servicediscovery.list_namespaces()
     # klogger_dat.debug(namespaces)
     if 200 == namespaces["ResponseMetadata"]["HTTPStatusCode"]:
