@@ -7,6 +7,7 @@
 # --------  -----------   -------------------------------------------------
 # Version :     date    :  reason
 #  1.0      2023.05.07     first create
+#  1.1      2023.05.17     add session handling logic
 #
 # Ref     : https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/kafka.html
 #          
@@ -53,7 +54,10 @@ def list_clusters():
   klogger_dat.debug('kafka clusters')
   try:
     results = [] 
-    kafka=boto3.client('kafka')
+    global KAFKA_session
+
+    KAFKA_session = utils.get_session('kafka')
+    kafka = KAFKA_session
     clusters = kafka.list_clusters()
     # klogger_dat.debug(clusters)
     if 200 == clusters["ResponseMetadata"]["HTTPStatusCode"]:
@@ -249,7 +253,7 @@ def describe_cluster(clusterArn):
 
   try:
     result = None
-    kafka=boto3.client('kafka')
+    kafka = KAFKA_session
     klogger.debug(f'{clusterArn}')
     clusterInfo = kafka.describe_cluster(ClusterArn=clusterArn)
     # klogger.debug("%s", clusterInfo)

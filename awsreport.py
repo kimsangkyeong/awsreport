@@ -332,8 +332,13 @@ def main(argv):
     klogger_dat.debug("error finished")
     exit(1)
 
-  df_efs = results_to_dataframe(executefunc_p1("kskpkg.efs.describe_file_systems"))
-  
+  df_elb = results_to_dataframe(executefunc_p1("kskpkg.elb.describe_load_balancers"))
+  df_elb_listener = results_to_dataframe(executefunc("kskpkg.elb.describe_listeners", list(df_elb['LoadBalancerArn'].value_counts().index)))
+  df_elb_listener_rule = results_to_dataframe(executefunc("kskpkg.elb.describe_rules", list(df_elb_listener['ListenerArn'].value_counts().index)))
+  df_elb_targetgroup = results_to_dataframe(executefunc("kskpkg.elb.describe_target_groups", list(df_elb['LoadBalancerArn'].value_counts().index)))
+  df_kafka = results_to_dataframe(executefunc_p1("kskpkg.kafka.list_clusters"))
+  df_lambda = results_to_dataframe(executefunc("kskpkg.lambda.list_functions", {'Condition':'General','Region':''}))
+  df_lambda_edge = results_to_dataframe(executefunc("kskpkg.lambda.list_functions", {'Condition':'Lambda@Edge','Region':'ap-northeast-2'}))
 
   exit(1)
   df_route53 = results_to_dataframe(executefunc_p1("kskpkg.route53.list_hosted_zones"))

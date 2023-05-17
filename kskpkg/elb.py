@@ -7,6 +7,7 @@
 # --------  -----------   -------------------------------------------------
 # Version :     date    :  reason
 #  1.0      2022.08.20     first create
+#  1.1      2023.05.17     add session handling logic
 #
 # Ref     : https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/elb.html
 #          
@@ -53,7 +54,10 @@ def describe_load_balancers():
   klogger_dat.debug('elb')
   try:
     results = [] 
-    elb=boto3.client('elbv2')
+    global ELBV2_session
+
+    ELBV2_session = utils.get_session('elbv2')
+    elb = ELBV2_session
     loadbalancers = elb.describe_load_balancers()
     # klogger_dat.debug(loadbalancers)
     if 200 == loadbalancers["ResponseMetadata"]["HTTPStatusCode"]:
@@ -178,7 +182,7 @@ def describe_listeners(LoadBalancerArns):
 #   klogger_dat.debug(LoadBalancerArns)
   try:
     results = [] 
-    elb=boto3.client('elbv2')
+    elb = ELBV2_session
     for LoadBalancerArn in LoadBalancerArns :
       if (LoadBalancerArn == ' ') : # Not Exist LoadBalancer
         continue
@@ -485,7 +489,7 @@ def describe_rules(ListenerArns):
 #   klogger_dat.debug(ListenerArns)
   try:
     results = [] 
-    elb=boto3.client('elbv2')
+    elb = ELBV2_session
     for LisenerArn in ListenerArns :
       if LisenerArn == ' ' : # Not Exist Listener
         continue
@@ -570,7 +574,7 @@ def describe_target_groups(LoadBalancerArns):
 #   klogger_dat.debug(LoadBalancerArns)
   try:
     results = [] 
-    elb=boto3.client('elbv2')
+    elb = ELBV2_session
     for LoadBalancerArn in LoadBalancerArns :
       if LoadBalancerArn == ' ': # Not Exist LoadBalancer
         continue
