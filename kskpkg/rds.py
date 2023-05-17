@@ -80,7 +80,7 @@ def describe_db_clusters():
               vsgstatus.append(vsg['Status'] if 'Status' in vsg else ' ')
           if 'AssociatedRoles' in dbcluster:
             for assrole in dbcluster['AssociatedRoles']:
-              associaterole.apend(assrole)
+              associaterole.append(assrole)
           if 'IAMDatabaseAuthenticationEnabled' in dbcluster:
             if dbcluster['IAMDatabaseAuthenticationEnabled']:
               iamauthenabled = 'TRUE'
