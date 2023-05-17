@@ -66,19 +66,46 @@ def ListSyncCountWithSpace(*lists):
     return False
 
 # AWS Session
-def get_session(AWSService):
+def get_session(AWSService, func_region=None):
   '''
     AWS Configure Profile 이름을 참고하여 Session 생성하기
   '''
   if profile_flag :
     try:
-      session = boto3.Session(profile_name=profile, region_name=region)
+      if func_region != None :  # 함수에서 리전 정보를 입력값으로 하여 처리하고자 하는 경우. 기동 시 입력 parameter 보다 우선처리
+        session = boto3.Session(profile_name=profile, region_name=func_region)
+      else :
+        session = boto3.Session(profile_name=profile, region_name=region)
       return session.client(AWSService)
     except Exception as othererr:
       print("get_session() %s" % othererr)
       return None
   else :
-    return boto3.client(AWSService)
+    if func_region != None :  # 함수에서 리전 정보를 입력값으로 하여 처리하고자 하는 경우
+      return boto3.client(AWSService, region_name=func_region)
+    else :
+      return boto3.client(AWSService)
+
+# AWS Session resource
+def get_session_resource(AWSService, func_region=None):
+  '''
+    AWS Configure Profile 이름을 참고하여 Session 생성하기
+  '''
+  if profile_flag :
+    try:
+      if func_region != None :  # 함수에서 리전 정보를 입력값으로 하여 처리하고자 하는 경우. 기동 시 입력 parameter 보다 우선처리
+        session = boto3.Session(profile_name=profile, region_name=func_region)
+      else :
+        session = boto3.Session(profile_name=profile, region_name=region)
+      return session.resource(AWSService)
+    except Exception as othererr:
+      print("get_session() %s" % othererr)
+      return None
+  else :
+    if func_region != None :  # 함수에서 리전 정보를 입력값으로 하여 처리하고자 하는 경우
+      return boto3.resource(AWSService, region_name=func_region)
+    else :
+      return boto3.resource(AWSService)
 
 def main(argv):
 

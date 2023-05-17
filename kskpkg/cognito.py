@@ -55,7 +55,10 @@ def list_identity_pools(MaxResults):
 
   try:
     results = [] 
-    cognitoid=boto3.client('cognito-identity')
+    global COGNITOID_session
+
+    COGNITOID_session = utils.get_session('cognito-identity')
+    cognitoid = COGNITOID_session
     pools = cognitoid.list_identity_pools(MaxResults=MaxResults)
     # klogger_dat.debug("%s", pools)
     if 200 == pools["ResponseMetadata"]["HTTPStatusCode"]:
@@ -131,7 +134,7 @@ def get_identity_pool_roles(IdentityPoolId):
 
   try:
     result1 = {}; result2 = {} 
-    cognitoid=boto3.client('cognito-identity')
+    cognitoid = COGNITOID_session
     # klogger.debug("%s", IdentityPoolId)
     roles = cognitoid.get_identity_pool_roles(IdentityPoolId=IdentityPoolId)
     # klogger.debug("%s", roles)
@@ -157,7 +160,7 @@ def list_identities(IdentityPoolId, MaxResults, HideDisabled):
 
   try:
     results = [] 
-    cognitoid=boto3.client('cognito-identity')
+    cognitoid = COGNITOID_session
     # klogger.debug("%s, %d, %s", IdentityPoolId, MaxResults, HideDisabled)
     ids = cognitoid.list_identities(IdentityPoolId=IdentityPoolId, MaxResults=MaxResults, HideDisabled=HideDisabled)
     # klogger.debug(ids)
@@ -181,7 +184,10 @@ def list_user_pools(MaxResults):
 
   try:
     results = [] 
-    cognitoidp=boto3.client('cognito-idp')
+    global COGNITOIDP_session
+    
+    COGNITOIDP_session = utils.get_session('cognito-idp')
+    cognitoidp = COGNITOIDP_session
     pools = cognitoidp.list_user_pools(MaxResults=MaxResults)
     # klogger.debug(pools)
     if 200 == pools["ResponseMetadata"]["HTTPStatusCode"]:

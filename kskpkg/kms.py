@@ -7,6 +7,7 @@
 # --------  -----------   -------------------------------------------------
 # Version :     date    :  reason
 #  1.0      2022.08.21     first create
+#  1.1      2023.05.17     add session handling logic
 #
 # Ref     : https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/kms.html
 #          
@@ -53,7 +54,10 @@ def list_keys():
   klogger_dat.debug('kms')
   try:
     results = [] 
-    kms=boto3.client('kms')
+    global KMS_session
+
+    KMS_session = utils.get_session('kms')
+    kms = KMS_session
     keys = kms.list_keys()
     # klogger_dat.debug(keys)
     if 200 == keys["ResponseMetadata"]["HTTPStatusCode"]:
@@ -96,7 +100,7 @@ def list_aliases(KeyId):
 #   klogger_dat.debug('kms alias')
   try:
     result = 'ERROR CHECK' 
-    kms=boto3.client('kms')
+    kms = KMS_session
     alias = kms.list_aliases(KeyId=KeyId)
     # klogger_dat.debug(keys)
     if 200 == alias["ResponseMetadata"]["HTTPStatusCode"]:

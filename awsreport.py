@@ -332,7 +332,9 @@ def main(argv):
     klogger_dat.debug("error finished")
     exit(1)
 
-  df_codecommit = results_to_dataframe(executefunc_p1("kskpkg.codecommit.list_repositories"))
+  df_ins = results_to_dataframe(executefunc("kskpkg.ec2.describe_instances", ['ap-northeast-2']))
+  # klogger_dat.debug(df_ins)
+  
   exit(1)
   df_route53 = results_to_dataframe(executefunc_p1("kskpkg.route53.list_hosted_zones"))
   # klogger_dat.debug(df_route53)

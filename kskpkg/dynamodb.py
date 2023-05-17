@@ -53,7 +53,10 @@ def list_tables():
   klogger_dat.debug('dynamodb tables')
   try:
     results = [] 
-    dynamodb=boto3.client('dynamodb')
+    global DYNAMODB_session
+
+    DYNAMODB_session = utils.get_session('dynamodb')
+    dynamodb = DYNAMODB_session
     tables = dynamodb.list_tables()
     # klogger_dat.debug(tables)
     if 200 == tables["ResponseMetadata"]["HTTPStatusCode"]:
@@ -191,7 +194,7 @@ def describe_table(TableName):
 
   try:
     result = None
-    dynamodb=boto3.client('dynamodb')
+    dynamodb = DYNAMODB_session
     # klogger.debug(f'{TableName}')
     table = dynamodb.describe_table(TableName=TableName)
     # klogger.debug("%s", table)
@@ -214,7 +217,7 @@ def list_global_tables():
   klogger_dat.debug('dynamodb global tables')
   try:
     results = [] 
-    dynamodb=boto3.client('dynamodb')
+    dynamodb = DYNAMODB_session
     gtables = dynamodb.list_global_tables()
     # klogger_dat.debug(gtables)
     if 200 == gtables["ResponseMetadata"]["HTTPStatusCode"]:
@@ -288,7 +291,7 @@ def describe_global_table(GlobalTableName):
 
   try:
     result = None
-    dynamodb=boto3.client('dynamodb')
+    dynamodb = DYNAMODB_session
     # klogger.debug(f'{GlobalTableName}')
     gtable = dynamodb.describe_global_table(GlobalTableName=GlobalTableName)
     # klogger.debug("%s", gtable)
