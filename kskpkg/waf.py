@@ -7,6 +7,7 @@
 # --------  -----------   -------------------------------------------------
 # Version :     date    :  reason
 #  1.0      2022.09.12     first create
+#  1.1      2023.05.17     add session handling logic
 #
 # Ref     : https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/waf.html
 #          
@@ -54,7 +55,7 @@ def list_web_acls(Scope):
 
   try:
     results = [] 
-    wafv2=boto3.client('wafv2')
+    wafv2 = WAFV2_session
     webacls = wafv2.list_web_acls(Scope=Scope)
     # klogger_dat.debug("%s", webacls)
     if 200 == webacls["ResponseMetadata"]["HTTPStatusCode"]:
@@ -180,7 +181,7 @@ def get_web_acl(Name, Scope, Id):
 
   try:
     result = None
-    wafv2=boto3.client('wafv2')
+    wafv2 = WAFV2_session
     # klogger.debug(f'{Name}, {Scope}, {Id}')
     webacl = wafv2.get_web_acl(Name=Name, Scope=Scope, Id=Id)
     # klogger.debug("%s", webacl)
@@ -203,7 +204,7 @@ def list_rule_groups(Scope):
 
   try:
     results = [] 
-    wafv2=boto3.client('wafv2')
+    wafv2 = WAFV2_session
     rulegrps = wafv2.list_rule_groups(Scope=Scope)
     # klogger_dat.debug("%s", rules)
     if 200 == rulegrps["ResponseMetadata"]["HTTPStatusCode"]:
@@ -300,7 +301,7 @@ def get_rule_group(Name, Scope, Id):
 
   try:
     result = None
-    wafv2=boto3.client('wafv2')
+    wafv2 = WAFV2_session
     # klogger.debug(f'{Name}, {Scope}, {Id}')
     rulegrp = wafv2.get_rule_group(Name=Name,Scope=Scope,Id=Id)
     # klogger.debug("%s", rulegrp)
@@ -324,7 +325,10 @@ def list_ip_sets(Scope):
 
   try:
     results = [] 
-    wafv2=boto3.client('wafv2')
+    global WAFV2_session
+
+    WAFV2_session = utils.get_session('wafv2')
+    wafv2 = WAFV2_session
     ipsets = wafv2.list_ip_sets(Scope=Scope)
     # klogger_dat.debug("%s", ipsets)
     if 200 == ipsets["ResponseMetadata"]["HTTPStatusCode"]:
@@ -397,7 +401,7 @@ def get_ip_set(Name, Scope, Id):
 
   try:
     result = None
-    wafv2=boto3.client('wafv2')
+    wafv2 = WAFV2_session
     # klogger.debug(f'{Name}, {Scope}, {Id}')
     ipset = wafv2.get_ip_set(Name=Name, Scope=Scope, Id=Id)
     # klogger.debug("%s", ipset)

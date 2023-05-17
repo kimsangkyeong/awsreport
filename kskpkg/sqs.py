@@ -7,6 +7,7 @@
 # --------  -----------   -------------------------------------------------
 # Version :     date    :  reason
 #  1.0      2022.09.11     first create
+#  1.1      2023.05.17     add session handling logic
 #
 # Ref     : https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/sqs.html
 #          
@@ -55,7 +56,10 @@ def list_queues(MaxResults):
 
   try:
     results = [] 
-    sqs=boto3.client('sqs')
+    global SQS_session
+
+    SQS_session = utils.get_session('sqs')
+    sqs = SQS_session
     queues = sqs.list_queues(MaxResults=MaxResults)
     # klogger_dat.debug("%s", queues)
     if 200 == queues["ResponseMetadata"]["HTTPStatusCode"]:
@@ -99,7 +103,7 @@ def get_queue_attributes(QueueUrl, AttributeNames):
 
   try:
     result = None
-    sqs=boto3.client('sqs')
+    sqs = SQS_session
     # klogger.debug(f'{QueueUrl}, {AttributeNames}')
     attributes = sqs.get_queue_attributes(QueueUrl=QueueUrl, AttributeNames=AttributeNames)
     # klogger.debug("%s", attributes)
