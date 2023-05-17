@@ -65,10 +65,9 @@ def list_clusters():
           # Kafka Tag중 Name 값 
           tagname = 'Not Exist Name Tag'
           if 'Tags' in ClusterInfo:
-            for tag in ClusterInfo['Tags']:
-              if tag['Key'] == 'Name':
-                tagname = tag['Value']
-                break
+              tag = ClusterInfo['Tags']
+              if tag['Name'] != None:
+                tagname = tag['Name']
           createdtm = ClusterInfo['CreationTime'].strftime('%Y-%m-%d %H:%M') if 'CreationTime' in ClusterInfo else ' '
           datavolumekmskeyid = []; brokerazdist = []; instancetype = []; numbrokernodes = []; enhancemonitor = [];
           openmonitoring = []; encryptintransit = []; currbswinfo = []; cliauth = []; clientsubnets = []; subnetTName = [];
