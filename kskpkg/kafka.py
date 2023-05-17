@@ -70,7 +70,7 @@ def list_clusters():
           tagname = 'Not Exist Name Tag'
           if 'Tags' in ClusterInfo:
               tag = ClusterInfo['Tags']
-              if tag['Name'] != None:
+              if 'Name' in tag:
                 tagname = tag['Name']
           createdtm = ClusterInfo['CreationTime'].strftime('%Y-%m-%d %H:%M') if 'CreationTime' in ClusterInfo else ' '
           datavolumekmskeyid = []; brokerazdist = []; instancetype = []; numbrokernodes = []; enhancemonitor = [];
