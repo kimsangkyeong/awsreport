@@ -7,6 +7,7 @@
 # --------  -----------   -------------------------------------------------
 # Version :     date    :  reason
 #  1.0      2022.09.08     first create
+#  1.1      2023.05.17     add session handling logic
 #
 # Ref     : https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/codebuild.html
 #          
@@ -55,7 +56,10 @@ def list_projects():
 
   try:
     results = [] 
-    codebuild=boto3.client('codebuild')
+    global CODEBUILD_session
+
+    CODEBUILD_session = utils.get_session('codebuild')
+    codebuild = CODEBUILD_session
     projects = codebuild.list_projects()
     # klogger_dat.debug(projects)
     if 200 == projects["ResponseMetadata"]["HTTPStatusCode"]:
@@ -226,7 +230,7 @@ def batch_get_projects(project):
 
   try:
     results = [] 
-    codebuild=boto3.client('codebuild')
+    codebuild = CODEBUILD_session
     # klogger_dat.debug(project)
     projects = codebuild.batch_get_projects(names=project)
     # klogger_dat.debug(projects)

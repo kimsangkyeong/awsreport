@@ -7,6 +7,7 @@
 # --------  -----------   -------------------------------------------------
 # Version :     date    :  reason
 #  1.0      2022.09.07     first create
+#  1.1      2023.05.17     add session handling logic
 #
 # Ref     : https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/backup.html
 #          
@@ -53,7 +54,10 @@ def list_backup_plans():
   klogger_dat.debug('backup')
   try:
     results = [] 
-    backup=boto3.client('backup')
+    global BACKUP_session
+
+    BACKUP_session = utils.get_session('backup')
+    backup = BACKUP_session
     bkplans = backup.list_backup_plans(IncludeDeleted=False)
     # klogger_dat.debug(bkplans)
     if 200 == bkplans["ResponseMetadata"]["HTTPStatusCode"]:
@@ -211,7 +215,7 @@ def get_backup_selection(BackupPlanId, SelectionId):
 #   klogger_dat.debug('backup selection')
   try:
     result = None 
-    backup=boto3.client('backup')
+    backup = BACKUP_session
     bkselection = backup.get_backup_selection(BackupPlanId=BackupPlanId, SelectionId=SelectionId)
     # klogger_dat.debug(bkselection)
     if 200 == bkselection["ResponseMetadata"]["HTTPStatusCode"]:
@@ -232,7 +236,7 @@ def get_backup_plan(BackupPlanId, VersionId):
 #   klogger_dat.debug('backup plan')
   try:
     results = [] 
-    backup=boto3.client('backup')
+    backup = BACKUP_session
     bkplan = backup.get_backup_plan(BackupPlanId=BackupPlanId, VersionId=VersionId)
     # klogger_dat.debug(bkplan)
     if 200 == bkplan["ResponseMetadata"]["HTTPStatusCode"]:
@@ -255,7 +259,7 @@ def list_backup_selections(BackupPlanId):
 #   klogger_dat.debug('backup plan selection')
   try:
     results = [] 
-    backup=boto3.client('backup')
+    backup = BACKUP_session
     select = backup.list_backup_selections(BackupPlanId=BackupPlanId)
     # klogger_dat.debug(select)
     if 200 == select["ResponseMetadata"]["HTTPStatusCode"]:
@@ -277,7 +281,7 @@ def list_backup_vaults():
   klogger_dat.debug('backup vault')
   try:
     results = [] 
-    backup=boto3.client('backup')
+    backup = BACKUP_session
     bkvaults = backup.list_backup_vaults()
     # klogger_dat.debug(bkvaults)
     if 200 == bkvaults["ResponseMetadata"]["HTTPStatusCode"]:

@@ -7,6 +7,7 @@
 # --------  -----------   -------------------------------------------------
 # Version :     date    :  reason
 #  1.0      2022.09.09     first create
+#  1.1      2023.05.17     add session handling logic
 #
 # Ref     : https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/codepipeline.html
 #          
@@ -54,7 +55,10 @@ def list_pipelines():
 
   try:
     results = [] 
-    codepipeline=boto3.client('codepipeline')
+    global CODEPIPELINE_session
+
+    CODEPIPELINE_session = utils.get_session('codepipeline')
+    codepipeline = CODEPIPELINE_session
     pipelines = codepipeline.list_pipelines()
     # klogger_dat.debug(pipelines)
     if 200 == pipelines["ResponseMetadata"]["HTTPStatusCode"]:
@@ -140,7 +144,7 @@ def get_pipeline(pipelineName):
 
   try:
     result = None
-    codepipeline=boto3.client('codepipeline')
+    codepipeline = CODEPIPELINE_session
     # klogger_dat.debug(pipelineName)
     pipeline = codepipeline.get_pipeline(name=pipelineName)
     # klogger_dat.debug(pipeline)

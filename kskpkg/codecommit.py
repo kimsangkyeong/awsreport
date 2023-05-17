@@ -7,6 +7,7 @@
 # --------  -----------   -------------------------------------------------
 # Version :     date    :  reason
 #  1.0      2022.09.08     first create
+#  1.1      2023.05.17     add session handling logic
 #
 # Ref     : https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/codecommit.html
 #          
@@ -54,7 +55,10 @@ def list_repositories():
 
   try:
     results = [] 
-    codecommit=boto3.client('codecommit')
+    global CODECOMMIT_session
+
+    CODECOMMIT_session = utils.get_session('codecommit')
+    codecommit = CODECOMMIT_session
     repositories = codecommit.list_repositories()
     # klogger_dat.debug(repositories)
     if 200 == repositories["ResponseMetadata"]["HTTPStatusCode"]:
@@ -138,7 +142,7 @@ def get_repository(repositoryName):
 #   klogger_dat.debug('codecommit repository')
   try:
     result = None 
-    codecommit=boto3.client('codecommit')
+    codecommit = CODECOMMIT_session
     repository = codecommit.get_repository(repositoryName=repositoryName)
     # klogger_dat.debug(repository)
     if 200 == repository["ResponseMetadata"]["HTTPStatusCode"]:
