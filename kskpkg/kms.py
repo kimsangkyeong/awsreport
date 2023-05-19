@@ -8,6 +8,7 @@
 # Version :     date    :  reason
 #  1.0      2022.08.21     first create
 #  1.1      2023.05.17     add session handling logic
+#  1.2      2023.05.19     add status information
 #
 # Ref     : https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/kms.html
 #          
@@ -67,20 +68,30 @@ def list_keys():
         #   klogger_dat.debug(key)
           keyids = []
           keyids.append(key['KeyId'])
-
-          results.append( { "KeyId": keyids,
-                            "KeyAlias" : list_aliases(keyids[0]),
-                            "KeyArn": key['KeyArn'],
-                          })
+          keymetadata = describe_key(keyids[0])
+          if keymetadata != None :
+            results.append( { "KeyId": keyids,
+                              "KeyAlias" : list_aliases(keyids[0]),
+                              "KeyState" : keymetadata['KeyState'] if 'KeyState' in keymetadata else ' ',
+                              "KeyArn": key['KeyArn'],
+                            })
+          else :
+            results.append( { "KeyId": keyid,
+                              "KeyAlias" : list_aliases(keyid),
+                              "KeyState" : ' ',
+                              "KeyArn": key['KeyArn'],
+                            })
       else: # column list
         results.append( { "KeyId": ' ',
                           "KeyAlias": ' ',
+                          "KeyState" : ' ',
                           "KeyArn": list(' '),
                          })
     else:
       klogger.error("call error : %d", keys["ResponseMetadata"]["HTTPStatusCode"])
       results.append( { "KeyId": 'ERROR CHECK',
                         "KeyAlias": 'ERROR CHECK',
+                        "KeyState" : 'ERROR CHECK',
                         "KeyArn": list('ERROR CHECK'),
                        })
     # klogger.debug(results)
@@ -88,6 +99,7 @@ def list_keys():
     klogger.error("kms.list_keys(),%s", othererr)
     results.append( { "KeyId": 'ERROR CHECK',
                       "KeyAlias": 'ERROR CHECK',
+                      "KeyState" : 'ERROR CHECK',
                       "KeyArn": list('ERROR CHECK'),
                      })
   finally:
@@ -104,18 +116,42 @@ def list_aliases(KeyId):
     alias = kms.list_aliases(KeyId=KeyId)
     # klogger_dat.debug(keys)
     if 200 == alias["ResponseMetadata"]["HTTPStatusCode"]:
-    #   klogger_dat.debug(alias["Aliases"])
+      # klogger_dat.debug(alias["Aliases"])
       if len(alias["Aliases"]) > 0 :
         for alias in alias["Aliases"]:
         #   klogger_dat.debug(alias)
           if 'AliasName' in alias :
             result = alias['AliasName']
-            break        
+            break
+      else :
+        result = '-'   
     else:
       klogger.error("call error : %d", alias["ResponseMetadata"]["HTTPStatusCode"])
     # klogger.debug(result)
   except Exception as othererr:
     klogger.error("kms.list_aliases(),%s", othererr)
+  finally:
+    return result
+
+def describe_key(KeyId):
+  '''
+    search KMS describe_key
+  '''
+#   klogger_dat.debug('kms describe_key')
+  try:
+    result = None 
+    kms = KMS_session
+    desckey = kms.describe_key(KeyId=KeyId)
+    # klogger_dat.debug(desckey)
+    if 200 == desckey["ResponseMetadata"]["HTTPStatusCode"]:
+    #   klogger_dat.debug(alias["Aliases"])
+      if 'KeyMetadata' in desckey :
+        result = desckey['KeyMetadata']
+    else:
+      klogger.error("call error : %d", alias["ResponseMetadata"]["HTTPStatusCode"])
+    # klogger.debug(result)
+  except Exception as othererr:
+    klogger.error("kms.describe_key(),%s", othererr)
   finally:
     return result
 
