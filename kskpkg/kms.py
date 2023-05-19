@@ -70,38 +70,77 @@ def list_keys():
           if keymetadata != None :
             results.append( { "KeyId": keyids,
                               "KeyAlias" : list_aliases(keyids[0]),
-                              "KeyState" : keymetadata['KeyState'] if 'KeyState' in keymetadata else ' ',
                               "KeyArn": key['KeyArn'],
+                              "Description" : keymetadata['Description'] if 'Description' in keymetadata else ' ',
+                              "KeyState" : keymetadata['KeyState'] if 'KeyState' in keymetadata else ' ',
+                              "Origin" : keymetadata['Origin'] if 'Origin' in keymetadata else ' ',
+                              "KeyManager" : keymetadata['KeyManager'] if 'KeyManager' in keymetadata else ' ',
+                              "MultiRegion" : keymetadata['MultiRegion'] if 'MultiRegion' in keymetadata else ' ',
+                              "CreationDate" : keymetadata['CreationDate'].strftime("%Y-%m-%d") if 'CreationDate' in keymetadata else ' ',
+                              "ValidTo" : keymetadata['ValidTo'].strftime("%Y-%m-%d") if 'ValidTo' in keymetadata else ' ',
+                              "DeletionDate" : keymetadata['DeletionDate'].strftime("%Y-%m-%d") if 'DeletionDate' in keymetadata else ' ',
                             })
           else :
             results.append( { "KeyId": keyid,
                               "KeyAlias" : list_aliases(keyid),
-                              "KeyState" : ' ',
                               "KeyArn": key['KeyArn'],
+                              "KeyState" : ' ',
+                              "Description" : ' ',
+                              "KeyState" : ' ',
+                              "Origin" : ' ',
+                              "KeyManager" : ' ',
+                              "MultiRegion" : ' ',
+                              "CreationDate" : ' ',
+                              "ValidTo" : ' ',
+                              "DeletionDate" : list(' '),
                             })
       else: # column list
         results.append( { "KeyId": ' ',
                           "KeyAlias": ' ',
+                          "KeyArn": ' ',
                           "KeyState" : ' ',
-                          "KeyArn": list(' '),
-                         })
+                          "Description" : ' ',
+                          "KeyState" : ' ',
+                          "Origin" : ' ',
+                          "KeyManager" : ' ',
+                          "MultiRegion" : ' ',
+                          "CreationDate" : ' ',
+                          "ValidTo" : ' ',
+                          "DeletionDate" : list(' '),
+                        })
     else:
       klogger.error("call error : %d", keys["ResponseMetadata"]["HTTPStatusCode"])
       results.append( { "KeyId": 'ERROR CHECK',
                         "KeyAlias": 'ERROR CHECK',
+                        "KeyArn" : 'ERROR CHECK',
                         "KeyState" : 'ERROR CHECK',
-                        "KeyArn": list('ERROR CHECK'),
-                       })
+                        "Description" : 'ERROR CHECK',
+                        "KeyState" : 'ERROR CHECK',
+                        "Origin" : 'ERROR CHECK',
+                        "KeyManager" : 'ERROR CHECK',
+                        "MultiRegion" : 'ERROR CHECK',
+                        "CreationDate" : 'ERROR CHECK',
+                        "ValidTo" : 'ERROR CHECK',
+                        "DeletionDate" : list('ERROR CHECK'),
+                      })
     # klogger.debug(results)
   except Exception as othererr:
     klogger.error("kms.list_keys(),%s", othererr)
     results.append( { "KeyId": 'ERROR CHECK',
                       "KeyAlias": 'ERROR CHECK',
+                      "KeyArn" : 'ERROR CHECK',
                       "KeyState" : 'ERROR CHECK',
-                      "KeyArn": list('ERROR CHECK'),
-                     })
+                      "Description" : 'ERROR CHECK',
+                      "KeyState" : 'ERROR CHECK',
+                      "Origin" : 'ERROR CHECK',
+                      "KeyManager" : 'ERROR CHECK',
+                      "MultiRegion" : 'ERROR CHECK',
+                      "CreationDate" : 'ERROR CHECK',
+                      "ValidTo" : 'ERROR CHECK',
+                      "DeletionDate" : list('ERROR CHECK'),
+                    })
   finally:
-    return results
+    return results          
 
 def list_aliases(KeyId):
   '''
