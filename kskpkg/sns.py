@@ -7,6 +7,7 @@
 # --------  -----------   -------------------------------------------------
 # Version :     date    :  reason
 #  1.0      2022.09.11     first create
+#  1.1      2023.05.17     add session handling logic
 #
 # Ref     : https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/sns.html
 #          
@@ -55,7 +56,10 @@ def list_topics():
 
   try:
     results = [] 
-    sns=boto3.client('sns')
+    global SNS_session
+
+    SNS_session = utils.get_session('sns')
+    sns = SNS_session
     topics = sns.list_topics()
     # klogger_dat.debug("%s", topics)
     if 200 == topics["ResponseMetadata"]["HTTPStatusCode"]:
@@ -99,7 +103,7 @@ def get_topic_attributes(TopicArn):
 
   try:
     result = None
-    sns=boto3.client('sns')
+    sns = SNS_session
     # klogger.debug(f'{TopicArn}')
     attributes = sns.get_topic_attributes(TopicArn=TopicArn)
     # klogger.debug("%s", attributes)
@@ -123,7 +127,7 @@ def list_subscriptions():
 
   try:
     results = [] 
-    sns=boto3.client('sns')
+    sns = SNS_session
     subscriptions = sns.list_subscriptions()
     # klogger_dat.debug("%s", subscriptions)
     if 200 == subscriptions["ResponseMetadata"]["HTTPStatusCode"]:

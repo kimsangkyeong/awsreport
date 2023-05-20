@@ -7,6 +7,7 @@
 # --------  -----------   -------------------------------------------------
 # Version :     date    :  reason
 #  1.0      2022.08.20     first create
+#  1.1      2023.05.16     add session handling logic
 #
 # Ref     : https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3.html
 #          
@@ -49,11 +50,14 @@ def list_buckets():
   klogger_dat.debug('s3')
   try:
     results = [] 
-    s3=boto3.client('s3')
+    global S3_session
+
+    S3_session = utils.get_session('s3')
+    s3 = S3_session
     buckets = s3.list_buckets()
     # klogger.debug(buckets)
     if 200 == buckets["ResponseMetadata"]["HTTPStatusCode"]:
-    #   klogger.debug(buckets["Buckets"])
+      # klogger.debug(buckets["Buckets"])
       if 'Buckets' in buckets and len(buckets["Buckets"]) > 0 :
         bucketnames = []; createdates = []; locations = []; blockacl = []; ignoreacl = [];
         blockpolicy = []; restrictpublic = []; bucketkeyenabled = []; kmsmasterkeyid = [];
@@ -141,7 +145,7 @@ def get_bucket_location(bucket):
 #   klogger_dat.debug('s3-location')
   try:
     result = 'Error Check' 
-    s3=boto3.client('s3')
+    s3 = S3_session
     location = s3.get_bucket_location(Bucket=bucket)
     # klogger.debug(location)
     if 200 == location["ResponseMetadata"]["HTTPStatusCode"]:
@@ -169,7 +173,7 @@ def get_public_access_block(bucket):
         "BlockPublicPolicy" : "Error Check",
         "RestrictPublicBuckets" : "Error Check"
       }
-    s3=boto3.client('s3')
+    s3 = S3_session
     # klogger.debug(bucket)
     accessblock = s3.get_public_access_block(Bucket=bucket)
     # klogger.debug(accessblock)
@@ -203,7 +207,7 @@ def get_bucket_encryption(bucket):
 #   klogger_dat.debug('s3-encryption')
   try:
     results = []
-    s3=boto3.client('s3')
+    s3 = S3_session
     # klogger_dat.debug("-------%s",bucket)
     encrypt = s3.get_bucket_encryption(Bucket=bucket)
     # klogger_dat.debug(encrypt)

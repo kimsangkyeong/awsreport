@@ -7,6 +7,7 @@
 # --------  -----------   -------------------------------------------------
 # Version :     date    :  reason
 #  1.0      2022.08.30     first create
+#  1.1      2023.05.17     add session handling logic
 #
 # Ref     : https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/cloudfront.html
 #          
@@ -53,7 +54,7 @@ def list_cloud_front_origin_access_identities():
   klogger_dat.debug('cloudfront-origin_access_identities')
   try:
     results = [] 
-    cloudfront=boto3.client('cloudfront')
+    cloudfront = CLOUDFRONT_session
     oids = cloudfront.list_cloud_front_origin_access_identities()
     # klogger_dat.debug(oids)
     if 200 == oids["ResponseMetadata"]["HTTPStatusCode"]:
@@ -99,8 +100,11 @@ def list_distributions():
   '''
   klogger_dat.debug('cloudfront-distributions')
   try:
-    results = [] 
-    cloudfront=boto3.client('cloudfront')
+    results = []
+    global CLOUDFRONT_session
+
+    CLOUDFRONT_session = utils.get_session('cloudfront')
+    cloudfront = CLOUDFRONT_session
     distributions = cloudfront.list_distributions()
     # klogger_dat.debug(distributions)
     if 200 == distributions["ResponseMetadata"]["HTTPStatusCode"]:

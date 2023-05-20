@@ -7,6 +7,7 @@
 # --------  -----------   -------------------------------------------------
 # Version :     date    :  reason
 #  1.0      2022.08.22     first create
+#  1.1      2023.05.17     add session handling logic
 #
 # Ref     : https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/rds.html
 #          
@@ -53,7 +54,10 @@ def describe_db_clusters():
   klogger_dat.debug('rds')
   try:
     results = [] 
-    rds=boto3.client('rds')
+    global RDS_session
+
+    RDS_session = utils.get_session('rds')
+    rds = RDS_session
     dbclusters = rds.describe_db_clusters()
     # klogger_dat.debug(dbclusters)
     if 200 == dbclusters["ResponseMetadata"]["HTTPStatusCode"]:

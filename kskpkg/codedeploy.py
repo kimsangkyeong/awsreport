@@ -7,6 +7,7 @@
 # --------  -----------   -------------------------------------------------
 # Version :     date    :  reason
 #  1.0      2022.09.08     first create
+#  1.1      2023.05.17     add session handling logic
 #
 # Ref     : https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/codedeploy.html
 #          
@@ -54,7 +55,10 @@ def list_applications():
 
   try:
     results = [] 
-    codedeploy=boto3.client('codedeploy')
+    global CODEDEPLOY_session
+
+    CODEDEPLOY_session = utils.get_session('codedeploy')
+    codedeploy = CODEDEPLOY_session
     applications = codedeploy.list_applications()
     # klogger_dat.debug(applications)
     if 200 == applications["ResponseMetadata"]["HTTPStatusCode"]:
@@ -208,7 +212,7 @@ def get_application(applicationName):
 
   try:
     result = None
-    codedeploy=boto3.client('codedeploy')
+    codedeploy = CODEDEPLOY_session
     # klogger_dat.debug(applicationName)
     application = codedeploy.get_application(applicationName=applicationName)
     # klogger_dat.debug(application)
@@ -232,7 +236,7 @@ def get_deployment_group(applicationName, deploymentGroupName):
 
   try:
     result = None
-    codedeploy=boto3.client('codedeploy')
+    codedeploy = CODEDEPLOY_session
     # klogger_dat.debug(applicationName, deploymentGroupName)
     deploygrp = codedeploy.get_deployment_group(applicationName=applicationName, deploymentGroupName=deploymentGroupName)
     # klogger_dat.debug(deploygrp)
@@ -256,7 +260,7 @@ def list_deployment_groups(applicationName):
 
   try:
     results = [] 
-    codedeploy=boto3.client('codedeploy')
+    codedeploy = CODEDEPLOY_session
     deploygrps = codedeploy.list_deployment_groups(applicationName=applicationName)
     # klogger_dat.debug(deploygrps)
     if 200 == deploygrps["ResponseMetadata"]["HTTPStatusCode"]:
@@ -279,7 +283,7 @@ def list_deployments():
 
   try:
     results = [] 
-    codedeploy=boto3.client('codedeploy')
+    codedeploy = CODEDEPLOY_session
     deployments = codedeploy.list_deployments()
     # klogger_dat.debug(deployments)
     if 200 == deployments["ResponseMetadata"]["HTTPStatusCode"]:
@@ -426,7 +430,7 @@ def get_deployment(deploymentId):
 
   try:
     result = None
-    codedeploy=boto3.client('codedeploy')
+    codedeploy = CODEDEPLOY_session
     # klogger_dat.debug(applicationName)
     deployment = codedeploy.get_deployment(deploymentId=deploymentId)
     # klogger_dat.debug(deployment)

@@ -7,6 +7,7 @@
 # --------  -----------   -------------------------------------------------
 # Version :     date    :  reason
 #  1.0      2022.09.11     first create
+#  1.1      2023.05.17     add session handling logic
 #
 # Ref     : https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/athena.html
 #          
@@ -55,7 +56,10 @@ def list_data_catalogs():
 
   try:
     results = [] 
-    athena=boto3.client('athena')
+    global ATHENA_session
+
+    ATHENA_session = utils.get_session('athena')
+    athena = ATHENA_session
     catalogs = athena.list_data_catalogs()
     # klogger_dat.debug("%s", catalogs)
     if 200 == catalogs["ResponseMetadata"]["HTTPStatusCode"]:
@@ -120,7 +124,7 @@ def list_databases(CatalogName):
 
   try:
     results = []
-    athena=boto3.client('athena')
+    athena = ATHENA_session
     # klogger.debug(f'{CatalogName}')
     databases = athena.list_databases(CatalogName=CatalogName)
     # klogger.debug("%s", databases)
@@ -144,7 +148,7 @@ def list_table_metadata(CatalogName, DatabaseName):
 
   try:
     results = []
-    athena=boto3.client('athena')
+    athena = ATHENA_session
     # klogger.debug(f'{CatalogName, DatabaseName}')
     tables = athena.list_table_metadata(CatalogName=CatalogName, DatabaseName=DatabaseName)
     # klogger.debug("%s", tables)

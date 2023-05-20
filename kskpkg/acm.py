@@ -7,6 +7,7 @@
 # --------  -----------   -------------------------------------------------
 # Version :     date    :  reason
 #  1.0      2022.08.20     first create
+#  1.1      2023.05.17     add session handling logic
 #
 # Ref     : https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/acm.html
 #          
@@ -37,6 +38,7 @@ else:
   from .config import awsglobal
   klogger     = awsglobal.klogger
   klogger_dat = awsglobal.klogger_dat
+  from . import utils
 
 def list_certificates():
   '''
@@ -45,7 +47,10 @@ def list_certificates():
   klogger_dat.debug('acm')
   try:
     results = [] 
-    acm=boto3.client('acm')
+    global ACM_session
+
+    ACM_session = utils.get_session('acm')
+    acm = ACM_session
     certlists = acm.list_certificates()
     # klogger.debug(certlists)
     if 200 == certlists["ResponseMetadata"]["HTTPStatusCode"]:

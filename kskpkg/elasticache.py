@@ -7,6 +7,7 @@
 # --------  -----------   -------------------------------------------------
 # Version :     date    :  reason
 #  1.0      2022.09.08     first create
+#  1.1      2023.05.17     add session handling logic
 #
 # Ref     : https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/elasticache.html
 #          
@@ -54,7 +55,10 @@ def describe_cache_clusters():
 
   try:
     results = [] 
-    elasticache=boto3.client('elasticache')
+    global ELASTICACHE_session
+
+    ELASTICACHE_session = utils.get_session('elasticache')
+    elasticache = ELASTICACHE_session
     clusters = elasticache.describe_cache_clusters()
     # klogger_dat.debug(clusters)
     if 200 == clusters["ResponseMetadata"]["HTTPStatusCode"]:

@@ -8,6 +8,7 @@
 # Version :     date    :  reason
 #  1.0      2019.09.06     first create
 #  1.1      2019.09.15     local klogger assign to klogger that made by main program.
+#  1.2      2023.05.17     add session handling logic
 #
 # Ref     : https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/ec2.html
 #          
@@ -51,7 +52,9 @@ def describe_internet_gateways(searchRegions):
   for region in searchRegions:
     try:
       results = [] 
-      ec2=boto3.client('ec2', region )
+      EC2_session = utils.get_session('ec2', region)
+      ec2 = EC2_session
+      # ec2=boto3.client('ec2', region )
       igws = ec2.describe_internet_gateways()
       if 200 == igws["ResponseMetadata"]["HTTPStatusCode"]:
         # klogger_dat.debug(igws["InternetGateways"])
@@ -108,10 +111,13 @@ def describe_vpcs(searchRegions):
     search vpcs in searchRegions
   '''
   klogger_dat.debug('vpc')
+  # global EC2_session
   for region in searchRegions:
     try:
       results = [] 
-      ec2=boto3.client('ec2', region )
+      EC2_session = utils.get_session('ec2', region)
+      ec2 = EC2_session
+      # ec2=boto3.client('ec2', region )
       vpcs = ec2.describe_vpcs()
       if 200 == vpcs["ResponseMetadata"]["HTTPStatusCode"]:
         #klogger_dat.debug(vpcs["Vpcs"])
@@ -168,7 +174,9 @@ def describe_nat_gateways(searchRegions):
   for region in searchRegions:
     try:
       results = [] 
-      ec2=boto3.client('ec2', region )
+      EC2_session = utils.get_session('ec2', region)
+      ec2 = EC2_session
+      # ec2=boto3.client('ec2', region )
       nats = ec2.describe_nat_gateways()
       if 200 == nats["ResponseMetadata"]["HTTPStatusCode"]:
         # klogger_dat.debug(nats["NatGateways"])
@@ -275,7 +283,9 @@ def describe_subnets(searchRegions):
   for region in searchRegions:
     try:
       results = [] 
-      ec2=boto3.client('ec2', region )
+      EC2_session = utils.get_session('ec2', region)
+      ec2 = EC2_session
+      # ec2=boto3.client('ec2', region )
       subnets = ec2.describe_subnets()
       if 200 == subnets["ResponseMetadata"]["HTTPStatusCode"]:
         # klogger_dat.debug(subnets["Subnets"])
@@ -344,7 +354,9 @@ def describe_route_tables(searchRegions):
     try:
       results1 = []  # associate
       results2 = []  # route
-      ec2=boto3.client('ec2', region )
+      EC2_session = utils.get_session('ec2', region)
+      ec2 = EC2_session
+      # ec2=boto3.client('ec2', region )
       routers = ec2.describe_route_tables()
       if 200 == routers["ResponseMetadata"]["HTTPStatusCode"]:
         # klogger_dat.debug(routers["RouteTables"])
@@ -536,7 +548,9 @@ def describe_security_groups(searchRegions):
   for region in searchRegions:
     try:
       results = [] 
-      ec2=boto3.client('ec2', region )
+      EC2_session = utils.get_session('ec2', region)
+      ec2 = EC2_session
+      # ec2=boto3.client('ec2', region )
       sgs = ec2.describe_security_groups()
       if 200 == sgs["ResponseMetadata"]["HTTPStatusCode"]:
         # klogger_dat.debug("%s",sgs["SecurityGroups"])
@@ -944,7 +958,9 @@ def describe_network_interfaces(searchRegions):
   for region in searchRegions:
     try:
       results = [] 
-      ec2=boto3.client('ec2', region )
+      EC2_session = utils.get_session('ec2', region)
+      ec2 = EC2_session
+      # ec2=boto3.client('ec2', region )
       nets = ec2.describe_network_interfaces()
       if 200 == nets["ResponseMetadata"]["HTTPStatusCode"]:
         # klogger_dat.debug("%s",nets["NetworkInterfaces"])
@@ -1105,12 +1121,14 @@ def describe_instances(searchRegions):
   for region in searchRegions:
     try:
       results = [] 
-      ec2=boto3.client('ec2', region )
+      EC2_session = utils.get_session('ec2', region)
+      ec2 = EC2_session
+      # ec2=boto3.client('ec2', region )
       inss = ec2.describe_instances()
       if 200 == inss["ResponseMetadata"]["HTTPStatusCode"]:
         # klogger_dat.debug("%s",inss["Reservations"])
         if 'Reservations' in inss and len(inss["Reservations"]) > 0 :
-          ec2_resource = boto3.resource('ec2', region)
+          ec2_resource = utils.get_session_resource('ec2', region)
           for rsv in inss["Reservations"]:
             if len(rsv["Instances"]) > 0 :
               for ins in rsv["Instances"]:
@@ -1301,7 +1319,9 @@ def describe_addresses(searchRegions):
   for region in searchRegions:
     try:
       results = [] 
-      ec2=boto3.client('ec2', region )
+      EC2_session = utils.get_session('ec2', region)
+      ec2 = EC2_session
+      # ec2=boto3.client('ec2', region )
       eips = ec2.describe_addresses()
       if 200 == eips["ResponseMetadata"]["HTTPStatusCode"]:
         # klogger_dat.debug("%s",eips["Addresses"])
@@ -1389,7 +1409,9 @@ def describe_managed_prefix_lists(searchRegions):
   for region in searchRegions:
     try:
       results = [] 
-      ec2=boto3.client('ec2', region )
+      EC2_session = utils.get_session('ec2', region)
+      ec2 = EC2_session
+      # ec2=boto3.client('ec2', region )
       plss = ec2.describe_managed_prefix_lists()
       # klogger.debug("%s",plss["PrefixLists"])
       if 200 == plss["ResponseMetadata"]["HTTPStatusCode"]:
@@ -1476,7 +1498,9 @@ def get_managed_prefix_list_entries(region, PrefixListId):
   # klogger_dat.debug('managed prefix list entries')
   try:
     results = [] 
-    ec2=boto3.client('ec2', region )
+    EC2_session = utils.get_session('ec2', region)
+    ec2 = EC2_session
+    # ec2=boto3.client('ec2', region )
     plent = ec2.get_managed_prefix_list_entries(PrefixListId=PrefixListId)
     # klogger.debug("%s",plss["Entries"])
     if 200 == plent["ResponseMetadata"]["HTTPStatusCode"]:

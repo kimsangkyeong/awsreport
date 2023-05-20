@@ -7,6 +7,7 @@
 # --------  -----------   -------------------------------------------------
 # Version :     date    :  reason
 #  1.0      2022.08.22     first create
+#  1.1      2023.05.17     add session handling logic
 #
 # Ref     : https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/eks.html
 #          
@@ -53,7 +54,10 @@ def list_clusters():
   klogger_dat.debug('eks')
   try:
     results = [] 
-    eks=boto3.client('eks')
+    global EKS_session
+
+    EKS_session = utils.get_session('eks')
+    eks = EKS_session
     eksclusters = eks.list_clusters()
     # klogger_dat.debug(eksclusters)
     if 200 == eksclusters["ResponseMetadata"]["HTTPStatusCode"]:
@@ -245,7 +249,7 @@ def describe_cluster(cluster):
 #   klogger_dat.debug('eks-describe cluster')
   try:
     result = None
-    eks=boto3.client('eks')
+    eks = EKS_session
     ekscluster = eks.describe_cluster(name=cluster)
     # klogger_dat.debug(eksclusters)
     if 200 == ekscluster["ResponseMetadata"]["HTTPStatusCode"]:

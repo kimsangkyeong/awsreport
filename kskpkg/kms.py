@@ -7,6 +7,8 @@
 # --------  -----------   -------------------------------------------------
 # Version :     date    :  reason
 #  1.0      2022.08.21     first create
+#  1.1      2023.05.17     add session handling logic
+#  1.2      2023.05.19     add status information
 #
 # Ref     : https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/kms.html
 #          

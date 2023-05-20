@@ -7,6 +7,7 @@
 # --------  -----------   -------------------------------------------------
 # Version :     date    :  reason
 #  1.0      2022.09.08     first create
+#  1.1      2023.05.17     add session handling logic
 #
 # Ref     : https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/lambda.html
 #          
@@ -57,7 +58,10 @@ def list_functions(filter):
 
   try:
     results = [] 
-    lambdacli=boto3.client('lambda')
+    global LAMBDA_session
+
+    LAMBDA_session = utils.get_session('lambda')
+    lambdacli = LAMBDA_session
     if filter['Condition'] == 'Lambda@Edge' :
       functions = lambdacli.list_functions(MasterRegion=filter['Region'],FunctionVersion='ALL')
     else :

@@ -53,7 +53,10 @@ def describe_file_systems():
   klogger_dat.debug('efs')
   try:
     results = [] 
-    efs=boto3.client('efs')
+    global EFS_session
+
+    EFS_session = utils.get_session('efs')
+    efs = EFS_session
     filesystems = efs.describe_file_systems()
     # klogger_dat.debug(filesystems)
     if 200 == filesystems["ResponseMetadata"]["HTTPStatusCode"]:

@@ -7,6 +7,7 @@
 # --------  -----------   -------------------------------------------------
 # Version :     date    :  reason
 #  1.0      2022.09.06     first create
+#  1.1      2023.05.17     add session handling logic
 #
 # Ref     : https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/secretsmanager.html
 #          
@@ -53,7 +54,10 @@ def list_secrets():
   klogger_dat.debug('secretsmanager')
   try:
     results = [] 
-    secretsmgr=boto3.client('secretsmanager')
+    global SECRETMANAGER_session
+
+    SECRETMANAGER_session = utils.get_session('secretsmanager')
+    secretsmgr = SECRETMANAGER_session
     secrets = secretsmgr.list_secrets()
     # klogger_dat.debug(secrets)
     if 200 == secrets["ResponseMetadata"]["HTTPStatusCode"]:

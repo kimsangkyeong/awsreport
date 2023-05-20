@@ -7,6 +7,7 @@
 # --------  -----------   -------------------------------------------------
 # Version :     date    :  reason
 #  1.0      2022.09.06     first create
+#  1.1      2023.05.17     add session handling logic
 #
 # Ref     : https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/ssm.html
 #          
@@ -53,7 +54,10 @@ def describe_parameters():
   klogger_dat.debug('ssm-parameter store')
   try:
     results = [] 
-    ssm=boto3.client('ssm')
+    global SSM_session
+
+    SSM_session = utils.get_session('ssm')
+    ssm = SSM_session
     parameters = ssm.describe_parameters()
     # klogger_dat.debug(parameters)
     if 200 == parameters["ResponseMetadata"]["HTTPStatusCode"]:
@@ -125,7 +129,7 @@ def get_parameter(name):
   # klogger_dat.debug('ssm-parameter store info')
   try:
     result = None 
-    ssm=boto3.client('ssm')
+    ssm = SSM_session
     parameter = ssm.get_parameter(Name=name)
     # klogger_dat.debug(parameter)
     if 200 == parameter["ResponseMetadata"]["HTTPStatusCode"]:

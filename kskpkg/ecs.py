@@ -7,6 +7,7 @@
 # --------  -----------   -------------------------------------------------
 # Version :     date    :  reason
 #  1.0      2022.08.25     first create
+#  1.1      2023.05.17     add session handling logic
 #
 # Ref     : https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/ecs.html
 #          
@@ -53,7 +54,10 @@ def list_clusters():
   klogger_dat.debug('ecs')
   try:
     results = [] 
-    ecs=boto3.client('ecs')
+    global ECS_session
+
+    ECS_session = utils.get_session('ecs')
+    ecs = ECS_session
     ecsclusters = ecs.list_clusters()
     # klogger_dat.debug(ecsclusters)
     if 200 == ecsclusters["ResponseMetadata"]["HTTPStatusCode"]:
@@ -144,7 +148,7 @@ def describe_clusters(cluster):
 #   klogger_dat.debug('ecs-describe cluster')
   try:
     result = None
-    ecs=boto3.client('ecs')
+    ecs = ECS_session
     ecsclusters = ecs.describe_clusters(clusters=[cluster])
     # klogger_dat.debug(ecsclusters)
     if 200 == ecsclusters["ResponseMetadata"]["HTTPStatusCode"]:
@@ -169,7 +173,7 @@ def list_services(clusterArns):
   klogger_dat.debug('ecs service')
   try:
     results = [] 
-    ecs=boto3.client('ecs')
+    ecs = ECS_session
     # klogger.debug(clusterArns)
     for clusterArn in clusterArns :
       if (clusterArn == ' ') : # Not Exist Cluster
@@ -381,7 +385,7 @@ def describe_services(clusterArn, service):
 #   klogger_dat.debug('ecs-describe service')
   try:
     result = None
-    ecs=boto3.client('ecs')
+    ecs = ECS_session
     services = ecs.describe_services(cluster=clusterArn, services=[service])
     # klogger_dat.debug(services)
     if 200 == services["ResponseMetadata"]["HTTPStatusCode"]:

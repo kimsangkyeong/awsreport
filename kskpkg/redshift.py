@@ -7,6 +7,7 @@
 # --------  -----------   -------------------------------------------------
 # Version :     date    :  reason
 #  1.0      2022.09.11     first create
+#  1.1      2023.05.17     add session handling logic
 #
 # Ref     : https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/redshift.html
 #          
@@ -53,7 +54,10 @@ def describe_clusters():
   klogger_dat.debug('redshift')
   try:
     results = [] 
-    redshift=boto3.client('redshift')
+    global REDSHIFT_session
+
+    REDSHIFT_session = utils.get_session('redshift')
+    redshift = REDSHIFT_session
     clusters = redshift.describe_clusters()
     # klogger_dat.debug(dbclusters)
     if 200 == clusters["ResponseMetadata"]["HTTPStatusCode"]:
