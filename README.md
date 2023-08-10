@@ -1,5 +1,5 @@
-# AWS Resource 현황파악용 자동화 Tool (AWS 리소스 정보 -> Excel 저장)
-## 아키텍처
+# AWS Resource 현황파악용 자동화 Tool
+## 아키텍처 (AWS 리소스 정보 -> Excel 저장)
 - awsreport 프로그램 구성도
 
 ![awsreport 프로그램 구성도](/image/awsreport_architecture.png)
