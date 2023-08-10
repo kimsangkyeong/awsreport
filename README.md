@@ -23,7 +23,7 @@
 - 실행 방법 :  python awsreport.py
 
 ### 산출물 스크린샷
-- awsreport 예시 - route
+- awsreport 예시 - router
 
 ![awsreport 예시 - route](/image/awsreport_example_route.JPG)
 
