@@ -1,6 +1,7 @@
 # AWS Resource 현황파악용 자동화 Tool (AWS 리소스 정보 -> Excel 저장)
 ## 아키텍처
 - awsreport 프로그램 구성도
+
 ![awsreport 프로그램 구성도](/image/awsreport_architecture.png)
 
 ### 특징
@@ -19,11 +20,15 @@
 
 ### 산출물
 - Python 프로그램
+- 실행 방법 :  python awsreport.py
+
 ### 산출물 스크린샷
 - awsreport 예시 - route
-![awsreport 예시 - route](/image/awsreport_architecture.png)
+
+![awsreport 예시 - route](/image/awsreport_example_route.JPG)
+
 - awsreport 예시 - subnet
-![awsreport 예시 - subnet](/image/awsreport_architecture.png)
+![awsreport 예시 - subnet](/image/awsreport_example_subnet.JPG)
 
 ### 참고자료
 1. [Python용 AWS SDK(Boto3)](https://aws.amazon.com/ko/sdk-for-python/)
