@@ -1,0 +1,61 @@
+# ##################################################################################################
+#
+# Purpose   : awsreportwithkiro runtime settings
+# Source    : settings.yaml
+# Developer : k.s.k & kiro
+# --------  -----------   -------------------------------------------------
+# Version :     date    :  reason
+#  1.0      2026.11.01     first create
+#
+# ##################################################################################################
+
+# 기본 리전 (regions 가 비어 있으면 이 리전 하나만 처리)
+default_region: ap-northeast-2
+
+# 수집 대상 리전 목록. 비워두면 default_region 단일 처리.
+# 출력 파일은 "global_region 을 제외한" 리전마다 1개씩 생성된다.
+# 글로벌 리소스(Route53/CloudFront 등)는 생성되는 각 리전 파일에 공통으로 중복 포함된다.
+#   예) global_region=us-east-1 일 때
+#       regions: [us-east-1, ap-northeast-2]              -> ap-northeast-2 파일 1개
+#       regions: [us-east-1, ap-northeast-2, ap-northeast-1] -> ap-northeast-2, ap-northeast-1 파일 2개
+#       (두 경우 모두 us-east-1 전용 파일은 만들지 않고, 글로벌 리소스를 각 파일에 중복 표시)
+regions:
+  - ap-northeast-2
+
+# 글로벌 리소스(Route53/CloudFront/글로벌 WAF/글로벌 ACM) 엔드포인트 리전.
+# 이 리전은 글로벌 리소스 수집 용도이며, 단독으로 출력 파일을 만들지 않는다.
+# (regions 가 이 리전 하나뿐이면 예외적으로 이 리전으로 파일 1개 생성)
+global_region: us-east-1
+
+# 출력 파일 접두어 (output_<account>_<region>_<timestamp>.xlsx)
+output_prefix: output
+
+# 동시 수집(--parallel 옵션 사용 시에만 적용)
+concurrency:
+  regions: 4     # 리전 단위 동시 실행 수
+  services: 8    # 리전 내 서비스 동시 실행 수
+
+# SSO 안전장치: frozen credential 만료까지 남은 시간(분)이 이 값 미만이면
+# 병렬을 쓰더라도 순차로 자동 폴백한다.
+sso_min_remaining_minutes: 15
+
+# 서비스 토글 (레지스트리 key 기준). disabled 에 넣으면 수집 제외.
+services:
+  disabled: []
+
+# Discovery(조합 방식 C): Resource Groups Tagging API 로 '계정에 실제 존재하는 서비스'를
+# 먼저 파악 → 존재하는 서비스만 상세 수집하고, 없는 서비스는 호출 생략 + 문서(sheet) 생략.
+#   enabled           : 기본 ON. CLI --full / --no-discover 로 끄면 전량 수집.
+#   emit_empty_sheets : 실데이터 없는 sheet 생성 여부. 기본 false(생략).
+#                       Discovery OFF(전량) 시에는 항상 생성한다.
+# 안전장치: Discovery 실패 시 자동으로 전량 수집 폴백, 선행 의존/커버리지 밖 리소스는 항상 수집.
+discovery:
+  enabled: true
+  emit_empty_sheets: false
+
+# 변경 비교(diff): 같은 폴더에 같은 account/region/prefix 의 '이전 리포트'가 있으면
+# 현재 리포트와 비교하여 변경 유무/추가·삭제·수정 리소스를 diff 엑셀로 생성한다.
+#   파일명: diff_<account>_<region>_<timestamp>.xlsx
+#   enabled : 기본 ON. CLI --no-diff 로 끔. 이전 파일이 없으면 자동 생략.
+diff:
+  enabled: true
